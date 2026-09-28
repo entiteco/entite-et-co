@@ -88,7 +88,7 @@ Tu dois lire les fichiers Markdown (`.md`) présents dans ces sous-dossiers pour
 
 Pour mener à bien cette mission, procède étape par étape. Ne tente pas de tout générer en une seule réponse.
 
-**⚠️ RÈGLE D'OR CONCERNANT LES IMAGES (PLACEHOLDERS) :**
+**⚠️ RÈGLE D'OR CONCERNANT LES IMAGES (PLACEHOLDERS) :** *(valable jusqu'à la phase d'intégration des médias, voir section 7)*
 Pour cette phase de développement, n'intègre **aucune véritable image**. Tu dois générer des espaces réservés (placeholders) élégants en utilisant Tailwind CSS (ex: un bloc `bg-neutral-900 border border-neutral-800 rounded-xl` centré avec une icône Phosphor et le texte "Ajouter une image" ou "Mockup Projet"). Cela permettra de valider la structure de la maquette avant l'intégration des médias finaux.
 
 **Étape 0 : Scan et Apprentissage**
@@ -123,3 +123,32 @@ Pour cette phase de développement, n'intègre **aucune véritable image**. Tu d
 
 * Le site doit obtenir un score de 100% sur Lighthouse (Performance, Accessibilité, Best Practices, SEO).
 * Le design doit être parfaitement responsive (Mobile-first).
+
+---
+
+# 6. ÉTAT D'AVANCEMENT
+
+* ✅ Étapes 0 à 4 terminées (commit `feat: dynamic portfolio collection, filters, and modal system (step 4)`).
+* Portfolio : collection Astro `src/content/portfolio/*.md` (schéma dans `src/content.config.ts`), catégories dans `src/data/portfolio.ts`, helpers dans `src/lib/portfolio.ts`, composants dans `src/components/portfolio/`. Chaque projet a une page `/portfolio/[slug]` (SEO) et s'ouvre en modale depuis la grille.
+* Les projets `demo: true` sont fictifs : à supprimer quand les vraies réalisations sont ajoutées.
+* 🔜 Prochaine phase : intégration des vrais médias (section 7), puis déploiement Vercel (section 8).
+
+---
+
+# 7. INTÉGRATION DES VRAIS MÉDIAS (FIN DE LA RÈGLE D'OR)
+
+* **Emplacement :** images de contenu dans `src/assets/images/` (optimisées par Astro : WebP/AVIF, `width`/`height`, lazy-loading). Sous-dossiers : `portfolio/<slug>/`, `expertises/`, `a-propos/`. `public/` est réservé aux fichiers servis tels quels (favicon, `robots.txt`, images Open Graph).
+* **Portfolio :** ajouter au schéma `portfolio` un champ `cover: image()` (fonction `({ image }) => z.object({...})`) + `coverAlt: z.string()` ; dans le frontmatter, chemin **relatif au fichier `.md`** : `cover: ../../assets/images/portfolio/<slug>/cover.jpg`.
+* **Rendu :** remplacer `<ImagePlaceholder />` par `<Image src={...} alt={...} widths={[...]} sizes="..." />` (`astro:assets`) en conservant le même ratio (anti-CLS). Image du hero : `loading="eager"` + `fetchpriority="high"`.
+* **Pages statiques** (accueil, expertises, à propos) : `import visuel from '@/assets/images/...'` puis `<Image src={visuel} alt="..." />`.
+* Toujours un `alt` descriptif en français ; sources ≤ 2560 px de large.
+
+---
+
+# 8. DÉPLOIEMENT VERCEL
+
+* Rendu 100 % statique (`output: 'static'`) : **aucun adaptateur `@astrojs/vercel` requis**.
+* `vercel.json` : preset `astro`, `npm run build` (`astro check` + build), sortie `dist/`, `cleanUrls` + `trailingSlash: false` (aligné sur `trailingSlash: 'never'` d'Astro), cache immuable sur `/_astro/*`, en-têtes de sécurité.
+* Node ≥ 22.12 (champ `engines` de `package.json`, requis par Astro 7).
+* `site: 'https://www.entite.co'` dans `astro.config.mjs` : à modifier si le domaine final change (canonical, sitemap, Open Graph).
+* Procédure : pousser sur GitHub → importer le dépôt dans Vercel (réglages détectés automatiquement) → brancher le domaine.
