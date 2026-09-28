@@ -1,0 +1,82 @@
+---
+import '@/styles/global.css';
+import spaceGroteskWoff2 from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+import interWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import { site, socials } from '@/data/site';
+
+interface Props {
+  /** Balise <title> complète (issue de `titre_seo` des fichiers de migration). */
+  title?: string;
+  /** Meta description (issue de `description_seo`). */
+  description?: string;
+  /** Empêche l'indexation (pages utilitaires). */
+  noindex?: boolean;
+}
+
+const {
+  title = site.defaultTitle,
+  description = site.defaultDescription,
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
+
+const organizationLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.name,
+  url: site.url,
+  email: site.email,
+  slogan: site.slogan,
+  founder: { '@type': 'Person', name: site.founder },
+  sameAs: socials.map((s) => s.href),
+};
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    <meta name="theme-color" content="#050505" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" type="image/webp" href="/favicon.webp" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preload" href={spaceGroteskWoff2} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={interWoff2} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
+  </head>
+  <body>
+    <div class="bg-atmosphere" aria-hidden="true"></div>
+
+    <a
+      href="#contenu"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-(--z-index-modal) focus:rounded-full focus:bg-brand focus:px-5 focus:py-3 focus:text-white"
+    >
+      Aller au contenu
+    </a>
+
+    <slot name="header" />
+
+    <main id="contenu">
+      <slot />
+    </main>
+
+    <slot name="footer" />
+  </body>
+</html>

@@ -1,0 +1,23 @@
+---
+// Page provisoire (Étape 1) : valide le layout, les polices et le thème.
+// La page d'accueil complète est construite à l'Étape 3.
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="container-site flex min-h-dvh flex-col justify-center gap-8 py-24">
+    <p class="font-display text-sm tracking-[0.3em] text-brand-bright uppercase">Entité & Co</p>
+    <h1 class="max-w-4xl text-5xl leading-[0.95] font-bold sm:text-7xl lg:text-8xl">
+      Studio Digital <span class="text-brand-bright">&</span> IA
+    </h1>
+    <p class="max-w-2xl text-lg text-gray-400">
+      L'alliance de la technologie, de la créativité et de l'innovation. Nous transformons vos
+      idées en écosystèmes digitaux et physiques performants.
+    </p>
+    <div
+      class="glass reveal flex aspect-video max-w-3xl items-center justify-center rounded-2xl text-sm text-gray-400"
+    >
+      Mockup Projet
+    </div>
+  </section>
+</Layout>

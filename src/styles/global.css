@@ -1,0 +1,135 @@
+@import '@fontsource-variable/space-grotesk/wght.css';
+@import '@fontsource-variable/inter/wght.css';
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Design tokens — Entité & Co
+   Dark par défaut, accent vermillon issu du « É » rouge du logo.
+   ------------------------------------------------------------------ */
+@theme {
+  --font-display: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #050505;
+  --color-ink-soft: #0c0c0c;
+
+  /* brand : remplissages (boutons, pastilles) — texte blanc dessus = 4.8:1
+     brand-bright : texte/icônes accent sur fond noir = 5.7:1 (WCAG AA) */
+  --color-brand: #e60000;
+  --color-brand-hover: #ff1a1a;
+  --color-brand-bright: #ff3b3b;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Échelle z-index (ui-ux-pro-max : z-index-management) */
+  --z-index-base: 0;
+  --z-index-overlay: 10;
+  --z-index-nav: 30;
+  --z-index-modal: 50;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-ink font-sans text-base leading-relaxed text-gray-100 antialiased;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight text-balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    @apply bg-brand text-white;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-brand-bright;
+  }
+}
+
+@layer components {
+  /* Grain + halos subtils en arrière-plan (aucune image, 100 % CSS/SVG inline) */
+  .bg-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(60rem 40rem at 85% -10%, rgb(230 0 0 / 0.12), transparent 60%),
+      radial-gradient(50rem 35rem at -10% 110%, rgb(230 0 0 / 0.06), transparent 60%),
+      var(--color-ink);
+  }
+
+  .bg-atmosphere::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Glassmorphism (cartes, navbar) */
+  .glass {
+    @apply border border-white/10 bg-white/[0.03] backdrop-blur-xl;
+  }
+
+  .container-site {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Apparition au scroll — CSS natif (scroll-driven animations),
+   zéro JS. Les navigateurs non compatibles affichent le contenu tel quel.
+   ------------------------------------------------------------------ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
