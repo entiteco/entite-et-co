@@ -80,7 +80,7 @@ Tu dois lire les fichiers Markdown (`.md`) présents dans ces sous-dossiers pour
 * `/migration-entite/page-impression-textile/` : Contenu sur le marquage textile et accessoires.
 * `/migration-entite/page-a-propos/` : Contenu sur la vision de l'entreprise et le fondateur.
 
-*Note pour le développeur IA :* Les images listées dans ces dossiers doivent être déplacées dans le dossier `public/` d'Astro pour être accessibles, en respectant les bonnes pratiques d'optimisation (utilisation du composant `<Image />` d'Astro quand c'est possible).
+*Note pour le développeur IA :* Les images de ces dossiers vont dans `src/assets/images/` (et non `public/`) pour être optimisées par le composant `<Image />` d'Astro : voir section 7.
 
 ---
 
