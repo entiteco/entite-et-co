@@ -1,0 +1,51 @@
+---
+// Espace réservé pour les visuels (phase maquette : aucune vraie image).
+// Le ratio est réservé pour éviter tout décalage de mise en page (CLS).
+import { ImagePlus, type LucideIcon } from 'lucide-react';
+
+type Ratio = 'video' | 'square' | 'portrait' | 'wide';
+
+interface Props {
+  label?: string;
+  /** Décrit le visuel attendu, pour les lecteurs d'écran et l'intégration future. */
+  description?: string;
+  ratio?: Ratio;
+  icon?: LucideIcon;
+  class?: string;
+}
+
+const {
+  label = 'Ajouter une image',
+  description,
+  ratio = 'video',
+  icon: Icon = ImagePlus,
+  class: className = '',
+} = Astro.props;
+
+const ratios: Record<Ratio, string> = {
+  video: 'aspect-video',
+  square: 'aspect-square',
+  portrait: 'aspect-[4/5]',
+  wide: 'aspect-[21/9]',
+};
+---
+
+<div
+  role="img"
+  aria-label={description ? `${label} : ${description}` : label}
+  class:list={[
+    'relative flex w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 text-gray-400',
+    ratios[ratio],
+    className,
+  ]}
+>
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgb(230_0_0/0.10),transparent_60%)]"
+  >
+  </div>
+  <Icon aria-hidden="true" className="relative size-8 text-neutral-500" strokeWidth={1.5} />
+  <span aria-hidden="true" class="relative font-display text-xs tracking-[0.2em] uppercase">
+    {label}
+  </span>
+</div>

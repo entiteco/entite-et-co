@@ -115,7 +115,9 @@
     .reveal {
       animation: reveal-up linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 40%;
+      /* Stagger : décaler la plage via style="--reveal-start: 8%" (les délais en ms
+         ne s'appliquent pas aux animations pilotées par le scroll). */
+      animation-range: entry var(--reveal-start, 0%) entry calc(var(--reveal-start, 0%) + 40%);
     }
   }
 }

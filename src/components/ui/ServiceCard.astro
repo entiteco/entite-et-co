@@ -1,0 +1,83 @@
+---
+import { ArrowUpRight, type LucideIcon } from 'lucide-react';
+import ImagePlaceholder from './ImagePlaceholder.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Points clés (ex. « Data Science & IA : Machine Learning… »). */
+  items?: readonly string[];
+  icon?: LucideIcon;
+  href?: string;
+  linkLabel?: string;
+  /** Libellé du placeholder visuel. */
+  imageLabel?: string;
+  headingLevel?: 'h2' | 'h3';
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  items = [],
+  icon: Icon,
+  href,
+  linkLabel = 'En savoir plus',
+  imageLabel = 'Ajouter une image',
+  headingLevel: Heading = 'h3',
+  class: className = '',
+} = Astro.props;
+---
+
+<article
+  class:list={[
+    'glass group/card flex h-full flex-col gap-6 rounded-2xl p-5 transition-[border-color,box-shadow] duration-300 ease-out-expo hover:border-brand/40 hover:shadow-[0_0_40px_-12px_rgb(230_0_0/0.5)] sm:p-6',
+    className,
+  ]}
+>
+  <ImagePlaceholder label={imageLabel} description={title} />
+
+  <div class="flex flex-1 flex-col gap-4">
+    <div class="flex items-center gap-3">
+      {
+        Icon && (
+          <span class="grid size-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-brand-bright">
+            <Icon aria-hidden="true" className="size-5" strokeWidth={1.75} />
+          </span>
+        )
+      }
+      <Heading class="text-xl font-semibold text-gray-100 sm:text-2xl">{title}</Heading>
+    </div>
+
+    <p class="text-gray-400">{description}</p>
+
+    {
+      items.length > 0 && (
+        <ul class="flex flex-col gap-2 text-sm text-gray-400">
+          {items.map((item) => (
+            <li class="flex gap-3">
+              <span aria-hidden="true" class="mt-2 size-1.5 shrink-0 rounded-full bg-brand" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {
+      href && (
+        <a
+          href={href}
+          class="mt-auto inline-flex min-h-11 w-fit cursor-pointer items-center gap-2 pt-2 font-display text-sm font-semibold text-gray-100 transition-colors duration-200 hover:text-brand-bright"
+        >
+          {linkLabel}
+          <span class="sr-only"> — {title}</span>
+          <ArrowUpRight
+            aria-hidden="true"
+            className="size-4 transition-transform duration-300 ease-out-expo group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5"
+          />
+        </a>
+      )
+    }
+  </div>
+</article>

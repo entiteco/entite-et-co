@@ -1,0 +1,44 @@
+---
+interface Props {
+  /** Surtitre (ex. « 01 — Data & IA »). */
+  eyebrow?: string;
+  title: string;
+  /** Niveau de titre, pour conserver une hiérarchie séquentielle. */
+  as?: 'h1' | 'h2' | 'h3';
+  align?: 'left' | 'center';
+  class?: string;
+}
+
+const { eyebrow, title, as: Heading = 'h2', align = 'left', class: className = '' } = Astro.props;
+
+const sizes = {
+  h1: 'text-5xl sm:text-7xl lg:text-8xl leading-[0.95]',
+  h2: 'text-4xl sm:text-5xl lg:text-6xl leading-[1.02]',
+  h3: 'text-2xl sm:text-3xl leading-tight',
+} as const;
+---
+
+<header
+  class:list={[
+    'flex max-w-3xl flex-col gap-5',
+    align === 'center' && 'mx-auto items-center text-center',
+    className,
+  ]}
+>
+  {
+    eyebrow && (
+      <p class="flex items-center gap-3 font-display text-xs font-medium tracking-[0.3em] text-brand-bright uppercase sm:text-sm">
+        <span aria-hidden="true" class="h-px w-8 bg-brand" />
+        {eyebrow}
+      </p>
+    )
+  }
+  <Heading class:list={['font-bold text-gray-100', sizes[Heading]]}>{title}</Heading>
+  {
+    Astro.slots.has('default') && (
+      <div class="max-w-[65ch] text-lg text-gray-400">
+        <slot />
+      </div>
+    )
+  }
+</header>

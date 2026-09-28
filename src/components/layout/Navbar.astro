@@ -1,0 +1,179 @@
+---
+import { ArrowRight, ArrowUpRight, Menu, X } from 'lucide-react';
+import Logo from '@/components/ui/Logo.astro';
+import Button from '@/components/ui/Button.astro';
+import { mainNav, site, socials } from '@/data/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`);
+
+const contact = mainNav.find((item) => item.href === '/contact');
+const primaryLinks = mainNav.filter((item) => item.href !== '/contact');
+---
+
+<!-- Sentinelle : quand elle sort de l'écran, la navbar passe en mode « verre ». -->
+<div data-nav-sentinel aria-hidden="true" class="pointer-events-none absolute top-0 h-6 w-px"></div>
+
+<header data-nav class="group/nav fixed inset-x-3 top-3 z-(--z-index-nav) sm:inset-x-4 sm:top-4">
+  <nav
+    aria-label="Navigation principale"
+    class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 rounded-full border border-transparent pr-2 pl-5 transition-[background-color,border-color,backdrop-filter] duration-300 ease-out-expo group-data-scrolled/nav:border-white/10 group-data-scrolled/nav:bg-ink/60 group-data-scrolled/nav:backdrop-blur-xl group-data-open/nav:border-transparent group-data-open/nav:bg-transparent group-data-open/nav:backdrop-blur-none sm:pl-6"
+  >
+    <a
+      href="/"
+      class="-my-2 flex min-h-11 cursor-pointer items-center py-2 text-lg"
+      aria-current={path === '/' ? 'page' : undefined}
+    >
+      <Logo />
+      <span class="sr-only"> — Accueil</span>
+    </a>
+
+    <ul class="hidden items-center gap-1 xl:flex">
+      {
+        primaryLinks.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class="relative flex min-h-11 cursor-pointer items-center rounded-full px-3.5 text-sm text-gray-400 transition-colors duration-200 hover:text-gray-100 aria-[current=page]:text-gray-100 aria-[current=page]:after:absolute aria-[current=page]:after:bottom-1.5 aria-[current=page]:after:left-1/2 aria-[current=page]:after:size-1 aria-[current=page]:after:-translate-x-1/2 aria-[current=page]:after:rounded-full aria-[current=page]:after:bg-brand"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="flex items-center gap-2">
+      {
+        contact && (
+          <Button
+            href={contact.href}
+            icon={ArrowRight}
+            class="hidden sm:inline-flex"
+            aria-current={isActive(contact.href) ? 'page' : undefined}
+          >
+            {contact.label}
+          </Button>
+        )
+      }
+
+      <button
+        type="button"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="menu-mobile"
+        class="grid size-12 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/5 text-gray-100 transition-colors duration-200 hover:border-white/30 xl:hidden"
+      >
+        <span class="sr-only" data-nav-toggle-label>Ouvrir le menu</span>
+        <Menu aria-hidden="true" className="size-5 group-data-open/nav:hidden" />
+        <X aria-hidden="true" className="hidden size-5 group-data-open/nav:block" />
+      </button>
+    </div>
+  </nav>
+
+  <!-- Menu mobile plein écran (hors du <nav> flouté pour que position:fixed reste relatif au viewport). -->
+  <div
+    id="menu-mobile"
+    inert
+    class="invisible fixed inset-0 -z-10 flex flex-col overflow-y-auto bg-ink/95 px-6 pt-28 pb-10 opacity-0 backdrop-blur-2xl transition-[opacity,visibility] duration-200 ease-in group-data-open/nav:visible group-data-open/nav:opacity-100 group-data-open/nav:duration-300 group-data-open/nav:ease-out-expo xl:hidden"
+  >
+    <ul class="flex flex-col">
+      {
+        mainNav.map((item, i) => (
+          <li
+            style={`--i:${i}`}
+            class="translate-y-4 border-b border-white/10 opacity-0 transition-[opacity,transform] delay-[calc(var(--i)*40ms)] duration-500 ease-out-expo group-data-open/nav:translate-y-0 group-data-open/nav:opacity-100"
+          >
+            <a
+              href={item.href}
+              data-nav-link
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class="flex min-h-16 cursor-pointer items-center gap-4 py-3 font-display text-3xl font-semibold text-gray-100 transition-colors duration-200 hover:text-brand-bright aria-[current=page]:text-brand-bright"
+            >
+              <span aria-hidden="true" class="w-8 text-sm font-medium text-gray-400 tabular-nums">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-auto flex flex-col gap-4 pt-10 text-gray-400">
+      <a
+        href={`mailto:${site.email}`}
+        class="min-h-11 w-fit cursor-pointer content-center text-lg text-gray-100 transition-colors duration-200 hover:text-brand-bright"
+      >
+        {site.email}
+      </a>
+      <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        {
+          socials.map((social) => (
+            <li>
+              <a
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex min-h-11 cursor-pointer items-center gap-1.5 transition-colors duration-200 hover:text-gray-100"
+              >
+                {social.label}
+                <span class="sr-only"> (nouvel onglet)</span>
+                <ArrowUpRight aria-hidden="true" className="size-4" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-nav]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const toggleLabel = document.querySelector<HTMLElement>('[data-nav-toggle-label]');
+  const panel = document.getElementById('menu-mobile');
+  const sentinel = document.querySelector('[data-nav-sentinel]');
+
+  if (header && toggle && toggleLabel && panel) {
+    // Fond « verre » dès que l'on quitte le haut de page (sans écouteur de scroll).
+    if (sentinel) {
+      new IntersectionObserver(([entry]) => {
+        header.toggleAttribute('data-scrolled', !entry?.isIntersecting);
+      }).observe(sentinel);
+    }
+
+    const setOpen = (open: boolean, { restoreFocus = false } = {}) => {
+      header.toggleAttribute('data-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggleLabel.textContent = open ? 'Fermer le menu' : 'Ouvrir le menu';
+      panel.inert = !open;
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+      // Le reste de la page devient inerte : le focus reste dans le menu.
+      document
+        .querySelectorAll<HTMLElement>('body > main, body > footer')
+        .forEach((el) => (el.inert = open));
+      if (restoreFocus) toggle.focus();
+    };
+
+    toggle.addEventListener('click', () => setOpen(!header.hasAttribute('data-open')));
+
+    panel.querySelectorAll('[data-nav-link]').forEach((link) => {
+      link.addEventListener('click', () => setOpen(false));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && header.hasAttribute('data-open')) {
+        setOpen(false, { restoreFocus: true });
+      }
+    });
+
+    // Passage en desktop avec le menu ouvert : on referme proprement.
+    window.matchMedia('(min-width: 80rem)').addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+</script>

@@ -1,23 +1,86 @@
 ---
-// Page provisoire (Étape 1) : valide le layout, les polices et le thème.
+// Page provisoire (Étape 2) : vitrine des composants globaux.
 // La page d'accueil complète est construite à l'Étape 3.
+import { ArrowRight, BrainCircuit, PenTool, Shirt } from 'lucide-react';
 import Layout from '@/layouts/Layout.astro';
+import Button from '@/components/ui/Button.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+
+const services = [
+  {
+    title: 'Data & Intelligence Artificielle',
+    description:
+      "Accélérez votre business avec la force de l'IA et de la data. Nous transformons vos bases de données brutes en décisions stratégiques.",
+    items: [
+      'Data Science & IA : Machine Learning, NLP, modèles prédictifs.',
+      'Data Analyse & BI : tableaux de bord Power BI, reportings automatisés.',
+      'Architecture Data : nettoyage, structuration, pipelines sécurisés.',
+    ],
+    icon: BrainCircuit,
+    href: '/expertises/data-ia',
+    linkLabel: "Explorer l'expertise",
+  },
+  {
+    title: 'Création Digitale & Web',
+    description:
+      'Construisons ensemble votre identité digitale : esthétique, ergonomique et conçue pour convertir.',
+    items: [
+      'Développement Web : sites vitrines et e-commerce.',
+      'Graphisme & Branding : logos, chartes, identités visuelles.',
+      'Visibilité : marketplaces et community management.',
+    ],
+    icon: PenTool,
+    href: '/expertises/creation-digitale',
+    linkLabel: 'Découvrir le Studio Web',
+  },
+  {
+    title: 'Impression Textile & Merchandising',
+    description:
+      'Donnez vie à votre marque avec des vêtements et objets promotionnels de qualité professionnelle.',
+    items: [
+      'Marquage Textile : sérigraphie, flocage, DTG, broderie, sublimation.',
+      'Objets publicitaires : Ecocups, stickers, casquettes.',
+      'Production centralisée : de la petite série au volume événementiel.',
+    ],
+    icon: Shirt,
+    href: '/expertises/impression-textile',
+    linkLabel: 'Voir les solutions',
+  },
+] as const;
 ---
 
 <Layout>
-  <section class="container-site flex min-h-dvh flex-col justify-center gap-8 py-24">
-    <p class="font-display text-sm tracking-[0.3em] text-brand-bright uppercase">Entité & Co</p>
-    <h1 class="max-w-4xl text-5xl leading-[0.95] font-bold sm:text-7xl lg:text-8xl">
-      Studio Digital <span class="text-brand-bright">&</span> IA
-    </h1>
-    <p class="max-w-2xl text-lg text-gray-400">
-      L'alliance de la technologie, de la créativité et de l'innovation. Nous transformons vos
-      idées en écosystèmes digitaux et physiques performants.
-    </p>
-    <div
-      class="glass reveal flex aspect-video max-w-3xl items-center justify-center rounded-2xl text-sm text-gray-400"
-    >
-      Mockup Projet
+  <section class="container-site flex min-h-dvh flex-col justify-center gap-10 pt-32 pb-16">
+    <SectionHeading as="h1" eyebrow="Entité & Co" title="Studio Digital & IA">
+      <p>
+        L'alliance de la technologie, de la créativité et de l'innovation. Nous transformons vos
+        idées en écosystèmes digitaux et physiques performants.
+      </p>
+    </SectionHeading>
+    <div class="flex flex-wrap gap-3">
+      <Button href="#expertises" size="lg" icon={ArrowRight}>Découvrir nos expertises</Button>
+      <Button href="/contact" size="lg" variant="secondary">Discuter de votre projet</Button>
+    </div>
+    <ImagePlaceholder label="Mockup Projet" description="Bannière principale" ratio="wide" />
+  </section>
+
+  <section id="expertises" class="container-site flex scroll-mt-28 flex-col gap-12 py-24 sm:py-32">
+    <SectionHeading eyebrow="Nos expertises" title="Un est tout, tout est un.">
+      <p>
+        Pourquoi multiplier les prestataires quand une seule entité peut maîtriser toute votre
+        chaîne de valeur ?
+      </p>
+    </SectionHeading>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {
+        services.map((service, i) => (
+          <div class="reveal" style={`--reveal-start: ${i * 8}%`}>
+            <ServiceCard {...service} />
+          </div>
+        ))
+      }
     </div>
   </section>
 </Layout>

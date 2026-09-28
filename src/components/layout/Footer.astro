@@ -1,0 +1,128 @@
+---
+import { ArrowRight, ArrowUpRight, Mail } from 'lucide-react';
+import Logo from '@/components/ui/Logo.astro';
+import Button from '@/components/ui/Button.astro';
+import { legalNav, mainNav, site, socials } from '@/data/site';
+
+const expertises = mainNav.filter((item) => item.href.startsWith('/expertises/'));
+const studio = mainNav.filter(
+  (item) => item.href !== '/' && !item.href.startsWith('/expertises/'),
+);
+const year = new Date().getFullYear();
+
+const linkClass =
+  'inline-flex min-h-11 cursor-pointer items-center text-gray-400 transition-colors duration-200 hover:text-gray-100 sm:min-h-9';
+---
+
+<footer class="relative mt-24 border-t border-white/10">
+  <div class="container-site flex flex-col gap-16 py-16 sm:py-20">
+    <div class="grid gap-12 lg:grid-cols-12">
+      <div class="flex flex-col gap-6 lg:col-span-5">
+        <a href="/" class="w-fit cursor-pointer text-2xl">
+          <Logo />
+          <span class="sr-only"> — Accueil</span>
+        </a>
+        <p class="max-w-sm text-gray-400">{site.slogan}</p>
+        <Button href="/contact" icon={ArrowRight} class="w-fit">Discuter de votre projet</Button>
+      </div>
+
+      <nav aria-label="Expertises" class="lg:col-span-2">
+        <h2 class="mb-4 font-display text-sm font-semibold tracking-[0.2em] text-gray-100 uppercase">
+          Expertises
+        </h2>
+        <ul class="flex flex-col gap-1">
+          {
+            expertises.map((item) => (
+              <li>
+                <a href={item.href} class={linkClass}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav aria-label="Studio" class="lg:col-span-2">
+        <h2 class="mb-4 font-display text-sm font-semibold tracking-[0.2em] text-gray-100 uppercase">
+          Studio
+        </h2>
+        <ul class="flex flex-col gap-1">
+          {
+            studio.map((item) => (
+              <li>
+                <a href={item.href} class={linkClass}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="lg:col-span-3">
+        <h2 class="mb-4 font-display text-sm font-semibold tracking-[0.2em] text-gray-100 uppercase">
+          Contact
+        </h2>
+        <ul class="flex flex-col gap-1">
+          <li>
+            <a href={`mailto:${site.email}`} class:list={[linkClass, 'gap-2']}>
+              <Mail aria-hidden="true" className="size-4 text-brand-bright" />
+              {site.email}
+            </a>
+          </li>
+          {
+            socials.map((social) => (
+              <li>
+                <a
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class:list={[linkClass, 'gap-1.5']}
+                >
+                  {social.label}
+                  <span class="sr-only"> (nouvel onglet)</span>
+                  <ArrowUpRight aria-hidden="true" className="size-4" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="flex flex-col gap-4 border-t border-white/10 pt-8 text-sm text-gray-400 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© {year} {site.name}. Tous droits réservés.</p>
+      <ul class="flex flex-wrap gap-x-6 gap-y-1">
+        {
+          legalNav.map((item) => (
+            <li>
+              <a href={item.href} class={linkClass}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  <!-- Signature typographique géante, purement décorative (SVG : hors calcul de contraste) -->
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    viewBox="0 0 1000 250"
+    class="pointer-events-none block w-full fill-white/[0.03] font-display font-bold select-none"
+  >
+    <text
+      x="500"
+      y="235"
+      text-anchor="middle"
+      textLength="960"
+      lengthAdjust="spacingAndGlyphs"
+      font-size="240">ENTITÉ</text
+    >
+  </svg>
+</footer>

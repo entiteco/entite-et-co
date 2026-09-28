@@ -77,7 +77,7 @@
 
 ## Motion
 
-- **Apparition au scroll :** `.reveal` — CSS scroll-driven (`animation-timeline: view()`), zéro JS. Stagger via `style="--reveal-delay"` 40–60ms/élément.
+- **Apparition au scroll :** `.reveal` — CSS scroll-driven (`animation-timeline: view()`), zéro JS. Stagger via `style="--reveal-start: N%"` (décalage de plage, ~6–8 % par élément).
 - Pas de GSAP ni Framer Motion par défaut (budget JS / Lighthouse 100). À réévaluer seulement si un besoin précis l'exige.
 - Easing : `ease-out-expo` à l'entrée ; sorties ~65% de la durée d'entrée.
 - Transform/opacity uniquement. 1–2 éléments animés max par vue.

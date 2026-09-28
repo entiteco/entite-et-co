@@ -1,0 +1,15 @@
+---
+// Logotype texte : reprend le « É » rouge du logo historique.
+// Rendu 100 % texte (net à toutes les tailles, zéro requête image).
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<span class:list={['font-display font-bold tracking-tight whitespace-nowrap', className]}>
+  <span aria-hidden="true">ENTIT<span class="text-brand-bright">É</span></span>
+  <span aria-hidden="true" class="font-medium text-gray-400">&nbsp;&amp;&nbsp;Co</span>
+  <span class="sr-only">Entité & Co</span>
+</span>
