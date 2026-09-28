@@ -1,0 +1,40 @@
+---
+import { CaretRightIcon } from '@phosphor-icons/react/ssr';
+import type { NavItem } from '@/data/site';
+
+interface Props {
+  /** Chemin hors Accueil ; le dernier élément est la page courante. */
+  items: readonly NavItem[];
+  class?: string;
+}
+
+const { items, class: className = '' } = Astro.props;
+const trail: readonly NavItem[] = [{ label: 'Accueil', href: '/' }, ...items];
+---
+
+<nav aria-label="Fil d'Ariane" class:list={['text-sm text-fg-muted', className]}>
+  <ol class="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+    {
+      trail.map((item, i) => {
+        const current = i === trail.length - 1;
+        return (
+          <li class="flex items-center gap-1.5">
+            {i > 0 && <CaretRightIcon aria-hidden="true" className="size-3.5" weight="bold" />}
+            {current ? (
+              <span aria-current="page" class="text-fg">
+                {item.label}
+              </span>
+            ) : (
+              <a
+                href={item.href}
+                class="inline-flex min-h-11 cursor-pointer items-center transition-colors duration-200 hover:text-fg sm:min-h-6"
+              >
+                {item.label}
+              </a>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>

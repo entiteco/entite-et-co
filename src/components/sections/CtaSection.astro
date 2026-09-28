@@ -1,0 +1,48 @@
+---
+import { ArrowRightIcon } from '@phosphor-icons/react/ssr';
+import Button from '@/components/ui/Button.astro';
+import type { Cta } from '@/data/expertises';
+
+interface Props {
+  title: string;
+  text?: string;
+  cta: Cta;
+  secondary?: Cta;
+  eyebrow?: string;
+}
+
+const { title, text, cta, secondary, eyebrow } = Astro.props;
+---
+
+<section class="container-site py-16 sm:py-24">
+  <div
+    class="glass reveal relative isolate overflow-hidden rounded-3xl px-6 py-16 text-center sm:px-12 sm:py-24"
+  >
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 bg-[radial-gradient(40rem_20rem_at_50%_110%,rgb(230_0_0/0.18),transparent_70%)]"
+    >
+    </div>
+    <div class="mx-auto flex max-w-3xl flex-col items-center gap-6">
+      {
+        eyebrow && (
+          <p class="font-display text-xs font-medium tracking-[0.3em] text-accent uppercase sm:text-sm">
+            {eyebrow}
+          </p>
+        )
+      }
+      <h2 class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">{title}</h2>
+      {text && <p class="max-w-[60ch] text-lg text-fg-muted">{text}</p>}
+      <div class="flex flex-wrap justify-center gap-3 pt-2">
+        <Button href={cta.href} size="lg" icon={ArrowRightIcon}>{cta.label}</Button>
+        {
+          secondary && (
+            <Button href={secondary.href} size="lg" variant="secondary">
+              {secondary.label}
+            </Button>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>

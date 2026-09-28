@@ -1,0 +1,48 @@
+---
+// Page d'attente : la galerie filtrable (Tous | Data | Web | Textile) est construite à l'Étape 4.
+import Layout from '@/layouts/Layout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import { expertises } from '@/data/expertises';
+import { expertiseIcons } from '@/data/expertise-icons';
+
+const breadcrumbs = [{ label: 'Portfolio', href: '/portfolio' }];
+---
+
+<Layout
+  title="Portfolio | Réalisations Web, Data & Textile | Entité & Co"
+  description="Les réalisations d'Entité & Co en Data & IA, création digitale et impression textile."
+  breadcrumbs={breadcrumbs}
+>
+  <PageHero
+    eyebrow="Portfolio"
+    title="Nos réalisations"
+    intro="La galerie de projets est en cours de préparation. En attendant, découvrez le détail de nos trois expertises."
+    breadcrumbs={breadcrumbs}
+    imageLabel={false}
+  />
+
+  <section aria-label="Expertises" class="container-site pb-8">
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {
+        expertises.map((item) => (
+          <ServiceCard
+            title={item.hero.title}
+            description={item.seo.description}
+            icon={expertiseIcons[item.slug]}
+            href={`/expertises/${item.slug}`}
+            linkLabel={`Découvrir ${item.navLabel}`}
+            imageLabel="Mockup Projet"
+            headingLevel="h2"
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <CtaSection
+    title="Un projet en tête ?"
+    cta={{ label: 'Discuter de votre projet', href: '/contact' }}
+  />
+</Layout>

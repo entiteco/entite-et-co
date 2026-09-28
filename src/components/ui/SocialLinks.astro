@@ -1,0 +1,59 @@
+---
+// Logos de marque officiels fournis par Phosphor (LinkedinLogo, InstagramLogo).
+import type { Icon } from '@phosphor-icons/react';
+import { InstagramLogoIcon, LinkedinLogoIcon } from '@phosphor-icons/react/ssr';
+import { socials, type SocialLink } from '@/data/site';
+
+interface Props {
+  /** `icons` : boutons ronds icône seule · `list` : icône + libellé. */
+  variant?: 'icons' | 'list';
+  class?: string;
+}
+
+const { variant = 'list', class: className = '' } = Astro.props;
+
+const icons: Record<SocialLink['network'], Icon> = {
+  linkedin: LinkedinLogoIcon,
+  instagram: InstagramLogoIcon,
+};
+---
+
+<ul
+  class:list={[
+    variant === 'icons' ? 'flex items-center gap-2' : 'flex flex-col gap-1',
+    className,
+  ]}
+>
+  {
+    socials.map((social) => {
+      const SocialIcon = icons[social.network];
+      return (
+        <li>
+          {variant === 'icons' ? (
+            <a
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={social.label}
+              class="grid size-11 cursor-pointer place-items-center rounded-full text-fg-muted transition-colors duration-200 hover:bg-fg/5 hover:text-fg"
+            >
+              <SocialIcon aria-hidden="true" className="size-5" weight="regular" />
+              <span class="sr-only">{social.label} (nouvel onglet)</span>
+            </a>
+          ) : (
+            <a
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex min-h-11 cursor-pointer items-center gap-2.5 text-fg-muted transition-colors duration-200 hover:text-fg sm:min-h-9"
+            >
+              <SocialIcon aria-hidden="true" className="size-5 shrink-0" weight="regular" />
+              {social.label}
+              <span class="sr-only"> (nouvel onglet)</span>
+            </a>
+          )}
+        </li>
+      );
+    })
+  }
+</ul>

@@ -1,0 +1,82 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props {
+  id: string;
+  label: string;
+  /** Aide affichée sous le champ (reliée par aria-describedby). */
+  hint?: string;
+  required?: boolean;
+  multiline?: boolean;
+  type?: HTMLAttributes<'input'>['type'];
+  autocomplete?: HTMLAttributes<'input'>['autocomplete'];
+  inputmode?: HTMLAttributes<'input'>['inputmode'];
+  class?: string;
+}
+
+const {
+  id,
+  label,
+  hint,
+  required = false,
+  multiline = false,
+  type = 'text',
+  autocomplete,
+  inputmode,
+  class: className = '',
+} = Astro.props;
+
+const hintId = hint ? `${id}-aide` : undefined;
+const errorId = `${id}-erreur`;
+const describedBy = [hintId, errorId].filter(Boolean).join(' ');
+
+const control =
+  'w-full rounded-xl border border-line-strong bg-surface px-4 text-base text-fg transition-[border-color,box-shadow] duration-200 placeholder:text-fg-muted hover:border-fg/40 focus:border-accent focus:ring-4 focus:ring-brand/15 focus:outline-none aria-invalid:border-accent';
+---
+
+<div class:list={['flex flex-col gap-2', className]} data-field>
+  <label for={id} class="font-display text-sm font-semibold text-fg">
+    {label}
+    {
+      required ? (
+        <span class="text-accent" aria-hidden="true">
+          {' '}
+          *
+        </span>
+      ) : (
+        <span class="font-sans font-normal text-fg-muted"> (facultatif)</span>
+      )
+    }
+  </label>
+  {
+    multiline ? (
+      <textarea
+        id={id}
+        name={id}
+        rows={6}
+        required={required}
+        aria-describedby={describedBy}
+        class:list={[control, 'min-h-40 resize-y py-3']}
+      />
+    ) : (
+      <input
+        id={id}
+        name={id}
+        type={type}
+        required={required}
+        autocomplete={autocomplete}
+        inputmode={inputmode}
+        aria-describedby={describedBy}
+        class:list={[control, 'min-h-12']}
+      />
+    )
+  }
+  {
+    hint && (
+      <p id={hintId} class="text-sm text-fg-muted">
+        {hint}
+      </p>
+    )
+  }
+  <p id={errorId} class="text-sm font-medium text-accent empty:hidden" data-error></p>
+</div>

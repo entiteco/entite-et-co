@@ -13,21 +13,26 @@
 
 ---
 
-## Couleurs (tokens Tailwind)
+## Couleurs (tokens sémantiques, thème clair / sombre)
 
-| Rôle | Token / classe | Valeur | Usage |
-|------|----------------|--------|-------|
-| Background | `bg-ink` | `#050505` | Fond global (+ halos rouges et grain via `.bg-atmosphere`) |
-| Surface | `bg-ink-soft` / `.glass` | `#0c0c0c` / `white/3% + blur` | Cartes, navbar, modales |
-| Texte principal | `text-gray-100` | `#f3f4f6` | Titres, corps |
-| Texte secondaire | `text-gray-400` | `#9ca3af` | Descriptions (7.6:1 sur ink) |
-| Brand (fill) | `bg-brand` | `#e60000` | Fonds de CTA, pastilles — texte blanc dessus (4.8:1) |
-| Brand hover | `bg-brand-hover` | `#ff1a1a` | Survol des fills |
-| Brand (texte) | `text-brand-bright` | `#ff3b3b` | Texte/icônes accent sur fond noir (5.7:1) |
-| Bordures | `border-white/10` | — | Séparateurs, contours glass |
-| Focus ring | `outline-brand-bright` | `#ff3b3b` | 2px, offset 4px (global `:focus-visible`) |
+Thème piloté par la classe `.dark` sur `<html>` (`@custom-variant dark`). Script anti-FOUC inline dans
+`Layout.astro` : choix mémorisé (`localStorage.theme`) → préférence système → sombre par défaut.
+Bouton `ThemeToggle` (soleil/lune, `aria-pressed`) dans la navbar, toutes tailles d'écran.
 
-⚠️ Ne jamais utiliser `text-brand` (#e60000) pour du texte courant sur fond noir : 4.3:1 < AA.
+| Rôle | Classe | Clair | Sombre | Usage |
+|------|--------|-------|--------|-------|
+| Fond | `bg-canvas` | `#fafafa` (neutral-50) | `#0a0a0a` (neutral-950) | Fond global + `.bg-atmosphere` |
+| Surface | `bg-surface` | `#ffffff` | `#111111` | Champs de formulaire |
+| Verre | `.glass` / `bg-glass` | `white/70` | `white/3` | Cartes, navbar |
+| Texte | `text-fg` | `#171717` (neutral-900) | `#f3f4f6` | Titres, corps |
+| Texte secondaire | `text-fg-muted` | `#525252` (7.5:1) | `#9ca3af` (7.7:1) | Descriptions |
+| Accent texte | `text-accent` | `#c40000` (6.0:1) | `#ff3b3b` (5.6:1) | Surtitres, icônes, liens actifs |
+| Brand (fill) | `bg-brand` / `border-brand` | `#e60000` | `#e60000` | CTA, puces — texte blanc dessus (4.8:1) |
+| Bordures | `border-line` / `border-line-strong` | `neutral-900/10` · `/20` | `white/10` · `/20` | Séparateurs |
+| Placeholder | `bg-placeholder` | `#f5f5f5` | `#171717` (neutral-900) | `ImagePlaceholder` |
+| Focus | `outline-accent` | — | — | 2px, offset 4px (global) |
+
+⚠️ Jamais de hex bruts dans les composants ; jamais `#e60000` en texte courant (4.3:1 sur noir).
 
 ## Typographie
 
@@ -56,7 +61,7 @@
 - **primary** : fond transparent + bordure brand, remplissage rouge qui monte au survol (`::before` en `scale-y`, transform only), texte blanc.
 - **secondary / ghost** : bordure `white/15`, survol `bg-white/5` + bordure `white/30`.
 - Hauteur min 48px (≥ 44px touch target), `cursor-pointer`, transitions 200–300ms `ease-out-expo`.
-- Icône Lucide optionnelle à droite, `aria-hidden`, translate-x au survol.
+- Icône Phosphor optionnelle à droite, `aria-hidden`, translate-x au survol.
 
 ### Cartes de service (`ServiceCard.astro`)
 - `.glass rounded-2xl`, placeholder image en tête, titre, texte, liste à puces, lien.
@@ -65,7 +70,7 @@
 
 ### Placeholders d'images (`ImagePlaceholder.astro`) — RÈGLE D'OR phase maquette
 - `bg-neutral-900 border border-neutral-800 rounded-xl`, ratio réservé (`aspect-*`) pour zéro CLS.
-- Icône Lucide `ImagePlus` + libellé ("Ajouter une image" / "Mockup Projet"), `role="img"` + `aria-label`.
+- Icône Phosphor `ImageSquareIcon` + libellé ("Ajouter une image" / "Mockup Projet"), `role="img"` + `aria-label`.
 
 ### Titres de section (`SectionHeading.astro`)
 - Eyebrow brand-bright (numéro/label) + H2 massif + intro gray-400 (max 65ch).
@@ -85,7 +90,7 @@
 
 ## Anti-patterns
 
-- ❌ Emojis comme icônes (Lucide uniquement, stroke 1.5–2, tailles cohérentes)
+- ❌ Emojis comme icônes — **Phosphor** uniquement (`@phosphor-icons/react/ssr`, noms `…Icon`, poids `regular`/`bold`, rendu statique sans JS). Logos de marque : `LinkedinLogoIcon`, `InstagramLogoIcon`
 - ❌ Hex bruts dans les composants — utiliser les tokens
 - ❌ Hover qui décale le layout (scale sur cartes en grille)
 - ❌ Focus invisible / supprimé
@@ -95,11 +100,12 @@
 
 ## Pre-Delivery Checklist
 
-- [ ] Icônes Lucide, pas d'emoji ; icônes décoratives `aria-hidden`
+- [ ] Icônes Phosphor, pas d'emoji ; icônes décoratives `aria-hidden`
 - [ ] `cursor-pointer` + feedback de survol sur tout élément cliquable
 - [ ] Transitions 150–300ms, transform/opacity only
 - [ ] Contraste ≥ 4.5:1 (texte), focus visible 3:1
 - [ ] `prefers-reduced-motion` respecté
+- [ ] Rendu vérifié en thème clair ET sombre
 - [ ] Responsive 375 / 768 / 1024 / 1440, aucun scroll horizontal
 - [ ] Aucun contenu masqué par la navbar fixe (ni élément focusé)
 - [ ] Hiérarchie de titres séquentielle, un seul H1 par page

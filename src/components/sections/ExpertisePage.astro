@@ -1,0 +1,205 @@
+---
+// Gabarit commun aux trois pages /expertises/* — le contenu vient de src/data/expertises.ts.
+import { ArrowRightIcon } from '@phosphor-icons/react/ssr';
+import Layout from '@/layouts/Layout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import Button from '@/components/ui/Button.astro';
+import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import { expertises, type Expertise } from '@/data/expertises';
+import { expertiseIcons } from '@/data/expertise-icons';
+import { inlineMarkdown } from '@/lib/inline-markdown';
+
+interface Props {
+  expertise: Expertise;
+}
+
+const { expertise } = Astro.props;
+
+const href = `/expertises/${expertise.slug}`;
+const breadcrumbs = [{ label: expertise.navLabel, href }];
+const others = expertises.filter((item) => item.slug !== expertise.slug);
+
+/** « **Libellé :** texte » → { label, text } pour les cartes de synthèse. */
+const splitFeature = (item: string) => {
+  const match = /^\*\*(.+?)\s*:\*\*\s*(.*)$/.exec(item);
+  return match ? { label: match[1] ?? item, text: match[2] ?? '' } : { label: item, text: '' };
+};
+---
+
+<Layout
+  title={expertise.seo.title}
+  description={expertise.seo.description}
+  breadcrumbs={breadcrumbs}
+>
+  <PageHero
+    eyebrow={expertise.hero.eyebrow}
+    title={expertise.hero.title}
+    intro={expertise.hero.intro}
+    breadcrumbs={breadcrumbs}
+    imageLabel={`Visuel ${expertise.navLabel}`}
+  >
+    <Fragment slot="actions">
+      <Button href={expertise.hero.cta.href} size="lg" icon={ArrowRightIcon}>
+        {expertise.hero.cta.label}
+      </Button>
+      <Button href="/portfolio" size="lg" variant="secondary">Voir le Portfolio</Button>
+    </Fragment>
+  </PageHero>
+
+  {
+    expertise.highlight && (
+      <section aria-labelledby="comprendre" class="container-site py-16 sm:py-24">
+        <div class="flex max-w-3xl flex-col gap-5">
+          <h2 id="comprendre" class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
+            {expertise.highlight.title}
+          </h2>
+          <p class="text-lg text-fg-muted">{expertise.highlight.intro}</p>
+        </div>
+        <div class="mt-12 grid gap-6 md:grid-cols-2">
+          {expertise.highlight.items.map((item, i) => {
+            const feature = splitFeature(item);
+            return (
+              <article class="glass reveal flex flex-col gap-4 rounded-2xl p-6 sm:p-8" style={`--reveal-start: ${i * 8}%`}>
+                <span aria-hidden="true" class="font-display text-5xl font-bold text-accent tabular-nums">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 class="text-xl font-semibold text-fg sm:text-2xl">{feature.label}</h3>
+                <p class="text-fg-muted">{feature.text}</p>
+              </article>
+            );
+          })}
+        </div>
+        {expertise.highlight.cta && (
+          <div class="mt-10">
+            <Button href={expertise.highlight.cta.href} icon={ArrowRightIcon}>
+              {expertise.highlight.cta.label}
+            </Button>
+          </div>
+        )}
+      </section>
+    )
+  }
+
+  {
+    expertise.sections.map((section, i) => (
+      <section
+        id={section.id}
+        aria-labelledby={`${section.id}-titre`}
+        class="container-site border-t border-line py-16 sm:py-24"
+      >
+        <div class="grid gap-12 lg:grid-cols-12">
+          <div class="flex flex-col gap-6 lg:sticky lg:top-28 lg:col-span-5 lg:self-start">
+            <p class="font-display text-sm font-medium tracking-[0.3em] text-accent uppercase">
+              {String(i + 1).padStart(2, '0')} — {expertise.navLabel}
+            </p>
+            <h2 id={`${section.id}-titre`} class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
+              {section.title}
+            </h2>
+            <p class="text-lg text-fg-muted">{section.intro}</p>
+            <ImagePlaceholder label={section.imageLabel} description={section.title} ratio="landscape" />
+            {section.cta && (
+              <Button href={section.cta.href} icon={ArrowRightIcon} class="w-fit">
+                {section.cta.label}
+              </Button>
+            )}
+          </div>
+
+          <div class="flex flex-col gap-6 lg:col-span-7">
+            {section.groups.map((group) => (
+              <article class="glass reveal rounded-2xl p-6 sm:p-8">
+                <h3 class="text-xl font-semibold text-fg sm:text-2xl">{group.title}</h3>
+                <ul class="mt-6 flex flex-col gap-5">
+                  {group.items.map((item) => (
+                    <li class="flex gap-4 text-fg-muted">
+                      <span aria-hidden="true" class="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand" />
+                      <span set:html={inlineMarkdown(item)} />
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  {
+    expertise.ecosystem && (
+      <section aria-labelledby="ecosysteme" class="container-site border-t border-line py-16 sm:py-24">
+        <div class="grid items-center gap-12 lg:grid-cols-12">
+          <div class="lg:col-span-5">
+            <ImagePlaceholder label="Du design à l'impression" description={expertise.ecosystem.title} ratio="square" />
+          </div>
+          <div class="flex flex-col gap-6 lg:col-span-7">
+            <h2 id="ecosysteme" class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
+              {expertise.ecosystem.title}
+            </h2>
+            {expertise.ecosystem.paragraphs.map((paragraph) => (
+              <p class="text-lg text-fg-muted" set:html={inlineMarkdown(paragraph)} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    expertise.stack && (
+      <section aria-labelledby="stack" class="container-site border-t border-line py-16 sm:py-24">
+        <div class="flex max-w-3xl flex-col gap-5">
+          <h2 id="stack" class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
+            {expertise.stack.title}
+          </h2>
+          <p class="text-lg text-fg-muted">{expertise.stack.intro}</p>
+        </div>
+        <dl class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {expertise.stack.groups.map((group) => (
+            <div class="glass rounded-2xl p-6">
+              <dt class="font-display text-sm font-semibold tracking-[0.2em] text-fg uppercase">
+                {group.label}
+              </dt>
+              <dd class="mt-4">
+                <ul class="flex flex-wrap gap-2">
+                  {group.items.map((tool) => (
+                    <li class="rounded-full border border-line px-3 py-1.5 text-sm text-fg-muted">{tool}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )
+  }
+
+  <CtaSection
+    eyebrow={`Pôle ${expertise.pole}`}
+    title={expertise.closing.title}
+    text={expertise.closing.text}
+    cta={expertise.closing.cta}
+    secondary={{ label: 'Discuter de votre projet', href: expertise.hero.cta.href }}
+  />
+
+  <section aria-labelledby="autres-expertises" class="container-site py-16 sm:py-24">
+    <h2 id="autres-expertises" class="text-2xl font-bold text-fg sm:text-3xl">
+      Nos autres expertises
+    </h2>
+    <div class="mt-8 grid gap-6 md:grid-cols-2">
+      {
+        others.map((other) => (
+          <ServiceCard
+            title={other.hero.title}
+            description={other.seo.description}
+            icon={expertiseIcons[other.slug]}
+            href={`/expertises/${other.slug}`}
+            linkLabel={`Découvrir ${other.navLabel}`}
+            imageLabel={false}
+          />
+        ))
+      }
+    </div>
+  </section>
+</Layout>

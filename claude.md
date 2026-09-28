@@ -19,7 +19,7 @@ Tu dois impérativement utiliser les technologies suivantes :
 * **Styling :** Tailwind CSS.
 * **Langage :** TypeScript (Typage strict requis pour tous les composants).
 * **Déploiement cible :** Vercel (Prévoir la configuration Vercel si nécessaire).
-* **Icônes :** Lucide React ou Astro Icon (pour des icônes légères et modernes).
+* **Icônes :** Phosphor Icons (`@phosphor-icons/react/ssr`, noms suffixés `…Icon`, rendu statique sans JS), recommandé par `ui-ux-pro-max`. Logos de marque officiels : `LinkedinLogoIcon`, `InstagramLogoIcon`.
 
 ---
 
@@ -27,18 +27,21 @@ Tu dois impérativement utiliser les technologies suivantes :
 
 Basé sur l'identité visuelle historique et amplifié par les directives de `skills/ui-ux-pro-max`, le nouveau site doit dégager une atmosphère technologique, premium, mystérieuse et épurée.
 
-* **Thème principal :** Dark Mode par défaut (Fonds très sombres, textes clairs).
+* **Thème principal :** Dark Mode par défaut (Fonds très sombres, textes clairs), avec un **thème clair** disponible :
+  * Bascule via la classe `.dark` sur `<html>` (variantes Tailwind `dark:`), bouton Soleil / Lune dans la Navbar (desktop et mobile).
+  * Script anti-FOUC inline dans le `<head>` de `Layout.astro` : choix mémorisé (`localStorage.theme`) → `prefers-color-scheme` → sombre par défaut.
+  * Couleurs exposées en tokens sémantiques (`bg-canvas`, `text-fg`, `text-fg-muted`, `text-accent`, `border-line`…) définis dans `src/styles/global.css` ; référence complète dans `design-system/entite-et-co/MASTER.md`.
 * **Palette de Couleurs (Tailwind) :**
-  * *Background :* Noir profond (`bg-neutral-950` ou `#050505`) avec de subtils dégradés ou effets de grain.
-  * *Texte Principal :* Blanc cassé (`text-gray-100`).
-  * *Texte Secondaire :* Gris clair (`text-gray-400`).
-  * *Couleur d'Accentuation (Brand) :* Rouge vif / Vermillon (pour rappeler le "É" rouge du logo historique. Ex: `#E60000` ou `bg-red-600`).
+  * *Background :* Sombre `neutral-950` (`#0a0a0a`) / Clair `neutral-50` (`#fafafa`), avec de subtils dégradés et effets de grain.
+  * *Texte Principal :* Sombre : blanc cassé (`#f3f4f6`) / Clair : `neutral-900`.
+  * *Texte Secondaire :* Sombre : gris clair (`#9ca3af`) / Clair : `neutral-600`.
+  * *Couleur d'Accentuation (Brand) :* Rouge vif / Vermillon (pour rappeler le "É" rouge du logo historique) : `#E60000` pour les fonds (boutons, puces). Pour le texte rouge, utiliser `text-accent` (`#ff3b3b` en sombre, `#c40000` en clair) afin de respecter le contraste AA.
 * **Typographie :**
   * *Titres (H1, H2) :* Police sans-serif géométrique et moderne (ex: `Space Grotesk`, `Syne` ou `Clash Display`). Titres massifs et impactants.
   * *Corps de texte :* Police lisible et neutre (ex: `Inter` ou `Plus Jakarta Sans`).
 * **Composants UI & Animations :**
   * Utilisation de *Glassmorphism* (fonds translucides avec flou) pour les cartes et la navigation fixe (Navbar).
-  * Animations subtiles au scroll (Framer Motion ou animations CSS natives via Tailwind) pour l'apparition des éléments.
+  * Animations subtiles au scroll en CSS natif (`.reveal`, scroll-driven animations, zéro JS) pour l'apparition des éléments ; `prefers-reduced-motion` respecté.
   * Boutons d'appel à l'action (CTA) minimalistes avec effet de survol marqué (ex: fond transparent qui se remplit de rouge).
   * Les projets du portfolio doivent s'ouvrir dans des modales (Dialogs) fluides, sans recharger la page.
 
@@ -86,7 +89,7 @@ Tu dois lire les fichiers Markdown (`.md`) présents dans ces sous-dossiers pour
 Pour mener à bien cette mission, procède étape par étape. Ne tente pas de tout générer en une seule réponse.
 
 **⚠️ RÈGLE D'OR CONCERNANT LES IMAGES (PLACEHOLDERS) :**
-Pour cette phase de développement, n'intègre **aucune véritable image**. Tu dois générer des espaces réservés (placeholders) élégants en utilisant Tailwind CSS (ex: un bloc `bg-neutral-900 border border-neutral-800 rounded-xl` centré avec une icône Lucide et le texte "Ajouter une image" ou "Mockup Projet"). Cela permettra de valider la structure de la maquette avant l'intégration des médias finaux.
+Pour cette phase de développement, n'intègre **aucune véritable image**. Tu dois générer des espaces réservés (placeholders) élégants en utilisant Tailwind CSS (ex: un bloc `bg-neutral-900 border border-neutral-800 rounded-xl` centré avec une icône Phosphor et le texte "Ajouter une image" ou "Mockup Projet"). Cela permettra de valider la structure de la maquette avant l'intégration des médias finaux.
 
 **Étape 0 : Scan et Apprentissage**
 

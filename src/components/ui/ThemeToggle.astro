@@ -1,0 +1,78 @@
+---
+// Bascule clair / sombre. Plusieurs instances possibles (navbar + menu mobile) :
+// le script (chargé une seule fois par Astro) les synchronise toutes.
+import { MoonIcon, SunIcon } from '@phosphor-icons/react/ssr';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  aria-pressed="true"
+  class:list={[
+    'group/theme relative grid size-11 cursor-pointer place-items-center overflow-hidden rounded-full border border-line bg-fg/5 text-fg transition-colors duration-200 hover:border-line-strong',
+    className,
+  ]}
+>
+  <span class="sr-only">Thème sombre</span>
+  <!-- Soleil visible en mode sombre (action : passer en clair), lune en mode clair -->
+  <SunIcon
+    aria-hidden="true"
+    className="absolute size-5 transition-[transform,opacity] duration-300 ease-out-expo not-dark:translate-y-6 not-dark:rotate-90 not-dark:opacity-0"
+    weight="regular"
+  />
+  <MoonIcon
+    aria-hidden="true"
+    className="absolute size-5 transition-[transform,opacity] duration-300 ease-out-expo dark:-translate-y-6 dark:-rotate-90 dark:opacity-0"
+    weight="regular"
+  />
+</button>
+
+<script>
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+
+  const sync = () => {
+    const dark = root.classList.contains('dark');
+    buttons.forEach((button) => {
+      button.setAttribute('aria-pressed', String(dark));
+      const label = button.querySelector('.sr-only');
+      if (label) label.textContent = 'Thème sombre';
+      button.title = dark ? 'Passer au thème clair' : 'Passer au thème sombre';
+    });
+  };
+
+  const apply = (theme: 'light' | 'dark', persist: boolean) => {
+    root.classList.toggle('dark', theme === 'dark');
+    if (persist) {
+      try {
+        localStorage.setItem('theme', theme);
+      } catch {
+        // Stockage indisponible (navigation privée) : le choix vaut pour la session.
+      }
+    }
+    sync();
+  };
+
+  buttons.forEach((button) =>
+    button.addEventListener('click', () =>
+      apply(root.classList.contains('dark') ? 'light' : 'dark', true),
+    ),
+  );
+
+  // Suit la préférence système tant que l'utilisateur n'a rien choisi.
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change', (event) => {
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem('theme');
+    } catch {}
+    if (!stored) apply(event.matches ? 'light' : 'dark', false);
+  });
+
+  sync();
+</script>

@@ -1,0 +1,270 @@
+---
+import { EnvelopeIcon, PaperPlaneTiltIcon } from '@phosphor-icons/react/ssr';
+import Layout from '@/layouts/Layout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import FormField from '@/components/ui/FormField.astro';
+import SocialLinks from '@/components/ui/SocialLinks.astro';
+import { expertises } from '@/data/expertises';
+import { site } from '@/data/site';
+
+const seo = {
+  title: 'Contact | Discutons de votre projet | Entité & Co',
+  description:
+    'Un projet web, data, IA ou textile ? Contactez Entité & Co par formulaire ou par email à contact@entite.co.',
+};
+
+const breadcrumbs = [{ label: 'Contact', href: '/contact' }];
+
+const subjects = [
+  ...expertises.map((item) => ({ value: item.slug, label: item.navLabel })),
+  { value: 'autre', label: 'Autre demande' },
+];
+---
+
+<Layout title={seo.title} description={seo.description} breadcrumbs={breadcrumbs}>
+  <PageHero
+    eyebrow="Contact"
+    title="Discutons de votre projet"
+    intro="Data & IA, création digitale ou impression textile : une seule entité pour connecter tous les points de votre projet. Décrivez-nous votre besoin, nous revenons vers vous."
+    breadcrumbs={breadcrumbs}
+    imageLabel={false}
+  />
+
+  <section class="container-site pb-16 sm:pb-24">
+    <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <!-- Sans JS : envoi natif via le client mail. Avec JS : validation en ligne + mailto pré-rempli. -->
+      <form
+        data-contact-form
+        action={`mailto:${site.email}`}
+        method="post"
+        enctype="text/plain"
+        aria-labelledby="formulaire-titre"
+        class="glass flex flex-col gap-6 rounded-3xl p-6 sm:p-10 lg:col-span-7"
+      >
+        <div class="flex flex-col gap-2">
+          <h2 id="formulaire-titre" class="text-2xl font-bold text-fg sm:text-3xl">
+            Formulaire de contact
+          </h2>
+          <p class="text-sm text-fg-muted">
+            Les champs marqués d'un <span class="text-accent">*</span> sont obligatoires.
+          </p>
+        </div>
+
+        <div class="grid gap-6 sm:grid-cols-2">
+          <FormField id="nom" label="Nom et prénom" required autocomplete="name" />
+          <FormField id="entreprise" label="Entreprise" autocomplete="organization" />
+          <FormField
+            id="email"
+            label="Adresse email"
+            type="email"
+            required
+            autocomplete="email"
+            inputmode="email"
+          />
+          <FormField
+            id="telephone"
+            label="Téléphone"
+            type="tel"
+            autocomplete="tel"
+            inputmode="tel"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2" data-field>
+          <label for="sujet" class="font-display text-sm font-semibold text-fg">
+            Votre projet concerne <span class="text-accent" aria-hidden="true">*</span>
+          </label>
+          <select
+            id="sujet"
+            name="sujet"
+            required
+            aria-describedby="sujet-erreur"
+            class="min-h-12 w-full cursor-pointer rounded-xl border border-line-strong bg-surface px-4 text-base text-fg transition-[border-color,box-shadow] duration-200 hover:border-fg/40 focus:border-accent focus:ring-4 focus:ring-brand/15 focus:outline-none aria-invalid:border-accent"
+          >
+            <option value="">Choisissez une expertise</option>
+            {subjects.map((subject) => <option value={subject.value}>{subject.label}</option>)}
+          </select>
+          <p id="sujet-erreur" class="text-sm font-medium text-accent empty:hidden" data-error></p>
+        </div>
+
+        <FormField
+          id="message"
+          label="Votre message"
+          required
+          multiline
+          hint="Contexte, objectifs, délais, budget : tout ce qui nous aide à bien comprendre votre besoin."
+        />
+
+        <div class="flex flex-col gap-2" data-field>
+          <div class="flex items-start gap-3">
+            <input
+              id="consentement"
+              name="consentement"
+              type="checkbox"
+              required
+              aria-describedby="consentement-erreur"
+              class="mt-0.5 size-5 shrink-0 cursor-pointer rounded accent-brand"
+            />
+            <label for="consentement" class="cursor-pointer text-sm text-fg-muted">
+              J'accepte que mes données soient utilisées pour traiter ma demande, conformément à la <a
+                href="/politique-de-confidentialite"
+                class="text-fg underline decoration-brand decoration-2 underline-offset-4 hover:text-accent"
+                >politique de confidentialité</a
+              >. <span class="text-accent" aria-hidden="true">*</span>
+            </label>
+          </div>
+          <p id="consentement-erreur" class="text-sm font-medium text-accent empty:hidden" data-error>
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <button
+            type="submit"
+            class="group/btn relative isolate inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full border border-brand bg-brand px-8 font-display text-base font-semibold text-white transition-colors duration-300 ease-out-expo hover:bg-brand-hover sm:w-fit"
+          >
+            Envoyer le message
+            <PaperPlaneTiltIcon
+              aria-hidden="true"
+              className="size-5 transition-transform duration-300 ease-out-expo group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+              weight="bold"
+            />
+          </button>
+        </div>
+
+        <p role="status" data-form-status class="text-sm text-fg-muted empty:hidden"></p>
+      </form>
+
+      <aside aria-labelledby="coordonnees" class="flex flex-col gap-6 lg:col-span-5">
+        <h2 id="coordonnees" class="text-2xl font-bold text-fg sm:text-3xl">Coordonnées</h2>
+
+        <a
+          href={`mailto:${site.email}`}
+          class="glass group/mail flex cursor-pointer items-center gap-4 rounded-2xl p-6 transition-colors duration-200 hover:border-brand/40"
+        >
+          <span class="grid size-12 shrink-0 place-items-center rounded-full bg-brand text-white">
+            <EnvelopeIcon aria-hidden="true" className="size-6" weight="regular" />
+          </span>
+          <span class="flex min-w-0 flex-col">
+            <span class="text-sm text-fg-muted">Écrivez-nous directement</span>
+            <span
+              class="font-display text-lg font-semibold break-all text-fg transition-colors duration-200 group-hover/mail:text-accent sm:text-xl"
+            >
+              {site.email}
+            </span>
+          </span>
+        </a>
+
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-display text-sm font-semibold tracking-[0.2em] text-fg uppercase">
+            Réseaux sociaux
+          </h3>
+          <SocialLinks class="mt-3" />
+        </div>
+
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-display text-sm font-semibold tracking-[0.2em] text-fg uppercase">
+            Nos expertises
+          </h3>
+          <ul class="mt-3 flex flex-col gap-1">
+            {
+              expertises.map((item) => (
+                <li>
+                  <a
+                    href={`/expertises/${item.slug}`}
+                    class="inline-flex min-h-11 cursor-pointer items-center text-fg-muted transition-colors duration-200 hover:text-fg sm:min-h-9"
+                  >
+                    {item.navLabel}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  import { site } from '@/data/site';
+
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const status = form?.querySelector<HTMLElement>('[data-form-status]');
+
+  const messages: Record<string, (field: HTMLInputElement) => string> = {
+    valueMissing: (field) =>
+      field.type === 'checkbox'
+        ? 'Merci de cocher cette case pour que nous puissions traiter votre demande.'
+        : field.tagName === 'SELECT'
+          ? 'Merci de choisir une expertise.'
+          : 'Ce champ est obligatoire.',
+    typeMismatch: () => 'Merci de saisir une adresse email valide (ex. nom@domaine.fr).',
+  };
+
+  const validate = (field: HTMLInputElement): boolean => {
+    const error = field.closest('[data-field]')?.querySelector<HTMLElement>('[data-error]');
+    const key = (['valueMissing', 'typeMismatch'] as const).find((k) => field.validity[k]);
+    const message = key ? (messages[key]?.(field) ?? '') : '';
+    if (message) field.setAttribute('aria-invalid', 'true');
+    else field.removeAttribute('aria-invalid');
+    if (error) error.textContent = message;
+    return !message;
+  };
+
+  if (form && status) {
+    // Validation personnalisée (messages en français, près du champ).
+    form.noValidate = true;
+    const fields = Array.from(
+      form.querySelectorAll<HTMLInputElement>('input, select, textarea'),
+    );
+
+    // Pré-sélection depuis les CTA des pages d'expertise (?sujet=data-ia…).
+    const subject = new URLSearchParams(location.search).get('sujet');
+    const select = form.querySelector<HTMLSelectElement>('#sujet');
+    if (subject && select && Array.from(select.options).some((o) => o.value === subject)) {
+      select.value = subject;
+    }
+
+    fields.forEach((field) => {
+      // Revalide après une première erreur, sans harceler pendant la saisie initiale.
+      field.addEventListener('input', () => {
+        if (field.hasAttribute('aria-invalid')) validate(field);
+      });
+      field.addEventListener('blur', () => {
+        if (field.value) validate(field);
+      });
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const invalid = fields.filter((field) => !validate(field));
+      if (invalid.length > 0) {
+        status.textContent = `Le formulaire contient ${invalid.length} erreur${invalid.length > 1 ? 's' : ''}.`;
+        invalid[0]?.focus();
+        return;
+      }
+
+      const data = new FormData(form);
+      const value = (key: string) => String(data.get(key) ?? '').trim();
+      const subjectLabel = select?.selectedOptions[0]?.textContent ?? '';
+      const optional = (label: string, key: string) =>
+        value(key) ? [`${label} : ${value(key)}`] : [];
+      const body = [
+        `Nom : ${value('nom')}`,
+        ...optional('Entreprise', 'entreprise'),
+        `Email : ${value('email')}`,
+        ...optional('Téléphone', 'telephone'),
+        `Projet : ${subjectLabel}`,
+        '',
+        value('message'),
+      ].join('\n');
+
+      const href = `mailto:${site.email}?subject=${encodeURIComponent(
+        `Projet ${subjectLabel} — ${value('nom')}`,
+      )}&body=${encodeURIComponent(body)}`;
+
+      status.textContent = `Votre messagerie va s'ouvrir avec votre message pré-rempli. Si rien ne se passe, écrivez-nous directement à ${site.email}.`;
+      window.location.href = href;
+    });
+  }
+</script>

@@ -1,5 +1,5 @@
 ---
-import type { LucideIcon } from 'lucide-react';
+import type { Icon } from '@phosphor-icons/react';
 import type { HTMLAttributes } from 'astro/types';
 
 type Variant = 'primary' | 'secondary' | 'ghost';
@@ -8,8 +8,8 @@ type Size = 'md' | 'lg';
 type Props = {
   variant?: Variant;
   size?: Size;
-  /** Icône Lucide affichée après le libellé (décorative). */
-  icon?: LucideIcon;
+  /** Icône Phosphor affichée après le libellé (décorative). */
+  icon?: Icon;
   class?: string;
 } & (
   | ({ href: string } & Omit<HTMLAttributes<'a'>, 'class'>)
@@ -36,9 +36,9 @@ const sizes: Record<Size, string> = {
 // primary : fond transparent qui se remplit de rouge du bas vers le haut au survol.
 const variants: Record<Variant, string> = {
   primary:
-    'border border-brand text-white before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:bg-brand before:transition-transform before:duration-300 before:ease-out-expo hover:before:scale-y-100 focus-visible:before:scale-y-100',
-  secondary: 'border border-white/15 text-gray-100 hover:border-white/30 hover:bg-white/5',
-  ghost: 'px-0! text-gray-100 hover:text-brand-bright',
+    'border border-brand text-fg hover:text-white focus-visible:text-white before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:bg-brand before:transition-transform before:duration-300 before:ease-out-expo hover:before:scale-y-100 focus-visible:before:scale-y-100',
+  secondary: 'border border-line-strong text-fg hover:border-fg/40 hover:bg-fg/5',
+  ghost: 'px-0! text-fg hover:text-accent',
 };
 
 const classes = [base, sizes[size], variants[variant], className];
@@ -52,12 +52,12 @@ const buttonAttrs = attrs as Omit<HTMLAttributes<'button'>, 'class'>;
   href ? (
     <a href={href} class:list={classes} {...anchorAttrs}>
       <slot />
-      {Icon && <Icon aria-hidden="true" className={iconClass} strokeWidth={2} />}
+      {Icon && <Icon aria-hidden="true" className={iconClass} weight="bold" />}
     </a>
   ) : (
     <button type="button" class:list={classes} {...buttonAttrs}>
       <slot />
-      {Icon && <Icon aria-hidden="true" className={iconClass} strokeWidth={2} />}
+      {Icon && <Icon aria-hidden="true" className={iconClass} weight="bold" />}
     </button>
   )
 }

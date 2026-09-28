@@ -2,22 +2,74 @@
 @import '@fontsource-variable/inter/wght.css';
 @import 'tailwindcss';
 
+/* Mode sombre piloté par la classe `.dark` sur <html> (script anti-FOUC dans Layout.astro). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ------------------------------------------------------------------
    Design tokens — Entité & Co
-   Dark par défaut, accent vermillon issu du « É » rouge du logo.
+   Tokens sémantiques : les composants n'utilisent jamais de hex bruts,
+   seules les valeurs ci-dessous changent entre thème clair et sombre.
+   Contrastes vérifiés (WCAG AA) :
+   - clair  : fg-muted #525252 / canvas 7.5:1 · accent #c40000 / canvas 6.0:1
+   - sombre : fg-muted #9ca3af / canvas 7.7:1 · accent #ff3b3b / canvas 5.6:1
+   - brand #e60000 + texte blanc : 4.8:1 (les deux thèmes)
    ------------------------------------------------------------------ */
+:root {
+  --canvas: #fafafa; /* neutral-50 */
+  --surface: #ffffff;
+  --fg: #171717; /* neutral-900 */
+  --fg-muted: #525252; /* neutral-600 */
+  --line: rgb(23 23 23 / 0.1);
+  --line-strong: rgb(23 23 23 / 0.2);
+  --glass: rgb(255 255 255 / 0.7);
+  --placeholder: #f5f5f5; /* neutral-100 */
+  --placeholder-line: #e5e5e5; /* neutral-200 */
+  --placeholder-icon: #a3a3a3;
+  --accent: #c40000;
+  --halo: rgb(230 0 0 / 0.07);
+  --grain-opacity: 0.035;
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: #0a0a0a; /* neutral-950 */
+  --surface: #111111;
+  --fg: #f3f4f6;
+  --fg-muted: #9ca3af;
+  --line: rgb(255 255 255 / 0.1);
+  --line-strong: rgb(255 255 255 / 0.2);
+  --glass: rgb(255 255 255 / 0.03);
+  --placeholder: #171717; /* neutral-900 */
+  --placeholder-line: #262626; /* neutral-800 */
+  --placeholder-icon: #737373;
+  --accent: #ff3b3b;
+  --halo: rgb(230 0 0 / 0.12);
+  --grain-opacity: 0.05;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-glass: var(--glass);
+  --color-placeholder: var(--placeholder);
+  --color-placeholder-line: var(--placeholder-line);
+  --color-placeholder-icon: var(--placeholder-icon);
+  /* accent : texte/icônes rouges sur le fond courant */
+  --color-accent: var(--accent);
+}
+
 @theme {
   --font-display: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #050505;
-  --color-ink-soft: #0c0c0c;
-
-  /* brand : remplissages (boutons, pastilles) — texte blanc dessus = 4.8:1
-     brand-bright : texte/icônes accent sur fond noir = 5.7:1 (WCAG AA) */
+  /* brand : remplissages (boutons, pastilles), identique dans les deux thèmes */
   --color-brand: #e60000;
   --color-brand-hover: #ff1a1a;
-  --color-brand-bright: #ff3b3b;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -29,10 +81,6 @@
 }
 
 @layer base {
-  :root {
-    color-scheme: dark;
-  }
-
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
@@ -40,7 +88,7 @@
   }
 
   body {
-    @apply bg-ink font-sans text-base leading-relaxed text-gray-100 antialiased;
+    @apply bg-canvas font-sans text-base leading-relaxed text-fg antialiased;
     min-height: 100dvh;
   }
 
@@ -60,7 +108,12 @@
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-4 outline-brand-bright;
+    @apply outline-2 outline-offset-4 outline-accent;
+  }
+
+  /* Ancres : ne pas finir sous la navbar fixe (focus-not-obscured) */
+  [id] {
+    scroll-margin-top: 7rem;
   }
 }
 
@@ -72,26 +125,54 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(60rem 40rem at 85% -10%, rgb(230 0 0 / 0.12), transparent 60%),
-      radial-gradient(50rem 35rem at -10% 110%, rgb(230 0 0 / 0.06), transparent 60%),
-      var(--color-ink);
+      radial-gradient(60rem 40rem at 85% -10%, var(--halo), transparent 60%),
+      radial-gradient(50rem 35rem at -10% 110%, var(--halo), transparent 60%),
+      var(--canvas);
   }
 
   .bg-atmosphere::after {
     content: '';
     position: absolute;
     inset: 0;
-    opacity: 0.05;
+    opacity: var(--grain-opacity);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* Glassmorphism (cartes, navbar) */
+  /* Glassmorphism (cartes, navbar) — plus opaque en clair (ui-ux-pro-max : glass light mode) */
   .glass {
-    @apply border border-white/10 bg-white/[0.03] backdrop-blur-xl;
+    @apply border border-line bg-glass backdrop-blur-xl;
   }
 
   .container-site {
     @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+  }
+
+  /* Texte long (pages légales) — pas de plugin typography, styles ciblés */
+  .prose-site {
+    @apply max-w-[70ch] text-fg-muted;
+  }
+  .prose-site :where(h2) {
+    @apply mt-14 mb-4 text-2xl font-semibold text-fg sm:text-3xl;
+  }
+  .prose-site :where(h3) {
+    @apply mt-10 mb-3 text-xl font-semibold text-fg;
+  }
+  .prose-site :where(p, ul) {
+    @apply mb-5;
+  }
+  .prose-site :where(ul) {
+    @apply flex flex-col gap-2 pl-5;
+    list-style: square;
+  }
+  .prose-site :where(li)::marker {
+    @apply text-brand;
+  }
+  .prose-site :where(strong) {
+    @apply font-semibold text-fg;
+  }
+  .prose-site :where(a) {
+    @apply text-fg underline decoration-brand decoration-2 underline-offset-4 transition-colors duration-200 hover:text-accent;
+    overflow-wrap: anywhere;
   }
 }
 

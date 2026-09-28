@@ -1,0 +1,39 @@
+---
+import { getEntry, render } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+
+interface Props {
+  id: 'mentions-legales' | 'politique-de-confidentialite';
+}
+
+const { id } = Astro.props;
+const entry = await getEntry('legal', id);
+if (!entry) throw new Error(`Page légale introuvable : ${id}`);
+
+const { Content } = await render(entry);
+const { title, description, updated } = entry.data;
+const breadcrumbs = [{ label: title, href: `/${id}` }];
+
+const updatedLabel = updated?.toLocaleDateString('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+---
+
+<Layout title={`${title} | Entité & Co`} description={description} breadcrumbs={breadcrumbs}>
+  <PageHero
+    eyebrow="Informations légales"
+    title={title}
+    breadcrumbs={breadcrumbs}
+    imageLabel={false}
+    {...(updatedLabel ? { intro: `Dernière mise à jour : ${updatedLabel}` } : {})}
+  />
+  <article class="container-site pb-16">
+    <div class="prose-site border-t border-line pt-4">
+      <Content />
+    </div>
+  </article>
+</Layout>

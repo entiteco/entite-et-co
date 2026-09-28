@@ -1,86 +1,195 @@
 ---
-// Page provisoire (Étape 2) : vitrine des composants globaux.
-// La page d'accueil complète est construite à l'Étape 3.
-import { ArrowRight, BrainCircuit, PenTool, Shirt } from 'lucide-react';
+// Contenu : migration-entite/page-accueil/page_accueil.md
+import { ArrowDownIcon, ArrowRightIcon } from '@phosphor-icons/react/ssr';
 import Layout from '@/layouts/Layout.astro';
 import Button from '@/components/ui/Button.astro';
-import SectionHeading from '@/components/ui/SectionHeading.astro';
-import ServiceCard from '@/components/ui/ServiceCard.astro';
 import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+import { expertiseIcons } from '@/data/expertise-icons';
+import type { ExpertiseSlug } from '@/data/expertises';
+import { inlineMarkdown } from '@/lib/inline-markdown';
 
-const services = [
+const seo = {
+  title: 'Studio Digital & IA | Web, Data et Merchandising | Entité & Co',
+  description:
+    "L'alliance de la technologie, de la créativité et de l'innovation. Entité & Co est votre studio tout-en-un pour le web, l'intelligence artificielle et l'impression textile.",
+};
+
+interface HomeExpertise {
+  slug: ExpertiseSlug;
+  title: string;
+  text: string;
+  items: readonly string[];
+  cta: string;
+  imageLabel: string;
+}
+
+const homeExpertises: readonly HomeExpertise[] = [
   {
+    slug: 'data-ia',
     title: 'Data & Intelligence Artificielle',
-    description:
-      "Accélérez votre business avec la force de l'IA et de la data. Nous transformons vos bases de données brutes en décisions stratégiques.",
+    text: "Accélérez votre business avec la force de l'IA et de la data. Nous transformons vos bases de données brutes en décisions stratégiques et développons des solutions prédictives sur-mesure pour automatiser votre croissance.",
     items: [
-      'Data Science & IA : Machine Learning, NLP, modèles prédictifs.',
-      'Data Analyse & BI : tableaux de bord Power BI, reportings automatisés.',
-      'Architecture Data : nettoyage, structuration, pipelines sécurisés.',
+      '**Data Science & IA :** Machine Learning, traitement du langage (NLP), modèles prédictifs.',
+      '**Data Analyse & BI :** Tableaux de bord interactifs (Power BI), analyse de données, automatisation de reportings.',
+      '**Architecture Data :** Nettoyage, structuration et déploiement de pipelines sécurisés.',
     ],
-    icon: BrainCircuit,
-    href: '/expertises/data-ia',
-    linkLabel: "Explorer l'expertise",
+    cta: "Explorer l'expertise Data & IA",
+    imageLabel: 'Visuel Data & IA',
   },
   {
+    slug: 'creation-digitale',
     title: 'Création Digitale & Web',
-    description:
-      'Construisons ensemble votre identité digitale : esthétique, ergonomique et conçue pour convertir.',
+    text: 'Construisons ensemble votre identité digitale. Votre présence en ligne est votre premier point de contact : elle se doit d\'être esthétique, ergonomique et conçue pour convertir.',
     items: [
-      'Développement Web : sites vitrines et e-commerce.',
-      'Graphisme & Branding : logos, chartes, identités visuelles.',
-      'Visibilité : marketplaces et community management.',
+      '**Développement Web :** Sites vitrines performants et plateformes e-commerce (WooCommerce, PrestaShop).',
+      '**Graphisme & Branding :** Création de logos, chartes graphiques et identités visuelles complètes.',
+      '**Visibilité :** Gestion de marketplaces et stratégies de community management pour fidéliser votre audience.',
     ],
-    icon: PenTool,
-    href: '/expertises/creation-digitale',
-    linkLabel: 'Découvrir le Studio Web',
+    cta: 'Découvrir le Studio Web',
+    imageLabel: 'Visuel Création Digitale',
   },
   {
+    slug: 'impression-textile',
     title: 'Impression Textile & Merchandising',
-    description:
-      'Donnez vie à votre marque avec des vêtements et objets promotionnels de qualité professionnelle.',
+    text: 'Vous cherchez à mettre en avant votre activité dans le monde réel ? Donnez vie à votre marque avec des vêtements et objets promotionnels de qualité professionnelle, imprimés selon vos besoins.',
     items: [
-      'Marquage Textile : sérigraphie, flocage, DTG, broderie, sublimation.',
-      'Objets publicitaires : Ecocups, stickers, casquettes.',
-      'Production centralisée : de la petite série au volume événementiel.',
+      '**Marquage Textile :** Sérigraphie, flocage, impression numérique (DTG), broderie et sublimation.',
+      '**Objets publicitaires :** Gobelets réutilisables (Ecocups), stickers, casquettes et accessoires sur-mesure.',
+      '**Production centralisée :** De la petite série à la production événementielle massive.',
     ],
-    icon: Shirt,
-    href: '/expertises/impression-textile',
-    linkLabel: 'Voir les solutions',
+    cta: "Voir les solutions d'Impression",
+    imageLabel: 'Visuel Impression Textile',
   },
-] as const;
+];
 ---
 
-<Layout>
-  <section class="container-site flex min-h-dvh flex-col justify-center gap-10 pt-32 pb-16">
-    <SectionHeading as="h1" eyebrow="Entité & Co" title="Studio Digital & IA">
-      <p>
-        L'alliance de la technologie, de la créativité et de l'innovation. Nous transformons vos
-        idées en écosystèmes digitaux et physiques performants.
+<Layout title={seo.title} description={seo.description}>
+  <!-- Héro -->
+  <section class="container-site flex min-h-dvh flex-col justify-center gap-12 pt-32 pb-16">
+    <div class="flex flex-col gap-8">
+      <p
+        class="flex items-center gap-3 font-display text-xs font-medium tracking-[0.3em] text-accent uppercase sm:text-sm"
+      >
+        <span aria-hidden="true" class="h-px w-8 bg-brand"></span>
+        Entité & Co
       </p>
-    </SectionHeading>
-    <div class="flex flex-wrap gap-3">
-      <Button href="#expertises" size="lg" icon={ArrowRight}>Découvrir nos expertises</Button>
-      <Button href="/contact" size="lg" variant="secondary">Discuter de votre projet</Button>
+      <h1 class="max-w-5xl text-6xl leading-[0.9] font-bold text-fg sm:text-8xl lg:text-9xl">
+        Studio Digital <span class="text-accent">&</span> IA
+      </h1>
+      <p class="max-w-2xl text-lg text-fg-muted sm:text-xl">
+        L'alliance de la technologie, de la créativité et de l'innovation.
+        <br class="hidden sm:inline" />
+        Nous transformons vos idées en écosystèmes digitaux et physiques performants.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <Button href="#expertises" size="lg" icon={ArrowDownIcon}>Découvrir nos expertises</Button>
+        <Button href="/contact" size="lg" variant="secondary">Discuter de votre projet</Button>
+      </div>
     </div>
-    <ImagePlaceholder label="Mockup Projet" description="Bannière principale" ratio="wide" />
+
+    <ul class="grid gap-3 sm:grid-cols-3" aria-label="Nos trois expertises">
+      {
+        homeExpertises.map((item) => {
+          const ItemIcon = expertiseIcons[item.slug];
+          return (
+            <li>
+              <a
+                href={`#${item.slug}`}
+                class="glass flex min-h-16 cursor-pointer items-center gap-3 rounded-2xl px-5 py-4 text-fg transition-colors duration-200 hover:border-brand/40"
+              >
+                <ItemIcon aria-hidden="true" className="size-6 shrink-0 text-accent" weight="regular" />
+                <span class="font-display font-semibold">{item.title}</span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
   </section>
 
-  <section id="expertises" class="container-site flex scroll-mt-28 flex-col gap-12 py-24 sm:py-32">
-    <SectionHeading eyebrow="Nos expertises" title="Un est tout, tout est un.">
-      <p>
-        Pourquoi multiplier les prestataires quand une seule entité peut maîtriser toute votre
-        chaîne de valeur ?
+  <!-- Expertises -->
+  <div id="expertises">
+    {
+      homeExpertises.map((item, i) => {
+        const ItemIcon = expertiseIcons[item.slug];
+        const reversed = i % 2 === 1;
+        return (
+          <section
+            id={item.slug}
+            aria-labelledby={`${item.slug}-titre`}
+            class="container-site border-t border-line py-20 sm:py-28"
+          >
+            <div class="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+              <div class:list={['reveal lg:col-span-6', reversed && 'lg:order-2']}>
+                <ImagePlaceholder label={item.imageLabel} description={item.title} ratio="landscape" />
+              </div>
+              <div class:list={['flex flex-col gap-6 lg:col-span-6', reversed && 'lg:order-1']}>
+                <div class="flex items-center gap-4">
+                  <span class="font-display text-5xl font-bold text-accent tabular-nums sm:text-6xl">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span class="grid size-12 place-items-center rounded-full border border-line bg-fg/5 text-accent">
+                    <ItemIcon aria-hidden="true" className="size-6" weight="regular" />
+                  </span>
+                </div>
+                <h2
+                  id={`${item.slug}-titre`}
+                  class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl"
+                >
+                  {item.title}
+                </h2>
+                <p class="text-lg text-fg-muted">{item.text}</p>
+                <ul class="flex flex-col gap-4">
+                  {item.items.map((point) => (
+                    <li class="flex gap-4 text-fg-muted">
+                      <span aria-hidden="true" class="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand" />
+                      <span set:html={inlineMarkdown(point)} />
+                    </li>
+                  ))}
+                </ul>
+                <Button href={`/expertises/${item.slug}`} icon={ArrowRightIcon} class="w-fit">
+                  {item.cta}
+                </Button>
+              </div>
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
+
+  <!-- Philosophie -->
+  <section
+    aria-labelledby="philosophie"
+    class="relative isolate overflow-hidden border-t border-line py-24 sm:py-36"
+  >
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 bg-[radial-gradient(45rem_25rem_at_50%_50%,rgb(230_0_0/0.14),transparent_70%)]"
+    >
+    </div>
+    <div class="container-site flex flex-col items-center gap-8 text-center">
+      <p class="font-display text-xs font-medium tracking-[0.3em] text-accent uppercase sm:text-sm">
+        Notre philosophie
       </p>
-    </SectionHeading>
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {
-        services.map((service, i) => (
-          <div class="reveal" style={`--reveal-start: ${i * 8}%`}>
-            <ServiceCard {...service} />
-          </div>
-        ))
-      }
+      <h2
+        id="philosophie"
+        class="reveal max-w-5xl text-5xl leading-[0.95] font-bold text-fg sm:text-7xl lg:text-8xl"
+      >
+        Un est tout, tout est un.
+      </h2>
+      <p class="max-w-[60ch] text-xl font-medium text-fg">
+        Pourquoi multiplier les prestataires quand une seule entité peut maîtriser toute votre chaîne
+        de valeur ?
+      </p>
+      <p class="max-w-[65ch] text-lg text-fg-muted">
+        C'est la philosophie d'<strong class="font-semibold text-fg">Entité & Co</strong>. De la
+        conception de votre identité visuelle, au développement de votre plateforme web boostée par
+        l'Intelligence Artificielle, jusqu'à l'impression physique de votre merchandising : nous
+        connectons tous les points de votre projet. Une vision globale pour un résultat cohérent et
+        percutant.
+      </p>
+      <Button href="/contact" size="lg" icon={ArrowRightIcon}>Discuter de votre projet</Button>
     </div>
   </section>
 </Layout>

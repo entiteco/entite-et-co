@@ -17,7 +17,11 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'hover',
   },
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    // La page 404 (noindex) est exclue du sitemap.
+    sitemap({ filter: (page) => !/\/404\/?$/.test(page) }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

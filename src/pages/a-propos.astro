@@ -1,0 +1,219 @@
+---
+// Contenu : migration-entite/page-a-propos/page_propos.md
+import { ArrowRightIcon, GraduationCapIcon, HandshakeIcon, StackIcon } from '@phosphor-icons/react/ssr';
+import Layout from '@/layouts/Layout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import Button from '@/components/ui/Button.astro';
+import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import { expertiseIcons } from '@/data/expertise-icons';
+import type { ExpertiseSlug } from '@/data/expertises';
+
+const seo = {
+  title: "À Propos d'Entité & Co | L'écosystème Digital, Data et Créatif",
+  description:
+    "Découvrez l'histoire et la vision d'Entité & Co. Un studio hybride fondé par Kévin Heugas, alliant expertise technique (IA, Data) et création digitale.",
+};
+
+const breadcrumbs = [{ label: 'À Propos', href: '/a-propos' }];
+
+const poles: readonly { slug: ExpertiseSlug; title: string; description: string }[] = [
+  {
+    slug: 'data-ia',
+    title: "L'Intelligence Technologique (XENA)",
+    description:
+      "Exploitation de la Data, création d'algorithmes et développement de solutions en Intelligence Artificielle pour propulser votre croissance.",
+  },
+  {
+    slug: 'creation-digitale',
+    title: 'Le Studio Créatif (KVN HGS)',
+    description:
+      'Web design, e-commerce, graphisme et direction artistique pour forger une identité digitale mémorable.',
+  },
+  {
+    slug: 'impression-textile',
+    title: "L'Atelier Physique (SFB)",
+    description:
+      "Impression textile et merchandising pour matérialiser votre marque et fidéliser votre communauté au-delà de l'écran.",
+  },
+];
+
+const references = [
+  'Satisfait Services',
+  'Au Chai de Jérôme',
+  'Adelante Polo Team',
+  'Amplitude 64',
+  'Optique Medar',
+  'Le Petit Pont',
+  'La Yeyette au Rhum',
+  'Balek',
+  'CFDT Enedis',
+] as const;
+
+const founderLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Kévin Heugas',
+  jobTitle: 'Fondateur, Lead Data Engineer & Créateur Digital',
+  worksFor: { '@type': 'Organization', name: 'Entité & Co' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'EFREI' },
+  sameAs: ['https://www.linkedin.com/in/kevinheugas/'],
+};
+---
+
+<Layout title={seo.title} description={seo.description} breadcrumbs={breadcrumbs}>
+  <script type="application/ld+json" set:html={JSON.stringify(founderLd)} />
+
+  <PageHero
+    eyebrow="À Propos"
+    title="À Propos d'Entité & Co"
+    intro="Entité & Co n'est pas une simple agence web. C'est un écosystème hybride né d'une conviction forte : les meilleurs projets naissent de la convergence entre la technologie de pointe, le design esthétique et la réalité du monde physique."
+    breadcrumbs={breadcrumbs}
+    imageLabel="Visuel Entité & Co"
+  />
+
+  <!-- Philosophie -->
+  <section aria-labelledby="philosophie" class="container-site border-t border-line py-16 sm:py-24">
+    <div class="grid gap-10 lg:grid-cols-12">
+      <h2
+        id="philosophie"
+        class="text-4xl leading-[0.95] font-bold text-fg sm:text-6xl lg:col-span-6"
+      >
+        « Un est tout, tout est un »
+      </h2>
+      <p class="reveal text-lg text-fg-muted lg:col-span-6 lg:pt-3 sm:text-xl">
+        Notre philosophie, <strong class="font-semibold text-fg">"Un est tout, tout est un"</strong>,
+        reflète notre approche globale. Nous refusons le travail en silo. Chez nous, la donnée nourrit
+        le design, le web propulse les ventes, et le textile incarne votre marque dans le monde réel.
+      </p>
+    </div>
+  </section>
+
+  <!-- Vision 360° -->
+  <section aria-labelledby="vision-titre" class="container-site py-16 sm:py-24">
+    <SectionHeading eyebrow="Notre vision" title="Notre Vision : L'Écosystème 360°">
+      <p>
+        Nous avons structuré notre offre autour de trois pôles d'expertise interconnectés pour vous
+        accompagner de la genèse de votre idée jusqu'à son déploiement à grande échelle :
+      </p>
+    </SectionHeading>
+    <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {
+        poles.map((pole, i) => (
+          <div class="reveal" style={`--reveal-start: ${i * 8}%`}>
+            <ServiceCard
+              title={pole.title}
+              description={pole.description}
+              icon={expertiseIcons[pole.slug]}
+              href={`/expertises/${pole.slug}`}
+              linkLabel="Découvrir le pôle"
+              imageLabel={`Visuel ${pole.title}`}
+            />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Fondateur -->
+  <section aria-labelledby="fondateur" class="container-site border-t border-line py-16 sm:py-24">
+    <div class="grid items-start gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:sticky lg:top-28 lg:col-span-5">
+        <ImagePlaceholder
+          label="Portrait du fondateur"
+          description="Kévin Heugas, fondateur d'Entité & Co"
+          ratio="portrait"
+        />
+      </div>
+      <div class="flex flex-col gap-6 lg:col-span-7">
+        <p class="font-display text-sm font-medium tracking-[0.3em] text-accent uppercase">
+          Le Fondateur
+        </p>
+        <h2 id="fondateur" class="text-4xl leading-[1.02] font-bold text-fg sm:text-6xl">
+          Kévin HEUGAS
+        </h2>
+        <p class="font-display text-lg text-fg">
+          Fondateur, Lead Data Engineer & Créateur Digital
+        </p>
+        <p class="text-lg text-fg-muted">
+          L'écosystème Entité & Co est le reflet du parcours atypique et pluridisciplinaire de son
+          fondateur. Alliant une expertise technique de haut vol à une sensibilité artistique pointue,
+          Kévin incarne cette alliance entre technologie et créativité.
+        </p>
+
+        <ul class="flex flex-col gap-4">
+          <li class="glass flex gap-4 rounded-2xl p-5 sm:p-6">
+            <GraduationCapIcon aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-accent" weight="regular" />
+            <p class="text-fg-muted">
+              Fort d'une solide formation en ingénierie de la donnée (<strong
+                class="font-semibold text-fg">Mastère Data Engineering & Artificial Intelligence à l'EFREI</strong
+              >) et d'une expérience concrète au cœur des systèmes d'information de grands groupes
+              (notamment au sein de la <strong class="font-semibold text-fg">DSI d'Enedis</strong>), il
+              apporte à l'agence une rigueur analytique et une maîtrise des architectures complexes (Big
+              Data, IA, RGPD).
+            </p>
+          </li>
+          <li class="glass flex gap-4 rounded-2xl p-5 sm:p-6">
+            <StackIcon aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-accent" weight="regular" />
+            <p class="text-fg-muted">
+              En parallèle de ce bagage technique, son profil de créateur autodidacte lui permet de
+              comprendre les enjeux d'image, de design et de commerce de chaque client, offrant ainsi une
+              direction de projet véritablement complète et singulière.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Références -->
+  <section aria-labelledby="references" class="container-site border-t border-line py-16 sm:py-24">
+    <div class="grid gap-12 lg:grid-cols-12">
+      <div class="flex flex-col gap-6 lg:col-span-5">
+        <span
+          class="grid size-12 place-items-center rounded-full border border-line bg-fg/5 text-accent"
+        >
+          <HandshakeIcon aria-hidden="true" className="size-6" weight="regular" />
+        </span>
+        <h2 id="references" class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
+          Ils nous font confiance
+        </h2>
+        <p class="text-lg text-fg-muted">
+          De l'artisan local à la startup innovante, en passant par les institutions et les acteurs
+          institutionnels, notre plus grande fierté est la diversité de nos partenaires. Nous adaptons
+          notre force de frappe à l'envergure de vos ambitions.
+        </p>
+      </div>
+      <div class="lg:col-span-7">
+        <p class="mb-5 text-sm text-fg-muted italic">Parmi nos références :</p>
+        <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {
+            references.map((name) => (
+              <li class="glass flex min-h-20 items-center justify-center rounded-xl px-4 py-3 text-center font-display font-semibold text-fg">
+                {name}
+              </li>
+            ))
+          }
+          <li
+            class="flex min-h-20 items-center justify-center rounded-xl border border-dashed border-line-strong px-4 py-3 text-center text-sm text-fg-muted"
+          >
+            et bien d'autres.
+          </li>
+        </ul>
+        <div class="mt-8">
+          <Button href="/portfolio" variant="secondary" icon={ArrowRightIcon}>
+            Voir les réalisations
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaSection
+    title="Discutons de votre projet."
+    text="De la genèse de votre idée jusqu'à son déploiement à grande échelle."
+    cta={{ label: 'Discuter de votre projet avec nous', href: '/contact' }}
+  />
+</Layout>

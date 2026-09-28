@@ -6,6 +6,7 @@ export interface NavItem {
 }
 
 export interface SocialLink {
+  network: 'linkedin' | 'instagram';
   label: string;
   href: string;
 }
@@ -39,6 +40,14 @@ export const legalNav: readonly NavItem[] = [
 ];
 
 export const socials: readonly SocialLink[] = [
-  { label: 'LinkedIn (Kévin Heugas)', href: 'https://www.linkedin.com/in/kevinheugas/' },
-  { label: 'Instagram (Entité & Co)', href: 'https://www.instagram.com/entite.co/' },
+  {
+    network: 'linkedin',
+    label: 'LinkedIn (Kévin Heugas)',
+    href: 'https://www.linkedin.com/in/kevinheugas/',
+  },
+  {
+    network: 'instagram',
+    label: 'Instagram (Entité & Co)',
+    href: 'https://www.instagram.com/entite.co/',
+  },
 ];
