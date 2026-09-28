@@ -1,0 +1,114 @@
+---
+// Fiche projet, partagée entre la modale (/portfolio) et la page dédiée (/portfolio/[slug]).
+import { render } from 'astro:content';
+import { ArrowRightIcon } from '@phosphor-icons/react/ssr';
+import Button from '@/components/ui/Button.astro';
+import PrefixIds from '@/components/ui/PrefixIds.astro';
+import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+import { categoryMeta } from '@/data/portfolio';
+import type { Project } from '@/lib/portfolio';
+
+interface Props {
+  project: Project;
+  /** h1 sur la page dédiée, h2 dans la modale. */
+  headingLevel?: 'h1' | 'h2';
+  titleId: string;
+  /** Focus initial sur le titre à l'ouverture de la modale. */
+  focusTitle?: boolean;
+}
+
+const { project, headingLevel: Heading = 'h2', titleId, focusTitle = false } = Astro.props;
+const { title, category, client, year, summary, services, tools, demo } = project.data;
+const meta = categoryMeta[category];
+const { Content } = await render(project);
+
+const facts = [
+  { label: 'Client', value: client },
+  { label: 'Année', value: String(year) },
+  { label: 'Expertise', value: meta.longLabel },
+  { label: 'Prestations', value: services.join(', ') },
+];
+---
+
+<div class="flex flex-col gap-8">
+  <header class="flex flex-col gap-4">
+    <div class="flex flex-wrap items-center gap-3">
+      <span
+        class="rounded-full border border-brand/40 px-2.5 py-0.5 font-display text-xs font-semibold tracking-[0.15em] text-accent uppercase"
+      >
+        {meta.label}
+      </span>
+      {
+        demo && (
+          <span class="rounded-full border border-line-strong px-2.5 py-0.5 text-xs text-fg-muted">
+            Projet de démonstration
+          </span>
+        )
+      }
+    </div>
+    <Heading
+      id={titleId}
+      autofocus={focusTitle}
+      tabindex={focusTitle ? -1 : undefined}
+      class:list={[
+        'focus:outline-none',
+        'leading-[1.05] font-bold text-fg',
+        Heading === 'h1' ? 'text-4xl sm:text-6xl' : 'text-3xl sm:text-5xl',
+      ]}
+    >
+      {title}
+    </Heading>
+    <p class="max-w-[65ch] text-lg text-fg-muted">{summary}</p>
+  </header>
+
+  <ImagePlaceholder label="Mockup Projet" description={`Visuel principal — ${title}`} ratio="video" />
+
+  <div class="grid gap-10 lg:grid-cols-12">
+    <dl class="grid content-start gap-5 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-1">
+      {
+        facts.map((fact) => (
+          <div class="border-t border-line pt-3">
+            <dt class="font-display text-xs font-semibold tracking-[0.2em] text-fg-muted uppercase">
+              {fact.label}
+            </dt>
+            <dd class="mt-1 text-fg">{fact.value}</dd>
+          </div>
+        ))
+      }
+      {
+        tools.length > 0 && (
+          <div class="border-t border-line pt-3 sm:col-span-2 lg:col-span-1">
+            <dt class="font-display text-xs font-semibold tracking-[0.2em] text-fg-muted uppercase">
+              Outils
+            </dt>
+            <dd class="mt-2">
+              <ul class="flex flex-wrap gap-2">
+                {tools.map((tool) => (
+                  <li class="rounded-full border border-line px-3 py-1 text-sm text-fg-muted">{tool}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <div class="prose-site lg:col-span-8 [&_h2]:mt-0 [&_h2:not(:first-child)]:mt-10 [&_h2]:text-xl sm:[&_h2]:text-2xl">
+      <PrefixIds prefix={project.id}><Content /></PrefixIds>
+    </div>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <ImagePlaceholder label="Ajouter une image" description={`Détail 1 — ${title}`} ratio="landscape" />
+    <ImagePlaceholder label="Ajouter une image" description={`Détail 2 — ${title}`} ratio="landscape" />
+  </div>
+
+  <div class="flex flex-wrap gap-3 border-t border-line pt-8">
+    <Button href={`/contact?sujet=${meta.expertise}`} icon={ArrowRightIcon}>
+      Discuter d'un projet similaire
+    </Button>
+    <Button href={`/expertises/${meta.expertise}`} variant="secondary">
+      Expertise {meta.longLabel}
+    </Button>
+  </div>
+</div>

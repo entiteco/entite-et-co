@@ -76,9 +76,13 @@ Bouton `ThemeToggle` (soleil/lune, `aria-pressed`) dans la navbar, toutes taille
 - Eyebrow brand-bright (numéro/label) + H2 massif + intro gray-400 (max 65ch).
 - Niveau de titre configurable (`as="h2" | "h3"`) pour respecter la hiérarchie.
 
-### Modales (portfolio, Étape 4)
-- Fond overlay `bg-ink/80 backdrop-blur` (blur = signal de dismiss), panneau `.glass` sombre — jamais blanc.
-- `<dialog>` natif ou React, focus trap, fermeture Échap + bouton visible, retour du focus au déclencheur.
+### Portfolio : filtres et modales (Étape 4)
+- **Données :** collection `src/content/portfolio/*.md` (schéma Zod dans `src/content.config.ts`), `demo: true` pour les projets fictifs.
+- **Filtres :** `<button aria-pressed>` dans un `role="group"`, compteur par catégorie, statut `role="status"` (« N projets affichés »). Catégorie dans l'URL (`?categorie=data|web|textile`, `replaceState`), appliquée par un script inline avant le premier rendu (zéro CLS). Transition via View Transitions API si disponible et hors `prefers-reduced-motion`.
+- **Modales :** `<dialog>` natif pré-rendu (focus piégé, Échap, fond inerte natifs), `aria-labelledby` sur le titre, focus initial sur le titre, retour du focus sur la carte. Fond `bg-canvas` (jamais blanc pur en sombre), `::backdrop` flouté. Plein écran « bottom sheet » sous 640px.
+- **URL :** clic carte → `pushState('/portfolio/<slug>')` sans rechargement ; fermeture → `history.back()` ; Précédent/Suivant rouvrent/ferment la modale. `/portfolio/<slug>` existe aussi en page statique (accès direct, partage, sans JS).
+- **Animation :** entrée 300ms `ease-out-expo`, sortie 200ms (`@starting-style` + `transition-behavior: allow-discrete`).
+- **IDs :** le contenu Markdown des fiches passe par `PrefixIds` (id préfixés par le slug) — aucun id dupliqué sur `/portfolio`.
 
 ## Motion
 

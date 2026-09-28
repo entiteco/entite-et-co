@@ -1,0 +1,252 @@
+---
+// Galerie unique filtrable (Tous | Data | Web | Textile).
+// - Filtre dans l'URL (?categorie=data) : lien partageable, retour arrière préservé.
+// - Chaque carte pointe vers /portfolio/[slug] (sans JS / lien direct) ; avec JS, le clic
+//   ouvre une modale <dialog> pré-rendue et met l'URL à jour sans recharger la page.
+import { XIcon } from '@phosphor-icons/react/ssr';
+import Layout from '@/layouts/Layout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import ProjectCard from '@/components/portfolio/ProjectCard.astro';
+import ProjectDetail from '@/components/portfolio/ProjectDetail.astro';
+import { categoryMeta, projectCategories } from '@/data/portfolio';
+import { getProjects } from '@/lib/portfolio';
+
+const projects = await getProjects();
+const breadcrumbs = [{ label: 'Portfolio', href: '/portfolio' }];
+const hasDemo = projects.some((project) => project.data.demo);
+
+const filters = [
+  { value: 'tous', label: 'Tous', count: projects.length },
+  ...projectCategories.map((category) => ({
+    value: category,
+    label: categoryMeta[category].label,
+    count: projects.filter((project) => project.data.category === category).length,
+  })),
+];
+
+const plural = (n: number) => `${n} projet${n > 1 ? 's' : ''} affiché${n > 1 ? 's' : ''}`;
+---
+
+<Layout
+  title="Portfolio | Réalisations Web, Data & Textile | Entité & Co"
+  description="Découvrez les réalisations d'Entité & Co : projets Data & IA, création digitale (web, e-commerce, branding) et impression textile."
+  breadcrumbs={breadcrumbs}
+>
+  <PageHero
+    eyebrow="Portfolio"
+    title="Nos réalisations"
+    intro="De la donnée au design, du web au textile : une sélection de projets qui illustrent notre philosophie « Un est tout, tout est un »."
+    breadcrumbs={breadcrumbs}
+    imageLabel={false}
+  />
+
+  <section aria-labelledby="projets-titre" class="container-site pb-8">
+    <h2 id="projets-titre" class="sr-only">Projets</h2>
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        role="group"
+        aria-label="Filtrer les projets par catégorie"
+        class="flex flex-wrap gap-2"
+        data-filters
+      >
+        {
+          filters.map((filter) => (
+            <button
+              type="button"
+              data-filter={filter.value}
+              aria-pressed={filter.value === 'tous' ? 'true' : 'false'}
+              class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-line-strong px-5 font-display text-sm font-semibold text-fg-muted transition-[color,background-color,border-color] duration-200 hover:border-fg/40 hover:text-fg aria-pressed:border-brand aria-pressed:bg-brand aria-pressed:text-white"
+            >
+              {filter.label}
+              <span class="text-xs font-medium tabular-nums">{filter.count}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p role="status" data-filter-status class="text-sm text-fg-muted">
+        {plural(projects.length)}
+      </p>
+    </div>
+
+    {
+      hasDemo && (
+        <p class="mt-6 rounded-xl border border-dashed border-line-strong px-4 py-3 text-sm text-fg-muted">
+          Phase maquette : les projets ci-dessous sont des exemples de démonstration, en attendant
+          l'intégration des réalisations et de leurs visuels.
+        </p>
+      )
+    }
+
+    <ul class="mt-8 grid grid-flow-dense gap-6 md:grid-cols-2 lg:grid-cols-3" data-project-grid>
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </ul>
+
+    <!-- Filtre initial appliqué avant le premier rendu (pas de saut de mise en page). -->
+    <script is:inline>
+      (() => {
+        const value = new URLSearchParams(location.search).get('categorie');
+        if (!value || !document.querySelector(`[data-filter="${CSS.escape(value)}"]`)) return;
+        let shown = 0;
+        document.querySelectorAll('[data-project]').forEach((item) => {
+          const match = value === 'tous' || item.dataset.category === value;
+          item.hidden = !match;
+          if (match) shown += 1;
+        });
+        document.querySelectorAll('[data-filter]').forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.filter === value));
+        });
+        const status = document.querySelector('[data-filter-status]');
+        if (status) {
+          status.textContent = `${shown} projet${shown > 1 ? 's' : ''} affiché${shown > 1 ? 's' : ''}`;
+        }
+      })();
+    </script>
+  </section>
+
+  {
+    projects.map((project) => (
+      <dialog
+        id={`projet-${project.id}`}
+        data-project-dialog={project.id}
+        data-title={project.data.title}
+        aria-labelledby={`projet-${project.id}-titre`}
+        class="project-dialog m-auto max-h-[92dvh] max-w-none w-[min(100%-1.5rem,64rem)] overflow-y-auto overscroll-contain rounded-3xl border border-line bg-canvas p-0 text-fg shadow-2xl max-sm:mb-0 max-sm:max-h-[94dvh] max-sm:w-full max-sm:rounded-b-none"
+      >
+        <div class="sticky top-0 z-(--z-index-overlay) flex justify-end bg-linear-to-b from-canvas via-canvas/80 to-transparent p-3 sm:p-4">
+          <button
+            type="button"
+            data-dialog-close
+            class="grid size-11 cursor-pointer place-items-center rounded-full border border-line bg-canvas text-fg transition-colors duration-200 hover:border-line-strong"
+          >
+            <XIcon aria-hidden="true" className="size-5" weight="regular" />
+            <span class="sr-only">Fermer le projet</span>
+          </button>
+        </div>
+        <div class="px-5 pb-8 sm:px-10 sm:pb-12">
+          <ProjectDetail project={project} titleId={`projet-${project.id}-titre`} focusTitle />
+        </div>
+      </dialog>
+    ))
+  }
+
+  <CtaSection
+    title="Un projet en tête ?"
+    text="Data, web ou textile : une seule entité pour connecter tous les points de votre projet."
+    cta={{ label: 'Discuter de votre projet', href: '/contact' }}
+  />
+</Layout>
+
+<script>
+  import { isProjectCategory } from '@/data/portfolio';
+
+  const grid = document.querySelector<HTMLElement>('[data-project-grid]');
+  const status = document.querySelector<HTMLElement>('[data-filter-status]');
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  const items = document.querySelectorAll<HTMLElement>('[data-project]');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const listTitle = document.title;
+
+  /* ---------------------------------------------------------------- Filtres */
+
+  const applyFilter = (value: string) => {
+    let shown = 0;
+    items.forEach((item) => {
+      const match = value === 'tous' || item.dataset.category === value;
+      item.hidden = !match;
+      if (match) shown += 1;
+    });
+    buttons.forEach((button) =>
+      button.setAttribute('aria-pressed', String(button.dataset.filter === value)),
+    );
+    if (status) {
+      status.textContent = `${shown} projet${shown > 1 ? 's' : ''} affiché${shown > 1 ? 's' : ''}`;
+    }
+  };
+
+  buttons.forEach((button) =>
+    button.addEventListener('click', () => {
+      const value = button.dataset.filter ?? 'tous';
+      const url = new URL(location.href);
+      if (isProjectCategory(value)) url.searchParams.set('categorie', value);
+      else url.searchParams.delete('categorie');
+      history.replaceState(history.state, '', url);
+
+      // Transition fluide entre les états de la grille (navigateurs compatibles).
+      if (document.startViewTransition && !reduceMotion.matches && grid) {
+        document.startViewTransition(() => applyFilter(value));
+      } else {
+        applyFilter(value);
+      }
+    }),
+  );
+
+  /* ---------------------------------------------------------------- Modales */
+
+  const dialogFor = (slug: string) =>
+    document.querySelector<HTMLDialogElement>(`[data-project-dialog="${CSS.escape(slug)}"]`);
+
+  let openSlug: string | null = null;
+  let closingFromHistory = false;
+
+  const openProject = (slug: string, { push }: { push: boolean }) => {
+    const dialog = dialogFor(slug);
+    if (!dialog) return false;
+    if (openSlug && openSlug !== slug) dialogFor(openSlug)?.close();
+    if (push) {
+      history.pushState({ project: slug }, '', `/portfolio/${slug}`);
+    }
+    openSlug = slug;
+    document.title = `${dialog.dataset.title ?? ''} | Portfolio | Entité & Co`;
+    if (!dialog.open) dialog.showModal();
+    dialog.scrollTop = 0;
+    return true;
+  };
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-project-link]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      // Ctrl/Cmd-clic, clic molette… : comportement natif (nouvel onglet vers la page dédiée).
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+        return;
+      }
+      const slug = link.dataset.projectLink;
+      if (slug && openProject(slug, { push: true })) event.preventDefault();
+    });
+  });
+
+  document.querySelectorAll<HTMLDialogElement>('[data-project-dialog]').forEach((dialog) => {
+    dialog.querySelector('[data-dialog-close]')?.addEventListener('click', () => dialog.close());
+
+    // Clic sur le fond (hors du contenu) : fermeture.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    // Fermeture (bouton, Échap, fond) : on revient à l'URL de la galerie.
+    dialog.addEventListener('close', () => {
+      const slug = dialog.dataset.projectDialog;
+      if (openSlug !== slug) return;
+      openSlug = null;
+      document.title = listTitle;
+      if (closingFromHistory) {
+        closingFromHistory = false;
+      } else if (history.state?.project === slug) {
+        history.back();
+      }
+      // Le focus revient sur la carte d'origine.
+      document.querySelector<HTMLElement>(`[data-project-link="${CSS.escape(slug ?? '')}"]`)?.focus();
+    });
+  });
+
+  // Précédent / Suivant du navigateur.
+  window.addEventListener('popstate', (event) => {
+    const slug = (event.state as { project?: string } | null)?.project;
+    if (slug) {
+      openProject(slug, { push: false });
+    } else if (openSlug) {
+      closingFromHistory = true;
+      dialogFor(openSlug)?.close();
+    }
+  });
+</script>

@@ -216,3 +216,63 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ------------------------------------------------------------------
+   Modales projet (<dialog> natif) — entrée 300 ms, sortie 200 ms
+   (exit-faster-than-enter), transform/opacity uniquement.
+   ------------------------------------------------------------------ */
+.project-dialog {
+  opacity: 0;
+  transform: translateY(1.5rem) scale(0.98);
+  transition:
+    opacity 200ms ease-in,
+    transform 200ms ease-in,
+    overlay 200ms ease-in allow-discrete,
+    display 200ms ease-in allow-discrete;
+}
+
+.project-dialog[open] {
+  opacity: 1;
+  transform: none;
+  transition-duration: 300ms;
+  transition-timing-function: var(--ease-out-expo);
+}
+
+@starting-style {
+  .project-dialog[open] {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.98);
+  }
+}
+
+.project-dialog::backdrop {
+  background-color: color-mix(in srgb, var(--canvas) 80%, transparent);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  transition:
+    opacity 200ms ease-in,
+    overlay 200ms ease-in allow-discrete,
+    display 200ms ease-in allow-discrete;
+}
+
+.project-dialog[open]::backdrop {
+  opacity: 1;
+  transition-duration: 300ms;
+}
+
+@starting-style {
+  .project-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* Pas de défilement de la page derrière une modale ouverte */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+/* Filtrage du portfolio : transition douce via View Transitions (si supporté) */
+::view-transition-group(*) {
+  animation-duration: 350ms;
+  animation-timing-function: var(--ease-out-expo);
+}

@@ -1,0 +1,58 @@
+---
+import { ArrowUpRightIcon } from '@phosphor-icons/react/ssr';
+import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+import { categoryMeta } from '@/data/portfolio';
+import { projectHref, type Project } from '@/lib/portfolio';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { title, category, client, year, summary, featured } = project.data;
+const meta = categoryMeta[category];
+---
+
+<li
+  data-project
+  data-category={category}
+  style={`view-transition-name: projet-${project.id}`}
+  class:list={['flex', featured && 'lg:col-span-2']}
+>
+  <a
+    href={projectHref(project)}
+    data-project-link={project.id}
+    data-astro-prefetch="false"
+    aria-haspopup="dialog"
+    class="glass group/project flex w-full cursor-pointer flex-col gap-5 rounded-2xl p-4 transition-[border-color,box-shadow] duration-300 ease-out-expo hover:border-brand/40 hover:shadow-[0_0_40px_-12px_rgb(230_0_0/0.45)] sm:p-5"
+  >
+    <ImagePlaceholder
+      label="Mockup Projet"
+      description={title}
+      ratio={featured ? 'video' : 'landscape'}
+      class="lg:aspect-auto lg:h-64"
+    />
+    <div class="flex flex-1 flex-col gap-3 px-1 pb-1">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+        <span
+          class="rounded-full border border-brand/40 px-2.5 py-0.5 font-display text-xs font-semibold tracking-[0.15em] text-accent uppercase"
+        >
+          {meta.label}
+        </span>
+        <span class="text-fg-muted">{client} · {year}</span>
+      </div>
+      <h3 class="text-xl font-semibold text-fg sm:text-2xl">{title}</h3>
+      <p class="text-fg-muted">{summary}</p>
+      <span
+        class="mt-auto inline-flex items-center gap-2 pt-2 font-display text-sm font-semibold text-fg transition-colors duration-200 group-hover/project:text-accent"
+      >
+        Voir le projet
+        <ArrowUpRightIcon
+          aria-hidden="true"
+          className="size-4 transition-transform duration-300 ease-out-expo group-hover/project:translate-x-0.5 group-hover/project:-translate-y-0.5"
+          weight="bold"
+        />
+      </span>
+    </div>
+  </a>
+</li>

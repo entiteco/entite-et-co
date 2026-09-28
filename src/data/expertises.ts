@@ -41,7 +41,10 @@ export interface Expertise {
   closing: { title: string; text: string; cta: Cta };
 }
 
-const portfolioCta: Cta = { label: 'Voir les réalisations dans le Portfolio', href: '/portfolio' };
+const portfolioCta = (categorie: 'data' | 'web' | 'textile'): Cta => ({
+  label: 'Voir les réalisations dans le Portfolio',
+  href: `/portfolio?categorie=${categorie}`,
+});
 
 export const dataIa: Expertise = {
   slug: 'data-ia',
@@ -140,7 +143,7 @@ export const dataIa: Expertise = {
   closing: {
     title: 'Transformez vos données en décisions stratégiques.',
     text: "De l'analyse brute jusqu'au déploiement de modèles prédictifs sur-mesure.",
-    cta: portfolioCta,
+    cta: portfolioCta('data'),
   },
 };
 
@@ -234,7 +237,7 @@ export const creationDigitale: Expertise = {
   closing: {
     title: 'Déployez votre identité en ligne.',
     text: 'Du web design au e-commerce, en passant par le graphisme et les réseaux sociaux.',
-    cta: portfolioCta,
+    cta: portfolioCta('web'),
   },
 };
 
@@ -302,7 +305,7 @@ export const impressionTextile: Expertise = {
   closing: {
     title: 'Donnez vie à votre marque.',
     text: 'Marquage textile (sérigraphie, broderie) et objets publicitaires personnalisés.',
-    cta: portfolioCta,
+    cta: portfolioCta('textile'),
   },
 };
 
