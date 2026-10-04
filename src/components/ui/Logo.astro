@@ -1,15 +1,35 @@
 ---
-// Logotype texte : reprend le « É » rouge du logo historique.
-// Rendu 100 % texte (net à toutes les tailles, zéro requête image).
+// Logo officiel : version noire en thème clair, blanche en thème sombre (bascule via `.dark`).
+import { Image } from 'astro:assets';
+import logoBlack from '@/assets/global/entite_co_logo_noir.webp';
+import logoWhite from '@/assets/global/entite_co_logo_blanc.webp';
+
 interface Props {
-  class?: string;
+  /** Hauteur affichée en px (sources 1x/2x générées à partir de cette valeur). */
+  height?: 32 | 40;
+  /** Logo visible dès l'affichage (Navbar) : chargement prioritaire. */
+  priority?: boolean;
 }
 
-const { class: className = '' } = Astro.props;
+const { height = 32, priority = false } = Astro.props;
+
+const heightClass = { 32: 'h-8', 40: 'h-10' }[height];
+const loading = priority ? { loading: 'eager', fetchpriority: 'high' } as const : {};
 ---
 
-<span class:list={['font-display font-bold tracking-tight whitespace-nowrap', className]}>
-  <span aria-hidden="true">ENTIT<span class="text-accent">É</span></span>
-  <span aria-hidden="true" class="font-medium text-fg-muted">&nbsp;&amp;&nbsp;Co</span>
-  <span class="sr-only">Entité & Co</span>
-</span>
+<Image
+  src={logoBlack}
+  alt="Entité & Co"
+  height={height}
+  densities={[1, 2]}
+  class:list={[heightClass, 'block w-auto dark:hidden']}
+  {...loading}
+/>
+<Image
+  src={logoWhite}
+  alt="Entité & Co"
+  height={height}
+  densities={[1, 2]}
+  class:list={[heightClass, 'hidden w-auto dark:block']}
+  {...loading}
+/>

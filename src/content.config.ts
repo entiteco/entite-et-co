@@ -16,22 +16,33 @@ const legal = defineCollection({
 // Portfolio : un fichier Markdown par projet (frontmatter = fiche, corps = description).
 const portfolio = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/portfolio' }),
-  schema: z.object({
-    title: z.string(),
-    category: z.enum(projectCategories),
-    client: z.string(),
-    year: z.number().int(),
-    /** Accroche affichée sur la carte (≤ 160 caractères). */
-    summary: z.string().max(160),
-    services: z.array(z.string()).min(1),
-    tools: z.array(z.string()).default([]),
-    /** Carte mise en avant (2 colonnes sur grand écran). */
-    featured: z.boolean().default(false),
-    /** Ordre d'affichage (croissant). */
-    order: z.number().int(),
-    /** Projet de démonstration (phase maquette) : à retirer avec les vraies réalisations. */
-    demo: z.boolean().default(false),
-  }),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string(),
+        category: z.enum(projectCategories),
+        client: z.string(),
+        year: z.number().int(),
+        /** Accroche affichée sur la carte (≤ 160 caractères). */
+        summary: z.string().max(160),
+        services: z.array(z.string()).min(1),
+        tools: z.array(z.string()).default([]),
+        /** Carte mise en avant (2 colonnes sur grand écran). */
+        featured: z.boolean().default(false),
+        /** Ordre d'affichage (croissant). */
+        order: z.number().int(),
+        /** Projet de démonstration (phase maquette) : à retirer avec les vraies réalisations. */
+        demo: z.boolean().default(false),
+        /** Visuel principal (chemin relatif au fichier .md) ; placeholder si absent. */
+        cover: image().optional(),
+        coverAlt: z.string().optional(),
+        /** Visuels complémentaires affichés en grille en bas de la fiche projet. */
+        gallery: z.array(image()).optional(),
+      })
+      .refine((data) => !data.cover || data.coverAlt, {
+        message: '`coverAlt` est requis lorsque `cover` est renseigné.',
+        path: ['coverAlt'],
+      }),
 });
 
 export const collections = { legal, portfolio };

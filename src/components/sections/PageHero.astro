@@ -1,9 +1,11 @@
 ---
-// En-tête des pages intérieures : fil d'Ariane, H1, intro, actions, visuel réservé.
+// En-tête des pages intérieures : fil d'Ariane, H1, intro, actions, visuel.
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import ContentImage from '@/components/ui/ContentImage.astro';
 import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
 import { inlineMarkdown } from '@/lib/inline-markdown';
 import type { NavItem } from '@/data/site';
+import type { ContentImageData } from '@/lib/image-ratios';
 
 interface Props {
   eyebrow?: string;
@@ -13,7 +15,11 @@ interface Props {
   breadcrumbs: readonly NavItem[];
   /** Libellé du placeholder ; `false` = pas de visuel (pages légales, contact…). */
   imageLabel?: string | false;
+  /** Visuel réel (chargement prioritaire) ; sinon placeholder `imageLabel`. */
+  image?: ContentImageData;
   imageRatio?: 'square' | 'portrait' | 'landscape';
+  /** Colonne unique centrée, sans visuel (ignore `image` et `imageLabel`). */
+  centered?: boolean;
 }
 
 const {
@@ -23,14 +29,22 @@ const {
   breadcrumbs,
   imageLabel = 'Visuel principal',
   imageRatio = 'square',
+  image,
+  centered = false,
 } = Astro.props;
 
-const withImage = imageLabel !== false;
+const withImage = !centered && imageLabel !== false;
 ---
 
 <section class="container-site pt-32 pb-16 sm:pt-40 sm:pb-24">
   <div class:list={['grid items-center gap-12', withImage && 'lg:grid-cols-12']}>
-    <div class:list={['flex flex-col gap-7', withImage && 'lg:col-span-7']}>
+    <div
+      class:list={[
+        'flex flex-col gap-7',
+        withImage && 'lg:col-span-7',
+        centered && 'mx-auto max-w-4xl items-center text-center',
+      ]}
+    >
       <Breadcrumbs items={breadcrumbs} />
       {
         eyebrow && (
@@ -44,7 +58,7 @@ const withImage = imageLabel !== false;
       {intro && <p class="max-w-[65ch] text-lg text-fg-muted" set:html={inlineMarkdown(intro)} />}
       {
         Astro.slots.has('actions') && (
-          <div class="flex flex-wrap gap-3 pt-1">
+          <div class:list={['flex flex-wrap gap-3 pt-1', centered && 'justify-center']}>
             <slot name="actions" />
           </div>
         )
@@ -54,7 +68,18 @@ const withImage = imageLabel !== false;
     {
       withImage && (
         <div class="lg:col-span-5">
-          <ImagePlaceholder label={imageLabel} description={title} ratio={imageRatio} />
+          {image ? (
+            <ContentImage
+              src={image.src}
+              alt={image.alt}
+              ratio={imageRatio}
+              class={image.class}
+              sizes="(min-width: 1280px) 480px, (min-width: 1024px) 38vw, calc(100vw - 2.5rem)"
+              priority
+            />
+          ) : (
+            <ImagePlaceholder label={imageLabel} description={title} ratio={imageRatio} />
+          )}
         </div>
       )
     }

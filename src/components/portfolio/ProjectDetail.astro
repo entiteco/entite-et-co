@@ -1,9 +1,11 @@
 ---
 // Fiche projet, partagée entre la modale (/portfolio) et la page dédiée (/portfolio/[slug]).
 import { render } from 'astro:content';
+import { Image } from 'astro:assets';
 import { ArrowRightIcon } from '@phosphor-icons/react/ssr';
 import Button from '@/components/ui/Button.astro';
 import PrefixIds from '@/components/ui/PrefixIds.astro';
+import ContentImage from '@/components/ui/ContentImage.astro';
 import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
 import { categoryMeta } from '@/data/portfolio';
 import type { Project } from '@/lib/portfolio';
@@ -18,7 +20,8 @@ interface Props {
 }
 
 const { project, headingLevel: Heading = 'h2', titleId, focusTitle = false } = Astro.props;
-const { title, category, client, year, summary, services, tools, demo } = project.data;
+const { title, category, client, year, summary, services, tools, demo, cover, coverAlt, gallery } =
+  project.data;
 const meta = categoryMeta[category];
 const { Content } = await render(project);
 
@@ -61,7 +64,13 @@ const facts = [
     <p class="max-w-[65ch] text-lg text-fg-muted">{summary}</p>
   </header>
 
-  <ImagePlaceholder label="Mockup Projet" description={`Visuel principal — ${title}`} ratio="video" />
+  {
+    cover ? (
+      <ContentImage src={cover} alt={coverAlt ?? ''} ratio="video" fit="contain" sizes="(min-width: 1280px) 1152px, 100vw" />
+    ) : (
+      <ImagePlaceholder label="Mockup Projet" description={`Visuel principal — ${title}`} ratio="video" />
+    )
+  }
 
   <div class="grid gap-10 lg:grid-cols-12">
     <dl class="grid content-start gap-5 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-1">
@@ -93,15 +102,34 @@ const facts = [
       }
     </dl>
 
-    <div class="prose-site lg:col-span-8 [&_h2]:mt-0 [&_h2:not(:first-child)]:mt-10 [&_h2]:text-xl sm:[&_h2]:text-2xl">
+    <div class="prose-site lg:col-span-8 [&_:is(h2,h3)]:mt-0 [&_:is(h2,h3):not(:first-child)]:mt-10 [&_:is(h2,h3)]:text-xl sm:[&_:is(h2,h3)]:text-2xl">
       <PrefixIds prefix={project.id}><Content /></PrefixIds>
     </div>
   </div>
 
-  <div class="grid gap-4 sm:grid-cols-2">
-    <ImagePlaceholder label="Ajouter une image" description={`Détail 1 — ${title}`} ratio="landscape" />
-    <ImagePlaceholder label="Ajouter une image" description={`Détail 2 — ${title}`} ratio="landscape" />
-  </div>
+  {
+    gallery && gallery.length > 0 ? (
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label={`Galerie — ${title}`}>
+        {gallery.map((img, index) => (
+          <li>
+            <Image
+              src={img}
+              alt={`${title} (${client}) — visuel ${index + 2}`}
+              widths={[320, 480, 640, 960].filter((w) => w <= img.width)}
+              sizes="(min-width: 1280px) 568px, (min-width: 640px) 50vw, 100vw"
+              loading="lazy"
+              class="h-auto w-full rounded-xl bg-white object-contain p-2 dark:bg-neutral-900"
+            />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="grid gap-4 sm:grid-cols-2">
+        <ImagePlaceholder label="Ajouter une image" description={`Détail 1 — ${title}`} ratio="landscape" />
+        <ImagePlaceholder label="Ajouter une image" description={`Détail 2 — ${title}`} ratio="landscape" />
+      </div>
+    )
+  }
 
   <div class="flex flex-wrap gap-3 border-t border-line pt-8">
     <Button href={`/contact?sujet=${meta.expertise}`} icon={ArrowRightIcon}>

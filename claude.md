@@ -1,4 +1,3 @@
-
 # CONTEXTE DU PROJET : REFONTE ENTITÉ & CO
 
 Tu es un développeur web expert full-stack spécialisé dans la création de sites vitrines ultra-performants, modernes et optimisés pour le SEO.
@@ -80,7 +79,7 @@ Tu dois lire les fichiers Markdown (`.md`) présents dans ces sous-dossiers pour
 * `/migration-entite/page-impression-textile/` : Contenu sur le marquage textile et accessoires.
 * `/migration-entite/page-a-propos/` : Contenu sur la vision de l'entreprise et le fondateur.
 
-*Note pour le développeur IA :* Les images de ces dossiers vont dans `src/assets/images/` (et non `public/`) pour être optimisées par le composant `<Image />` d'Astro : voir section 7.
+*Note pour le développeur IA :* Les images de ces dossiers vont dans `src/assets/<dossier-source>/` (et non `public/`) pour être optimisées par le composant `<Image />` d'Astro : voir section 7.
 
 ---
 
@@ -130,17 +129,19 @@ Pour cette phase de développement, n'intègre **aucune véritable image**. Tu d
 
 * ✅ Étapes 0 à 4 terminées (commit `feat: dynamic portfolio collection, filters, and modal system (step 4)`).
 * Portfolio : collection Astro `src/content/portfolio/*.md` (schéma dans `src/content.config.ts`), catégories dans `src/data/portfolio.ts`, helpers dans `src/lib/portfolio.ts`, composants dans `src/components/portfolio/`. Chaque projet a une page `/portfolio/[slug]` (SEO) et s'ouvre en modale depuis la grille.
-* Les projets `demo: true` sont fictifs : à supprimer quand les vraies réalisations sont ajoutées.
-* 🔜 Prochaine phase : intégration des vrais médias (section 7), puis déploiement Vercel (section 8).
+* ✅ Médias réels intégrés (section 7) : logos, accueil, expertises, à propos ; portfolio réel : 6 projets textile (Balek, Kayou, CFDT Enedis, P4PBLUR, La Yeyette, Adelante Polo Team) et 2 projets web (La Yeyette au Rhum e-commerce, Pavillons de l'Atlantique), avec `cover` + `gallery`.
+* Projets data réels (les projets `demo: true` ont été supprimés) : Prédiction de Churn, AISCA, Urban Data Explorer (`src/content/portfolio/data-ia-*.md`, logos dans `src/assets/page-portfolio/data-ia/`, `gallery: []`).
+* 🔜 Prochaine phase : déploiement Vercel (section 8).
 
 ---
 
 # 7. INTÉGRATION DES VRAIS MÉDIAS (FIN DE LA RÈGLE D'OR)
 
-* **Emplacement :** images de contenu dans `src/assets/images/` (optimisées par Astro : WebP/AVIF, `width`/`height`, lazy-loading). Sous-dossiers : `portfolio/<slug>/`, `expertises/`, `a-propos/`. `public/` est réservé aux fichiers servis tels quels (favicon, `robots.txt`, images Open Graph).
-* **Portfolio :** ajouter au schéma `portfolio` un champ `cover: image()` (fonction `({ image }) => z.object({...})`) + `coverAlt: z.string()` ; dans le frontmatter, chemin **relatif au fichier `.md`** : `cover: ../../assets/images/portfolio/<slug>/cover.jpg`.
-* **Rendu :** remplacer `<ImagePlaceholder />` par `<Image src={...} alt={...} widths={[...]} sizes="..." />` (`astro:assets`) en conservant le même ratio (anti-CLS). Image du hero : `loading="eager"` + `fetchpriority="high"`.
-* **Pages statiques** (accueil, expertises, à propos) : `import visuel from '@/assets/images/...'` puis `<Image src={visuel} alt="..." />`.
+* **Emplacement :** images de contenu dans `src/assets/` (optimisées par Astro : WebP, `width`/`height`, `srcset`, lazy-loading), un sous-dossier par page source : `global/`, `page-accueil/`, `page-data-ia/`, `page-creation-digitale/`, `page-impression-textile/`, `page-a-propos/`, `page-portfolio/<categorie-ou-projet>/` (ex. `page-portfolio/textile/entite_sfb_<client>_<visuel>.webp`). `public/` est réservé aux fichiers servis tels quels (favicon, `robots.txt`, images Open Graph).
+* **Format des sources :** `.webp` uniquement (convertir avant d'ajouter), noms en minuscules sans espaces ni guillemets.
+* **Portfolio :** schéma `portfolio` (`src/content.config.ts`) : `cover: image().optional()` + `coverAlt` (obligatoire si `cover`) + `gallery: z.array(image()).optional()`. Chemins **relatifs au fichier `.md`** : `cover: "../../assets/page-portfolio/textile/entite_sfb_kayou_1.webp"`. Champs requis : `title`, `category`, `client`, `year`, `summary` (≤ 160 car.), `services`, `order`. Tout champ hors schéma (ex. `expertise`) est ignoré.
+* **Rendu :** `<ContentImage />` (`src/components/ui/ContentImage.astro`) remplace `<ImagePlaceholder />` dans le même cadre (ratios dans `src/lib/image-ratios.ts`, anti-CLS) ; `priority` pour le hero (`loading="eager"` + `fetchpriority="high"`). `fit="contain"` pour les produits / vêtements (portfolio) : visuel entier, sans rognage, fond `bg-white dark:bg-neutral-900`, sans bordure (la carte `glass` en a déjà une). `fit="cover"` (défaut) : rognage + `border-line`.
+* **Pages statiques** : `import visuel from '@/assets/page-.../fichier.webp'` ; visuels des expertises centralisés dans `src/data/expertise-images.ts`.
 * Toujours un `alt` descriptif en français ; sources ≤ 2560 px de large.
 
 ---

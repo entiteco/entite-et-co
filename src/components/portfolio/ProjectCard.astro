@@ -1,5 +1,6 @@
 ---
 import { ArrowUpRightIcon } from '@phosphor-icons/react/ssr';
+import ContentImage from '@/components/ui/ContentImage.astro';
 import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
 import { categoryMeta } from '@/data/portfolio';
 import { projectHref, type Project } from '@/lib/portfolio';
@@ -9,7 +10,7 @@ interface Props {
 }
 
 const { project } = Astro.props;
-const { title, category, client, year, summary, featured } = project.data;
+const { title, category, client, year, summary, featured, cover, coverAlt } = project.data;
 const meta = categoryMeta[category];
 ---
 
@@ -26,12 +27,25 @@ const meta = categoryMeta[category];
     aria-haspopup="dialog"
     class="glass group/project flex w-full cursor-pointer flex-col gap-5 rounded-2xl p-4 transition-[border-color,box-shadow] duration-300 ease-out-expo hover:border-brand/40 hover:shadow-[0_0_40px_-12px_rgb(230_0_0/0.45)] sm:p-5"
   >
-    <ImagePlaceholder
-      label="Mockup Projet"
-      description={title}
-      ratio={featured ? 'video' : 'landscape'}
-      class="lg:aspect-auto lg:h-64"
-    />
+    {
+      cover ? (
+        <ContentImage
+          src={cover}
+          alt={coverAlt ?? ''}
+          fit="contain"
+          ratio={featured ? 'video' : 'landscape'}
+          sizes={featured ? '(min-width: 1024px) 66vw, 100vw' : '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'}
+          class="lg:aspect-auto lg:h-64"
+        />
+      ) : (
+        <ImagePlaceholder
+          label="Mockup Projet"
+          description={title}
+          ratio={featured ? 'video' : 'landscape'}
+          class="lg:aspect-auto lg:h-64"
+        />
+      )
+    }
     <div class="flex flex-1 flex-col gap-3 px-1 pb-1">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
         <span

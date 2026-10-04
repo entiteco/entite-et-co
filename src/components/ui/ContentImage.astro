@@ -1,0 +1,50 @@
+---
+// Image de contenu optimisée (WebP, srcset) dans le même cadre que <ImagePlaceholder />.
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { imageRatios, type ImageRatio } from '@/lib/image-ratios';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  ratio?: ImageRatio;
+  /** Largeur affichée, pour le choix de la source dans le srcset. */
+  sizes: string;
+  /** Visuel au-dessus de la ligne de flottaison (héro) : chargement prioritaire. */
+  priority?: boolean;
+  /** `contain` : visuel entier sur fond blanc (sombre en dark), sans rognage ni bordure. */
+  fit?: 'cover' | 'contain' | undefined;
+  class?: string | undefined;
+}
+
+const {
+  src,
+  alt,
+  ratio = 'video',
+  sizes,
+  priority = false,
+  fit = 'cover',
+  class: className = '',
+} = Astro.props;
+
+const maxWidth = Math.min(src.width, 1920);
+const widths = [320, 480, 640, 960, 1280, 1920].filter((w) => w <= maxWidth);
+---
+
+<Image
+  src={src}
+  alt={alt}
+  width={maxWidth}
+  widths={widths}
+  sizes={sizes}
+  loading={priority ? 'eager' : 'lazy'}
+  fetchpriority={priority ? 'high' : undefined}
+  class:list={[
+    'w-full rounded-xl',
+    fit === 'contain'
+      ? 'bg-white object-contain p-4 dark:bg-neutral-900'
+      : 'border border-line bg-placeholder object-cover',
+    imageRatios[ratio],
+    className,
+  ]}
+/>

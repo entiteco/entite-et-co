@@ -5,11 +5,13 @@ import Layout from '@/layouts/Layout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import CtaSection from '@/components/sections/CtaSection.astro';
 import Button from '@/components/ui/Button.astro';
-import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+import ContentImage from '@/components/ui/ContentImage.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import ServiceCard from '@/components/ui/ServiceCard.astro';
 import { expertiseIcons } from '@/data/expertise-icons';
+import { expertiseCardImages } from '@/data/expertise-images';
 import type { ExpertiseSlug } from '@/data/expertises';
+import founderImg from '@/assets/page-a-propos/entite_co_kevin_heugas.webp';
 
 const seo = {
   title: "À Propos d'Entité & Co | L'écosystème Digital, Data et Créatif",
@@ -71,7 +73,7 @@ const founderLd = {
     title="À Propos d'Entité & Co"
     intro="Entité & Co n'est pas une simple agence web. C'est un écosystème hybride né d'une conviction forte : les meilleurs projets naissent de la convergence entre la technologie de pointe, le design esthétique et la réalité du monde physique."
     breadcrumbs={breadcrumbs}
-    imageLabel="Visuel Entité & Co"
+    centered
   />
 
   <!-- Philosophie -->
@@ -109,7 +111,7 @@ const founderLd = {
               icon={expertiseIcons[pole.slug]}
               href={`/expertises/${pole.slug}`}
               linkLabel="Découvrir le pôle"
-              imageLabel={`Visuel ${pole.title}`}
+              image={expertiseCardImages[pole.slug]}
             />
           </div>
         ))
@@ -121,10 +123,12 @@ const founderLd = {
   <section aria-labelledby="fondateur" class="container-site border-t border-line py-16 sm:py-24">
     <div class="grid items-start gap-12 lg:grid-cols-12 lg:gap-16">
       <div class="lg:sticky lg:top-28 lg:col-span-5">
-        <ImagePlaceholder
-          label="Portrait du fondateur"
-          description="Kévin Heugas, fondateur d'Entité & Co"
+        <ContentImage
+          src={founderImg}
+          alt="Kévin Heugas, fondateur d'Entité & Co, sur un toit-terrasse parisien au coucher du soleil"
           ratio="portrait"
+          class="object-top"
+          sizes="(min-width: 1280px) 480px, (min-width: 1024px) 38vw, calc(100vw - 2.5rem)"
         />
       </div>
       <div class="flex flex-col gap-6 lg:col-span-7">

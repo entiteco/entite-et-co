@@ -3,10 +3,14 @@
 import { ArrowDownIcon, ArrowRightIcon } from '@phosphor-icons/react/ssr';
 import Layout from '@/layouts/Layout.astro';
 import Button from '@/components/ui/Button.astro';
-import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+import ContentImage from '@/components/ui/ContentImage.astro';
 import { expertiseIcons } from '@/data/expertise-icons';
 import type { ExpertiseSlug } from '@/data/expertises';
 import { inlineMarkdown } from '@/lib/inline-markdown';
+import type { ContentImageData } from '@/lib/image-ratios';
+import kvnHgsImg from '@/assets/page-accueil/entite_start_slider_kvn_hgs.webp';
+import sfbImg from '@/assets/page-accueil/entite_start_slider_sfb_4.webp';
+import xena from '@/assets/page-data-ia/entite_co_xena.webp';
 
 const seo = {
   title: 'Studio Digital & IA | Web, Data et Merchandising | Entité & Co',
@@ -20,7 +24,7 @@ interface HomeExpertise {
   text: string;
   items: readonly string[];
   cta: string;
-  imageLabel: string;
+  image: ContentImageData;
 }
 
 const homeExpertises: readonly HomeExpertise[] = [
@@ -34,7 +38,10 @@ const homeExpertises: readonly HomeExpertise[] = [
       '**Architecture Data :** Nettoyage, structuration et déploiement de pipelines sécurisés.',
     ],
     cta: "Explorer l'expertise Data & IA",
-    imageLabel: 'Visuel Data & IA',
+    image: {
+      src: xena,
+      alt: 'Ingénieure data devant un mur d’écrans de supervision, sous le logo XENA',
+    },
   },
   {
     slug: 'creation-digitale',
@@ -46,7 +53,10 @@ const homeExpertises: readonly HomeExpertise[] = [
       '**Visibilité :** Gestion de marketplaces et stratégies de community management pour fidéliser votre audience.',
     ],
     cta: 'Découvrir le Studio Web',
-    imageLabel: 'Visuel Création Digitale',
+    image: {
+      src: kvnHgsImg,
+      alt: 'Globe numérique formé d’un réseau de points lumineux, signé KVN HGS',
+    },
   },
   {
     slug: 'impression-textile',
@@ -58,7 +68,10 @@ const homeExpertises: readonly HomeExpertise[] = [
       '**Production centralisée :** De la petite série à la production événementielle massive.',
     ],
     cta: "Voir les solutions d'Impression",
-    imageLabel: 'Visuel Impression Textile',
+    image: {
+      src: sfbImg,
+      alt: 'Pile de feutrines colorées aux teintes de l’arc-en-ciel, marquée du logo SFB',
+    },
   },
 ];
 ---
@@ -121,7 +134,12 @@ const homeExpertises: readonly HomeExpertise[] = [
           >
             <div class="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
               <div class:list={['reveal lg:col-span-6', reversed && 'lg:order-2']}>
-                <ImagePlaceholder label={item.imageLabel} description={item.title} ratio="landscape" />
+                <ContentImage
+                  src={item.image.src}
+                  alt={item.image.alt}
+                  ratio="landscape"
+                  sizes="(min-width: 1280px) 584px, (min-width: 1024px) 46vw, calc(100vw - 2.5rem)"
+                />
               </div>
               <div class:list={['flex flex-col gap-6 lg:col-span-6', reversed && 'lg:order-1']}>
                 <div class="flex items-center gap-4">

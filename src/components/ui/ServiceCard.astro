@@ -1,8 +1,10 @@
 ---
 import type { Icon } from '@phosphor-icons/react';
 import { ArrowUpRightIcon } from '@phosphor-icons/react/ssr';
+import ContentImage from './ContentImage.astro';
 import ImagePlaceholder from './ImagePlaceholder.astro';
 import { inlineMarkdown } from '@/lib/inline-markdown';
+import type { ContentImageData } from '@/lib/image-ratios';
 
 interface Props {
   title: string;
@@ -14,6 +16,8 @@ interface Props {
   linkLabel?: string;
   /** Libellé du placeholder visuel ; `false` pour ne pas en afficher. */
   imageLabel?: string | false;
+  /** Visuel réel ; remplace le placeholder. */
+  image?: ContentImageData;
   headingLevel?: 'h2' | 'h3';
   class?: string;
 }
@@ -26,6 +30,7 @@ const {
   href,
   linkLabel = 'En savoir plus',
   imageLabel = 'Ajouter une image',
+  image,
   headingLevel: Heading = 'h3',
   class: className = '',
 } = Astro.props;
@@ -37,7 +42,18 @@ const {
     className,
   ]}
 >
-  {imageLabel !== false && <ImagePlaceholder label={imageLabel} description={title} />}
+  {
+    image ? (
+      <ContentImage
+        src={image.src}
+        alt={image.alt}
+        class={image.class}
+        sizes="(min-width: 1280px) 340px, (min-width: 1024px) 27vw, (min-width: 768px) 44vw, calc(100vw - 4.5rem)"
+      />
+    ) : (
+      imageLabel !== false && <ImagePlaceholder label={imageLabel} description={title} />
+    )
+  }
 
   <div class="flex flex-1 flex-col gap-4">
     <div class="flex items-center gap-3">

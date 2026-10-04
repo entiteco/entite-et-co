@@ -3,14 +3,13 @@
 // Le ratio est réservé pour éviter tout décalage de mise en page (CLS).
 import type { Icon } from '@phosphor-icons/react';
 import { ImageSquareIcon } from '@phosphor-icons/react/ssr';
-
-type Ratio = 'video' | 'square' | 'portrait' | 'landscape' | 'wide';
+import { imageRatios, type ImageRatio } from '@/lib/image-ratios';
 
 interface Props {
   label?: string;
   /** Décrit le visuel attendu, pour les lecteurs d'écran et l'intégration future. */
   description?: string;
-  ratio?: Ratio;
+  ratio?: ImageRatio;
   icon?: Icon;
   class?: string;
 }
@@ -23,13 +22,6 @@ const {
   class: className = '',
 } = Astro.props;
 
-const ratios: Record<Ratio, string> = {
-  video: 'aspect-video',
-  square: 'aspect-square',
-  portrait: 'aspect-[4/5]',
-  landscape: 'aspect-[4/3]',
-  wide: 'aspect-[21/9]',
-};
 ---
 
 <div
@@ -37,7 +29,7 @@ const ratios: Record<Ratio, string> = {
   aria-label={description ? `${label} : ${description}` : label}
   class:list={[
     'relative flex w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-placeholder-line bg-placeholder text-fg-muted',
-    ratios[ratio],
+    imageRatios[ratio],
     className,
   ]}
 >
