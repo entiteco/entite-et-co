@@ -1,0 +1,285 @@
+---
+// Étude de cas « Prédiction de Churn » (page /portfolio/data-ia-churn et modale du portfolio) :
+// simulateur Streamlit en iframe, décision de modélisation (Bento), architecture MLOps interactive
+// (FlowDiagram), stack technique et lien GitHub.
+import type { Icon } from '@phosphor-icons/react';
+import {
+  BrainIcon,
+  ChartLineUpIcon,
+  DatabaseIcon,
+  HardDrivesIcon,
+  ListMagnifyingGlassIcon,
+  CodeIcon,
+  CubeIcon,
+  ScalesIcon,
+  TargetIcon,
+  BrowserIcon,
+} from '@phosphor-icons/react/ssr';
+import FlowDiagram, { type FlowNode } from '@/components/portfolio/case-studies/FlowDiagram.astro';
+import StackSection, { type StackGroup } from '@/components/portfolio/case-studies/StackSection.astro';
+import LiveDemo from '@/components/portfolio/case-studies/LiveDemo.astro';
+import type { Lang } from '@/i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const SIMULATOR_SRC = 'https://projetdatasciencechurn.streamlit.app/?embed=true';
+const SIMULATOR_HREF = 'https://projetdatasciencechurn.streamlit.app/';
+const REPO_HREF = 'https://github.com/entiteco/Projet_Data_Science_Churn';
+
+/** Comparaison des modèles (jeu de test, 10 000 clients, ~20 % de churn). */
+const models = [
+  { name: { fr: 'Régression Logistique', en: 'Logistic Regression' }, accuracy: 66.9, recall: 63.7, kept: true },
+  { name: { fr: 'XGBoost / Random Forest', en: 'XGBoost / Random Forest' }, accuracy: 89.0, recall: 3.4, kept: false },
+];
+
+const stack: StackGroup[] = [
+  { title: 'Backend & ML', icon: CubeIcon, items: ['Python 3.10', 'Scikit-learn', 'XGBoost', 'Imbalanced-learn (SMOTE)', 'SHAP', 'Joblib'] },
+  { title: 'API & UI', icon: BrowserIcon, items: ['FastAPI', 'Uvicorn', 'Streamlit', 'Plotly'] },
+  { title: 'Industrialisation', icon: CodeIcon, items: ['Docker', 'Docker-Compose', 'Makefile', 'Git'] },
+];
+
+const copy = {
+  fr: {
+    simulatorTitle: 'Le simulateur, en direct',
+    simulatorIntro:
+      'Ajustez le profil d’un client et observez sa probabilité de départ et le revenu exposé. Hébergée sur Streamlit Cloud, l’application peut mettre quelques secondes à se réveiller.',
+    iframeTitle: 'Simulateur Streamlit de prédiction de churn et de revenu à risque',
+    openFull: 'Ouvrir dans Streamlit',
+    decisionEyebrow: 'Décision métier & modélisation',
+    decisionTitle: 'Le modèle le moins « précis » était le bon',
+    decisionText:
+      'XGBoost affiche la meilleure Accuracy, mais sur un jeu où seuls ~20 % des clients partent, prédire « reste » presque partout suffit à être juste 9 fois sur 10. Son Rappel de 3,4 % le rend aveugle aux départs. La Régression Logistique, avec 66,9 % d’Accuracy, est le seul modèle capable de détecter deux tiers des clients sur le départ (Rappel 63,7 %) : c’est ce qui compte pour une équipe Customer Success.',
+    accuracy: 'Accuracy',
+    recall: 'Rappel',
+    kept: 'Retenu',
+    discarded: 'Écarté',
+    smoteTitle: 'Rééquilibrage SMOTE',
+    smoteText:
+      'Avec ~20 % de churn, la classe minoritaire est sous-représentée. SMOTE génère des exemples synthétiques de clients partants sur le jeu d’entraînement, pour que le modèle apprenne réellement leur profil.',
+    shapTitle: 'Interprétable par design',
+    shapText:
+      'Coefficients lisibles et analyse SHAP globale : chaque score de risque s’explique aux équipes métier.',
+    archEyebrow: 'Architecture MLOps',
+    archTitle: 'De la donnée brute au dashboard',
+    archIntro: 'Le pipeline de bout en bout, de l’analyse exploratoire au micro-service servi au dashboard.',
+    diagramLabel: 'Schéma d’architecture MLOps du projet Prédiction de Churn',
+    flow: {
+      prep: {
+        tag: 'Data Prep',
+        title: 'EDA & Preprocessing',
+        text: 'Analyse exploratoire des données brutes (10 000 clients), puis rééquilibrage de la classe minoritaire avec SMOTE et normalisation des variables avec StandardScaler.',
+      },
+      ml: {
+        tag: 'Machine Learning',
+        title: 'Entraînement',
+        text: 'Comparaison algorithmique (Régression Logistique, Random Forest, XGBoost). La Régression Logistique est retenue pour son Rappel de 63,7 %, face à 3,4 % pour XGBoost.',
+      },
+      shap: {
+        tag: 'Interprétabilité',
+        title: 'SHAP & Sérialisation',
+        text: 'Explicabilité globale du modèle via SHAP, puis export des modèles entraînés avec Joblib pour l’inférence.',
+      },
+      api: {
+        tag: 'Backend',
+        title: 'API FastAPI',
+        text: 'Micro-service d’inférence conteneurisé avec Docker, exposant l’endpoint /predict.',
+      },
+      ui: {
+        tag: 'Frontend',
+        title: 'Dashboard Streamlit',
+        text: 'Simulateur client interactif et visualisation des KPI de revenus à risque.',
+      },
+    },
+    repoNote: 'Structure Docker, notebooks et API qui tournent en arrière-plan.',
+  },
+  en: {
+    simulatorTitle: 'The simulator, live',
+    simulatorIntro:
+      'Adjust a customer profile and watch their churn probability and the revenue at stake. Hosted on Streamlit Cloud, the app may take a few seconds to wake up.',
+    iframeTitle: 'Streamlit simulator for churn and revenue-at-risk prediction',
+    openFull: 'Open in Streamlit',
+    decisionEyebrow: 'Business decision & modelling',
+    decisionTitle: 'The least “accurate” model was the right one',
+    decisionText:
+      'XGBoost has the best Accuracy, but when only ~20% of customers leave, predicting “stays” almost everywhere is enough to be right 9 times out of 10. Its 3.4% Recall makes it blind to churn. Logistic Regression, at 66.9% Accuracy, is the only model able to detect two thirds of the customers about to leave (63.7% Recall): that is what matters to a Customer Success team.',
+    accuracy: 'Accuracy',
+    recall: 'Recall',
+    kept: 'Selected',
+    discarded: 'Discarded',
+    smoteTitle: 'SMOTE rebalancing',
+    smoteText:
+      'With ~20% churn, the minority class is under-represented. SMOTE generates synthetic churners in the training set so the model actually learns their profile.',
+    shapTitle: 'Interpretable by design',
+    shapText: 'Readable coefficients and global SHAP analysis: every risk score can be explained to business teams.',
+    archEyebrow: 'MLOps architecture',
+    archTitle: 'From raw data to dashboard',
+    archIntro: 'The end-to-end pipeline, from exploratory analysis to the micro-service feeding the dashboard.',
+    diagramLabel: 'MLOps architecture diagram of the Churn Prediction project',
+    flow: {
+      prep: {
+        tag: 'Data Prep',
+        title: 'EDA & Preprocessing',
+        text: 'Exploratory analysis of the raw data (10,000 customers), then minority-class rebalancing with SMOTE and feature scaling with StandardScaler.',
+      },
+      ml: {
+        tag: 'Machine Learning',
+        title: 'Training',
+        text: 'Algorithm benchmark (Logistic Regression, Random Forest, XGBoost). Logistic Regression is selected for its 63.7% Recall, versus 3.4% for XGBoost.',
+      },
+      shap: {
+        tag: 'Interpretability',
+        title: 'SHAP & Serialisation',
+        text: 'Global model explainability with SHAP, then export of the trained models with Joblib for inference.',
+      },
+      api: {
+        tag: 'Backend',
+        title: 'FastAPI API',
+        text: 'Inference micro-service containerised with Docker, exposing the /predict endpoint.',
+      },
+      ui: {
+        tag: 'Frontend',
+        title: 'Streamlit Dashboard',
+        text: 'Interactive customer simulator and revenue-at-risk KPI visualisation.',
+      },
+    },
+    repoNote: 'Docker setup, notebooks and the API running behind the scenes.',
+  },
+}[lang];
+
+const flowIcons: Record<keyof typeof copy.flow, Icon> = {
+  prep: DatabaseIcon,
+  ml: BrainIcon,
+  shap: ListMagnifyingGlassIcon,
+  api: HardDrivesIcon,
+  ui: ChartLineUpIcon,
+};
+const flowStacks: Record<keyof typeof copy.flow, string[]> = {
+  prep: ['Pandas', 'SMOTE', 'StandardScaler'],
+  ml: ['Scikit-learn', 'Random Forest', 'XGBoost'],
+  shap: ['SHAP', 'Joblib'],
+  api: ['FastAPI', 'Uvicorn', 'Docker'],
+  ui: ['Streamlit', 'Plotly'],
+};
+const flow: FlowNode[] = (Object.keys(copy.flow) as (keyof typeof copy.flow)[]).map((id) => ({
+  id,
+  icon: flowIcons[id],
+  ...copy.flow[id],
+  stack: flowStacks[id],
+}));
+
+const percent = (value: number) => value.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB', { minimumFractionDigits: 1 }) + (lang === 'fr' ? '\u00a0%' : '%');
+const eyebrow = 'font-mono text-xs tracking-[0.2em] text-accent uppercase sm:text-sm';
+const h2 = 'text-2xl leading-tight font-bold text-fg sm:text-4xl';
+const tag = 'font-mono text-[0.7rem] font-medium tracking-[0.15em] uppercase';
+---
+
+<LiveDemo
+  lang={lang}
+  title={copy.simulatorTitle}
+  intro={copy.simulatorIntro}
+  src={SIMULATOR_SRC}
+  href={SIMULATOR_HREF}
+  iframeTitle={copy.iframeTitle}
+  openLabel={copy.openFull}
+/>
+
+<section aria-labelledby="decision-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class={eyebrow}>{copy.decisionEyebrow}</p>
+    <h2 id="decision-titre" class={h2}>{copy.decisionTitle}</h2>
+  </div>
+
+  <div class="mt-10 grid gap-4 sm:gap-6 md:grid-cols-3">
+    <article class="glass card-hover flex flex-col gap-8 rounded-2xl p-6 sm:p-8 md:col-span-2 md:row-span-2">
+      <div class="flex items-start gap-4">
+        <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-brand/40 text-accent">
+          <TargetIcon aria-hidden="true" className="size-6" weight="duotone" />
+        </span>
+        <p class="text-fg-muted">{copy.decisionText}</p>
+      </div>
+
+      <ul class="mt-auto grid gap-4 sm:grid-cols-2">
+        {
+          models.map((model) => (
+            <li
+              class:list={[
+                'flex flex-col gap-5 rounded-xl border p-5',
+                model.kept ? 'border-brand/60 shadow-[0_0_32px_-12px_rgb(230_0_0/0.5)]' : 'border-line',
+              ]}
+            >
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="font-display text-base font-semibold text-fg">{model.name[lang]}</h3>
+                <span
+                  class:list={[
+                    tag,
+                    'rounded-full border px-2 py-0.5',
+                    model.kept ? 'border-brand/40 text-accent' : 'border-line text-fg-muted',
+                  ]}
+                >
+                  {model.kept ? copy.kept : copy.discarded}
+                </span>
+              </div>
+              <dl class="grid gap-4">
+                {[
+                  { label: copy.recall, value: model.recall, strong: true },
+                  { label: copy.accuracy, value: model.accuracy, strong: false },
+                ].map((metric) => (
+                  <div class="flex flex-col gap-2">
+                    <div class="flex items-baseline justify-between gap-3">
+                      <dt class:list={[tag, 'text-fg-muted']}>{metric.label}</dt>
+                      <dd
+                        class:list={[
+                          'font-display font-bold tabular-nums',
+                          metric.strong ? 'text-3xl' : 'text-lg',
+                          metric.strong && model.kept ? 'text-accent' : 'text-fg',
+                        ]}
+                      >
+                        {percent(metric.value)}
+                      </dd>
+                    </div>
+                    <span aria-hidden="true" class="h-1.5 overflow-hidden rounded-full bg-line">
+                      <span
+                        class:list={['block h-full rounded-full', metric.strong && model.kept ? 'bg-brand' : 'bg-fg-muted']}
+                        style={`width: ${metric.value}%`}
+                      />
+                    </span>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))
+        }
+      </ul>
+    </article>
+
+    <article class="glass card-hover flex flex-col gap-3 rounded-2xl p-6 sm:p-8">
+      <ScalesIcon aria-hidden="true" className="size-6 text-accent" weight="duotone" />
+      <h3 class="text-xl font-bold text-fg">{copy.smoteTitle}</h3>
+      <p class="text-fg-muted">{copy.smoteText}</p>
+    </article>
+
+    <article class="glass card-hover flex flex-col gap-3 rounded-2xl p-6 sm:p-8">
+      <p class:list={[tag, 'text-accent']}>SHAP</p>
+      <h3 class="text-xl font-bold text-fg">{copy.shapTitle}</h3>
+      <p class="text-fg-muted">{copy.shapText}</p>
+    </article>
+  </div>
+</section>
+
+<section aria-labelledby="architecture-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class={eyebrow}>{copy.archEyebrow}</p>
+    <h2 id="architecture-titre" class={h2}>{copy.archTitle}</h2>
+    <p class="text-fg-muted">{copy.archIntro}</p>
+  </div>
+
+  <div class="mt-10">
+    <FlowDiagram id="churn-archi" label={copy.diagramLabel} nodes={flow} />
+  </div>
+</section>
+
+<StackSection lang={lang} groups={stack} repoHref={REPO_HREF} repoNote={copy.repoNote} />

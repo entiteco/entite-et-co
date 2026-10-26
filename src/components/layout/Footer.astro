@@ -3,12 +3,21 @@ import { ArrowRightIcon, EnvelopeIcon } from '@phosphor-icons/react/ssr';
 import Logo from '@/components/ui/Logo.astro';
 import Button from '@/components/ui/Button.astro';
 import SocialLinks from '@/components/ui/SocialLinks.astro';
-import { legalNav, mainNav, site } from '@/data/site';
+import { legalNav, localizeNav, mainNav, site } from '@/data/site';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 
-const expertises = mainNav.filter((item) => item.href.startsWith('/expertises/'));
-const studio = mainNav.filter(
-  (item) => item.href !== '/' && !item.href.startsWith('/expertises/'),
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const expertises = localizeNav(
+  mainNav.filter((item) => item.href.startsWith('/expertises/')),
+  lang,
 );
+const studio = localizeNav(
+  mainNav.filter((item) => item.href !== '/' && !item.href.startsWith('/expertises/')),
+  lang,
+);
+const legal = localizeNav(legalNav, lang);
 const year = new Date().getFullYear();
 
 const linkClass =
@@ -21,16 +30,18 @@ const headingClass =
   <div class="container-site flex flex-col gap-16 py-16 sm:py-20">
     <div class="grid gap-12 lg:grid-cols-12">
       <div class="flex flex-col gap-6 lg:col-span-5">
-        <a href="/" class="w-fit cursor-pointer">
+        <a href={localizePath('/', lang)} class="w-fit cursor-pointer">
           <Logo height={40} />
-          <span class="sr-only"> — Accueil</span>
+          <span class="sr-only"> — {t('nav.home')}</span>
         </a>
-        <p class="max-w-sm text-fg-muted">{site.slogan}</p>
-        <Button href="/contact" icon={ArrowRightIcon} class="w-fit">Discuter de votre projet</Button>
+        <p class="max-w-sm text-fg-muted">{t('site.slogan')}</p>
+        <Button href={localizePath('/contact', lang)} icon={ArrowRightIcon} class="w-fit">
+          {t('common.discussProject')}
+        </Button>
       </div>
 
-      <nav aria-label="Expertises" class="lg:col-span-2">
-        <h2 class={headingClass}>Expertises</h2>
+      <nav aria-label={t('footer.expertises')} class="lg:col-span-2">
+        <h2 class={headingClass}>{t('footer.expertises')}</h2>
         <ul class="flex flex-col gap-1">
           {
             expertises.map((item) => (
@@ -44,8 +55,8 @@ const headingClass =
         </ul>
       </nav>
 
-      <nav aria-label="Studio" class="lg:col-span-2">
-        <h2 class={headingClass}>Studio</h2>
+      <nav aria-label={t('footer.studio')} class="lg:col-span-2">
+        <h2 class={headingClass}>{t('footer.studio')}</h2>
         <ul class="flex flex-col gap-1">
           {
             studio.map((item) => (
@@ -60,7 +71,7 @@ const headingClass =
       </nav>
 
       <div class="lg:col-span-3">
-        <h2 class={headingClass}>Contact</h2>
+        <h2 class={headingClass}>{t('footer.contact')}</h2>
         <a href={`mailto:${site.email}`} class:list={[linkClass, 'gap-2.5']}>
           <EnvelopeIcon aria-hidden="true" className="size-5 text-accent" weight="regular" />
           {site.email}
@@ -72,10 +83,10 @@ const headingClass =
     <div
       class="flex flex-col gap-4 border-t border-line pt-8 text-sm text-fg-muted sm:flex-row sm:items-center sm:justify-between"
     >
-      <p>© {year} {site.name}. Tous droits réservés.</p>
+      <p>© {year} {site.name}. {t('footer.rights')}</p>
       <ul class="flex flex-wrap gap-x-6 gap-y-1">
         {
-          legalNav.map((item) => (
+          legal.map((item) => (
             <li>
               <a href={item.href} class={linkClass}>
                 {item.label}

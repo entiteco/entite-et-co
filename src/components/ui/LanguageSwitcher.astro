@@ -1,0 +1,36 @@
+---
+// Sélecteur de langue minimaliste (FR / EN) : lien vers la même page dans l'autre langue,
+// ou vers l'accueil de cette langue si la page n'y est pas traduite (pages légales).
+import { langs, languages } from '@/i18n/ui';
+import { getLangFromUrl, localizePath, translatePath, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<ul
+  aria-label={t('lang.label')}
+  class:list={['flex items-center gap-0.5 rounded-full border border-line p-1', className]}
+>
+  {
+    langs.map((l) => (
+      <li>
+        <a
+          href={translatePath(Astro.url.pathname, l) ?? localizePath('/', l)}
+          hreflang={l}
+          lang={l}
+          aria-current={l === lang ? 'true' : undefined}
+          class="grid h-9 min-w-9 cursor-pointer place-items-center rounded-full px-2 font-mono text-xs font-medium text-fg-muted uppercase transition-colors duration-200 hover:text-fg aria-[current=true]:bg-fg aria-[current=true]:text-canvas"
+        >
+          {l}
+          <span class="sr-only"> — {languages[l]}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>

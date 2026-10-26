@@ -13,6 +13,12 @@ export default defineConfig({
     format: 'directory',
     inlineStylesheets: 'always',
   },
+  // Français à la racine (SEO historique conservé), anglais sous /en.
+  i18n: {
+    defaultLocale: 'fr',
+    locales: ['fr', 'en'],
+    routing: { prefixDefaultLocale: false },
+  },
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'hover',
@@ -20,7 +26,11 @@ export default defineConfig({
   integrations: [
     react(),
     // La page 404 (noindex) est exclue du sitemap.
-    sitemap({ filter: (page) => !/\/404\/?$/.test(page) }),
+    // Alternatives hreflang fr/en dans le sitemap.
+    sitemap({
+      filter: (page) => !/\/404\/?$/.test(page),
+      i18n: { defaultLocale: 'fr', locales: { fr: 'fr-FR', en: 'en-US' } },
+    }),
   ],
   vite: {
     plugins: [tailwindcss()],

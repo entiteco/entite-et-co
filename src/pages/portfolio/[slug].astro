@@ -1,19 +1,12 @@
 ---
-// Page dédiée à un projet : accès direct, partage, SEO et navigation sans JavaScript.
-// Sur /portfolio, la même fiche s'ouvre en modale.
 import type { GetStaticPaths } from 'astro';
-import { ArrowLeftIcon } from '@phosphor-icons/react/ssr';
-import Layout from '@/layouts/Layout.astro';
-import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
-import ServiceCard from '@/components/ui/ServiceCard.astro';
-import ProjectDetail from '@/components/portfolio/ProjectDetail.astro';
-import { categoryMeta } from '@/data/portfolio';
-import { getProjects, projectHref, type Project } from '@/lib/portfolio';
+import ProjectPage from '@/components/pages/ProjectPage.astro';
+import { getProjects, projectSlug, type Project } from '@/lib/portfolio';
 
 export const getStaticPaths = (async () => {
-  const projects = await getProjects();
+  const projects = await getProjects('fr');
   return projects.map((project) => ({
-    params: { slug: project.id },
+    params: { slug: projectSlug(project) },
     props: {
       project,
       related: projects
@@ -29,47 +22,6 @@ interface Props {
 }
 
 const { project, related } = Astro.props;
-const { title, summary, category } = project.data;
-const breadcrumbs = [
-  { label: 'Portfolio', href: '/portfolio' },
-  { label: title, href: projectHref(project) },
-];
 ---
 
-<Layout title={`${title} | Portfolio | Entité & Co`} description={summary} breadcrumbs={breadcrumbs}>
-  <article class="container-site pt-32 pb-16 sm:pt-40">
-    <Breadcrumbs items={breadcrumbs} class="mb-8" />
-    <ProjectDetail project={project} headingLevel="h1" titleId="projet-titre" />
-  </article>
-
-  {
-    related.length > 0 && (
-      <section aria-labelledby="projets-similaires" class="container-site py-16">
-        <h2 id="projets-similaires" class="text-2xl font-bold text-fg sm:text-3xl">
-          Autres projets {categoryMeta[category].longLabel}
-        </h2>
-        <div class="mt-8 grid gap-6 md:grid-cols-2">
-          {related.map((other) => (
-            <ServiceCard
-              title={other.data.title}
-              description={other.data.summary}
-              href={projectHref(other)}
-              linkLabel="Voir le projet"
-              imageLabel="Mockup Projet"
-            />
-          ))}
-        </div>
-      </section>
-    )
-  }
-
-  <div class="container-site pb-8">
-    <a
-      href={`/portfolio?categorie=${category}`}
-      class="inline-flex min-h-11 cursor-pointer items-center gap-2 font-display text-sm font-semibold text-fg transition-colors duration-200 hover:text-accent"
-    >
-      <ArrowLeftIcon aria-hidden="true" className="size-4" weight="bold" />
-      Retour au portfolio
-    </a>
-  </div>
-</Layout>
+<ProjectPage project={project} related={related} />

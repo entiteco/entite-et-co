@@ -1,0 +1,161 @@
+---
+// Étude de cas « Hubble Lakehouse » (page /portfolio/data-ia-hubble et modale du portfolio) :
+// schéma d'architecture Médaillon interactif (FlowDiagram), stack technique et lien GitHub.
+import {
+  ChartBarIcon,
+  CloudArrowDownIcon,
+  CubeIcon,
+  DatabaseIcon,
+  FunnelIcon,
+  GearSixIcon,
+  HardDrivesIcon,
+  PresentationChartIcon,
+  ShieldCheckIcon,
+  StackIcon,
+  TreeStructureIcon,
+} from '@phosphor-icons/react/ssr';
+import FlowDiagram, { type FlowNode } from '@/components/portfolio/case-studies/FlowDiagram.astro';
+import StackSection, { type StackGroup } from '@/components/portfolio/case-studies/StackSection.astro';
+import type { Lang } from '@/i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const REPO_HREF = 'https://github.com/entiteco/Big_Data_Framework_Hubble_Lakehouse';
+
+const copy = {
+  fr: {
+    archEyebrow: 'Architecture Médaillon',
+    archTitle: 'Du télescope au tableau de bord',
+    archIntro:
+      'Deux sources, trois couches HDFS, un catalogue Hive et une API sécurisée. Sélectionnez un composant pour lire les choix techniques.',
+    diagramLabel: 'Schéma d’architecture de Hubble Lakehouse',
+    repoNote: 'Réalisé par Kévin HEUGAS & Valentin MASSONNIERE : DAGs Airflow, jobs Spark, API Flask et manifestes Kubernetes.',
+    stack: {
+      storage: 'Sources & Stockage',
+      engine: 'Traitement & Moteur',
+      governance: 'Gouvernance & Orchestration',
+      backend: 'Backend & API',
+      devops: 'DevOps & Infra',
+      viz: 'Visualisation',
+      pbi: 'Power BI (4 pages métier)',
+    },
+    nodes: {
+      sources: {
+        tag: 'Sources',
+        title: 'MAST Hubble & NOAA SWPC',
+        text: 'Historique massif des observations Hubble (export CSV du MAST) chargé en batch dans une table source PostgreSQL ; flux JSON de météo spatiale de l’API NOAA SWPC consommé en continu.',
+      },
+      bronze: {
+        tag: 'Bronze',
+        title: 'Ingestion brute (HDFS)',
+        text: 'DAGs Airflow + Python pour l’extraction batch depuis PostgreSQL, Spark Structured Streaming pour le flux NOAA. Données conservées telles quelles en Parquet sur HDFS pour garantir la rejouabilité.',
+      },
+      silver: {
+        tag: 'Silver',
+        title: 'Nettoyage Spark',
+        text: 'Typage, parsing des coordonnées et des dates, déduplication : un Parquet propre et fiable, prêt à être croisé entre observations et météo spatiale.',
+      },
+      gold: {
+        tag: 'Gold',
+        title: 'Agrégation & catalogue Hive',
+        text: 'Agrégations Spark SQL orientées métier, matérialisées en Parquet et référencées dans l’Apache Hive Metastore pour une gouvernance centralisée des tables.',
+      },
+      datamarts: {
+        tag: 'Datamarts',
+        title: '4 datamarts PostgreSQL',
+        text: 'Export Spark SQL des tables Gold vers quatre datamarts relationnels : Physicien, Chimiste, Biologiste et Ingénieur.',
+      },
+      serving: {
+        tag: 'Serving',
+        title: 'API Flask & Power BI',
+        text: 'API REST Flask sécurisée par JWT et servie par Gunicorn, consommée par les dashboards Power BI et par des scripts Python / notebooks Jupyter.',
+      },
+    },
+  },
+  en: {
+    archEyebrow: 'Medallion architecture',
+    archTitle: 'From telescope to dashboard',
+    archIntro:
+      'Two sources, three HDFS layers, a Hive catalogue and a secured API. Select a component to read the technical choices.',
+    diagramLabel: 'Hubble Lakehouse architecture diagram',
+    repoNote: 'Built by Kévin HEUGAS & Valentin MASSONNIERE: Airflow DAGs, Spark jobs, Flask API and Kubernetes manifests.',
+    stack: {
+      storage: 'Sources & Storage',
+      engine: 'Processing & Engine',
+      governance: 'Governance & Orchestration',
+      backend: 'Backend & API',
+      devops: 'DevOps & Infra',
+      viz: 'Visualisation',
+      pbi: 'Power BI (4 business pages)',
+    },
+    nodes: {
+      sources: {
+        tag: 'Sources',
+        title: 'MAST Hubble & NOAA SWPC',
+        text: 'Massive history of Hubble observations (MAST CSV export) batch-loaded into a PostgreSQL source table; JSON space weather feed from the NOAA SWPC API consumed continuously.',
+      },
+      bronze: {
+        tag: 'Bronze',
+        title: 'Raw ingestion (HDFS)',
+        text: 'Airflow DAGs + Python for the batch extraction from PostgreSQL, Spark Structured Streaming for the NOAA feed. Data kept as-is in Parquet on HDFS to guarantee replayability.',
+      },
+      silver: {
+        tag: 'Silver',
+        title: 'Spark cleaning',
+        text: 'Typing, coordinate and date parsing, deduplication: clean, reliable Parquet, ready to join observations with space weather.',
+      },
+      gold: {
+        tag: 'Gold',
+        title: 'Aggregation & Hive catalogue',
+        text: 'Business-oriented Spark SQL aggregations, materialised as Parquet and registered in the Apache Hive Metastore for centralised table governance.',
+      },
+      datamarts: {
+        tag: 'Datamarts',
+        title: '4 PostgreSQL datamarts',
+        text: 'Spark SQL export of the Gold tables into four relational datamarts: Physicist, Chemist, Biologist and Engineer.',
+      },
+      serving: {
+        tag: 'Serving',
+        title: 'Flask API & Power BI',
+        text: 'JWT-secured Flask REST API served by Gunicorn, consumed by the Power BI dashboards and by Python scripts / Jupyter notebooks.',
+      },
+    },
+  },
+}[lang];
+
+const flow: FlowNode[] = [
+  { id: 'sources', icon: CloudArrowDownIcon, ...copy.nodes.sources, stack: ['MAST CSV', 'PostgreSQL', 'NOAA SWPC API'] },
+  { id: 'bronze', icon: HardDrivesIcon, ...copy.nodes.bronze, stack: ['Airflow', 'Spark Structured Streaming', 'HDFS', 'Parquet'] },
+  { id: 'silver', icon: FunnelIcon, ...copy.nodes.silver, stack: ['Apache Spark', 'HDFS', 'Parquet'] },
+  { id: 'gold', icon: StackIcon, ...copy.nodes.gold, stack: ['Spark SQL', 'Apache Hive Metastore'] },
+  { id: 'datamarts', icon: DatabaseIcon, ...copy.nodes.datamarts, stack: ['Spark SQL', 'PostgreSQL'] },
+  { id: 'serving', icon: PresentationChartIcon, ...copy.nodes.serving, stack: ['Flask', 'JWT', 'Gunicorn', 'Power BI', 'Jupyter'] },
+];
+
+const stack: StackGroup[] = [
+  { title: copy.stack.storage, icon: DatabaseIcon, items: ['PostgreSQL', 'HDFS', 'Parquet'] },
+  { title: copy.stack.engine, icon: GearSixIcon, items: ['Apache Spark', 'Structured Streaming', 'Spark SQL'] },
+  { title: copy.stack.governance, icon: TreeStructureIcon, items: ['Apache Hive Metastore', 'Apache Airflow (DAGs)'] },
+  { title: copy.stack.backend, icon: ShieldCheckIcon, items: ['Python', 'Flask', 'JWT', 'Gunicorn'] },
+  { title: copy.stack.devops, icon: CubeIcon, items: ['Docker', 'Kubernetes', 'GitLab CI/CD'] },
+  { title: copy.stack.viz, icon: ChartBarIcon, items: [copy.stack.pbi] },
+];
+---
+
+<section aria-labelledby="architecture-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class="font-mono text-xs tracking-[0.2em] text-accent uppercase sm:text-sm">{copy.archEyebrow}</p>
+    <h2 id="architecture-titre" class="text-2xl leading-tight font-bold text-fg sm:text-4xl">{copy.archTitle}</h2>
+    <p class="text-fg-muted">{copy.archIntro}</p>
+  </div>
+
+  <div class="mt-10">
+    <FlowDiagram id="hubble-archi" label={copy.diagramLabel} nodes={flow} />
+  </div>
+</section>
+
+<StackSection lang={lang} groups={stack} repoHref={REPO_HREF} repoNote={copy.repoNote} />

@@ -1,0 +1,36 @@
+---
+// Boutons de fin de fiche projet : contact, expertise associée et, dans la modale, lien vers la page dédiée.
+import { ArrowRightIcon, ArrowUpRightIcon } from '@phosphor-icons/react/ssr';
+import Button from '@/components/ui/Button.astro';
+import { categoryMeta } from '@/data/portfolio';
+import { projectLang, type Project } from '@/lib/portfolio';
+import { localizePath, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  project: Project;
+  /** URL de la page dédiée (modale uniquement). */
+  pageHref?: string;
+  class?: string;
+}
+
+const { project, pageHref, class: className = '' } = Astro.props;
+const lang = projectLang(project);
+const t = useTranslations(lang);
+const meta = categoryMeta[project.data.category];
+---
+
+<div class:list={['flex flex-wrap gap-3 border-t border-line pt-8', className]}>
+  <Button href={localizePath(`/contact?sujet=${meta.expertise}`, lang)} icon={ArrowRightIcon}>
+    {t('project.similar')}
+  </Button>
+  <Button href={localizePath(`/expertises/${meta.expertise}`, lang)} variant="secondary">
+    {`${t('project.expertise')} ${meta.longLabel[lang]}`}
+  </Button>
+  {
+    pageHref && (
+      <Button href={pageHref} variant="secondary" icon={ArrowUpRightIcon}>
+        {t('project.openPage')}
+      </Button>
+    )
+  }
+</div>

@@ -1,0 +1,107 @@
+---
+// Schéma d'architecture interactif linéaire (gauche → droite sur grand écran, haut → bas sur mobile).
+// Même rendu que le schéma d'Urban Data Explorer : clic, survol ou clavier sur un nœud → fiche de détail.
+import type { Icon } from '@phosphor-icons/react';
+import { ArrowDownIcon, ArrowRightIcon } from '@phosphor-icons/react/ssr';
+
+export interface FlowNode {
+  id: string;
+  icon: Icon;
+  tag: string;
+  title: string;
+  text: string;
+  stack: string[];
+}
+
+interface Props {
+  /** Préfixe des identifiants de fiches (unique dans la page). */
+  id: string;
+  label: string;
+  nodes: FlowNode[];
+}
+
+const { id: prefix, label, nodes } = Astro.props;
+const initial = nodes[0]?.id;
+const panelId = (id: string) => `${prefix}-${id}`;
+
+const nodeButton =
+  'group flex w-full cursor-pointer flex-col gap-3 rounded-xl border border-line bg-surface/60 p-4 text-left backdrop-blur-xl transition-[border-color,box-shadow,translate] duration-300 ease-out-expo hover:border-brand/40 motion-safe:hover:-translate-y-0.5 aria-pressed:border-brand/70 aria-pressed:shadow-[0_0_0_1px_rgb(230_0_0/0.35),0_0_32px_-8px_rgb(230_0_0/0.55)] lg:min-h-32';
+const tagClass = 'font-mono text-[0.7rem] font-medium tracking-[0.15em] uppercase';
+---
+
+<div data-archi class="flex flex-col gap-6">
+  <div role="group" aria-label={label} class="flex flex-col gap-3 lg:flex-row lg:items-stretch">
+    {
+      nodes.map((node, index) => (
+        <>
+          {index > 0 && (
+            <span class="flex shrink-0 items-center justify-center text-fg-muted" aria-hidden="true">
+              <ArrowDownIcon className="size-5 lg:hidden" />
+              <ArrowRightIcon className="hidden size-5 lg:block" />
+            </span>
+          )}
+          <button
+            type="button"
+            class:list={[nodeButton, 'lg:flex-1']}
+            data-node={node.id}
+            aria-controls={panelId(node.id)}
+            aria-pressed={node.id === initial ? 'true' : 'false'}
+          >
+            <span class="flex items-center justify-between gap-2">
+              <span class:list={[tagClass, 'text-fg-muted group-aria-pressed:text-accent']}>{node.tag}</span>
+              <node.icon aria-hidden="true" className="size-5 text-accent" weight="duotone" />
+            </span>
+            <span class="font-display text-base leading-snug font-semibold text-fg">{node.title}</span>
+          </button>
+        </>
+      ))
+    }
+  </div>
+
+  <!-- Fiches de détail : seule celle du nœud actif est affichée (toutes sans JavaScript). -->
+  <noscript><style>[data-panel][hidden] { display: block; }</style></noscript>
+  <div aria-live="polite" class="grid gap-4">
+    {
+      nodes.map((node) => (
+        <article id={panelId(node.id)} data-panel={node.id} hidden={node.id !== initial} class="glass rounded-2xl p-6 sm:p-8">
+          <div class="flex items-start gap-4">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-brand/40 text-accent">
+              <node.icon aria-hidden="true" className="size-6" weight="duotone" />
+            </span>
+            <div class="flex flex-col gap-3">
+              <p class:list={[tagClass, 'text-accent']}>{node.tag}</p>
+              <h3 class="text-xl font-bold text-fg sm:text-2xl">{node.title}</h3>
+              <p class="max-w-[70ch] text-fg-muted">{node.text}</p>
+              <ul class="flex flex-wrap gap-2">
+                {node.stack.map((item) => (
+                  <li class="rounded-full border border-line px-3 py-1 font-mono text-xs text-fg-muted">{item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-archi]').forEach((root) => {
+    const buttons = root.querySelectorAll<HTMLButtonElement>('[data-node]');
+    const panels = root.querySelectorAll<HTMLElement>('[data-panel]');
+
+    const select = (id: string) => {
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.node === id)));
+      panels.forEach((panel) => (panel.hidden = panel.dataset.panel !== id));
+    };
+
+    buttons.forEach((button) => {
+      const id = button.dataset.node ?? '';
+      button.addEventListener('click', () => select(id));
+      // Survol à la souris uniquement : au toucher, le clic suffit.
+      button.addEventListener('pointerenter', (event) => {
+        if (event.pointerType === 'mouse') select(id);
+      });
+    });
+  });
+</script>

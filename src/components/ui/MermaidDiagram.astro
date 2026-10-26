@@ -1,0 +1,101 @@
+---
+// Diagramme Mermaid rendu dans le navigateur, dans un panneau toujours sombre.
+// La bibliothèque (lourde) n'est importée qu'à l'approche du viewport : aucun coût au chargement de la page.
+// Sans JavaScript, le code source Mermaid reste lisible dans le bloc dépliable.
+import type { Lang } from '@/i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** Code Mermaid (ex. `erDiagram …`). */
+  code: string;
+  /** Description accessible du schéma. */
+  label: string;
+  class?: string;
+}
+
+const { lang, code, label, class: className = '' } = Astro.props;
+
+const copy = {
+  fr: { loading: 'Chargement du diagramme…', source: 'Voir le code Mermaid' },
+  en: { loading: 'Loading diagram…', source: 'View the Mermaid code' },
+}[lang];
+---
+
+<figure
+  data-mermaid
+  class:list={['overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl shadow-black/40', className]}
+>
+  <div
+    data-mermaid-target
+    role="img"
+    aria-label={label}
+    tabindex="0"
+    class="flex min-h-96 items-center overflow-x-auto p-4 sm:p-8 [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-none lg:[&_svg]:max-w-full"
+  >
+    <p data-mermaid-loading class="font-mono text-xs text-slate-400 motion-safe:animate-pulse">{copy.loading}</p>
+  </div>
+  <details class="border-t border-slate-700/60 bg-slate-800/40">
+    <summary class="flex min-h-11 cursor-pointer items-center px-4 font-mono text-xs text-slate-300 hover:text-white sm:px-6">
+      {copy.source}
+    </summary>
+    <pre data-mermaid-src class="overflow-x-auto px-4 pb-4 font-mono text-xs leading-relaxed text-slate-300 sm:px-6">{code}</pre>
+  </details>
+</figure>
+
+<script>
+  const roots = document.querySelectorAll<HTMLElement>('[data-mermaid]');
+
+  const render = async (root: HTMLElement, index: number) => {
+    const target = root.querySelector<HTMLElement>('[data-mermaid-target]');
+    const source = root.querySelector<HTMLElement>('[data-mermaid-src]')?.textContent;
+    if (!target || !source) return;
+
+    const { default: mermaid } = await import('mermaid');
+    // Palette alignée sur les tokens du thème sombre (canvas slate, accent #ff3b3b).
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: 'base',
+      fontFamily: "'Inter Variable', ui-sans-serif, system-ui, sans-serif",
+      themeVariables: {
+        darkMode: true,
+        background: '#0f172a',
+        mainBkg: '#1e293b',
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f3f4f6',
+        primaryBorderColor: '#ff3b3b',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#0f172a',
+        textColor: '#cbd5e1',
+        lineColor: '#64748b',
+        edgeLabelBackground: '#0f172a',
+        attributeBackgroundColorOdd: '#1e293b',
+        attributeBackgroundColorEven: '#172033',
+        fontSize: '14px',
+      },
+      er: { useMaxWidth: false },
+    });
+
+    try {
+      const { svg } = await mermaid.render(`mermaid-diagram-${index}`, source);
+      target.innerHTML = svg;
+    } catch (error) {
+      console.error('[MermaidDiagram]', error);
+      root.querySelector('[data-mermaid-loading]')?.remove();
+      root.querySelector('details')?.setAttribute('open', '');
+    }
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        void render(entry.target as HTMLElement, [...roots].indexOf(entry.target as HTMLElement));
+      });
+    },
+    { rootMargin: '400px 0px' },
+  );
+
+  roots.forEach((root) => observer.observe(root));
+</script>

@@ -1,17 +1,16 @@
 ---
-// Gabarit commun aux trois pages /expertises/* — le contenu vient de src/data/expertises.ts.
-import { ArrowRightIcon } from '@phosphor-icons/react/ssr';
+// Gabarit commun aux pages /expertises/* et /en/expertises/* — contenu : src/data/expertises*.ts.
+import { ArrowRightIcon, ArrowUpRightIcon } from '@phosphor-icons/react/ssr';
 import Layout from '@/layouts/Layout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import CtaSection from '@/components/sections/CtaSection.astro';
 import Button from '@/components/ui/Button.astro';
-import ContentImage from '@/components/ui/ContentImage.astro';
-import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
 import ServiceCard from '@/components/ui/ServiceCard.astro';
-import { expertises, type Expertise } from '@/data/expertises';
-import { expertiseIcons } from '@/data/expertise-icons';
-import { expertiseHeroImages, expertiseSectionImages } from '@/data/expertise-images';
+import { getExpertises, type Expertise } from '@/data/expertises';
+import { expertiseIcons, sectionIcons } from '@/data/expertise-icons';
 import { inlineMarkdown } from '@/lib/inline-markdown';
+import { getProject, projectHref } from '@/lib/portfolio';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 
 interface Props {
   expertise: Expertise;
@@ -19,9 +18,48 @@ interface Props {
 
 const { expertise } = Astro.props;
 
-const href = `/expertises/${expertise.slug}`;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const l = (path: string) => localizePath(path, lang);
+
+const href = l(`/expertises/${expertise.slug}`);
 const breadcrumbs = [{ label: expertise.navLabel, href }];
-const others = expertises.filter((item) => item.slug !== expertise.slug);
+const others = getExpertises(lang).filter((item) => item.slug !== expertise.slug);
+
+// Grille bento (lg), selon le nombre de sections. `wide` : contenu interne sur 2 colonnes.
+// 2 sections : large (3/5) + étroite (2/5). 3 sections : large, haute à droite, large.
+interface BentoSlot {
+  class: string;
+  wide: boolean;
+}
+const bentoLayouts: Partial<Record<number, { grid: string; slots: readonly BentoSlot[] }>> = {
+  2: {
+    grid: 'lg:grid-cols-5',
+    slots: [
+      { class: 'lg:col-span-3', wide: true },
+      { class: 'lg:col-span-2', wide: false },
+    ],
+  },
+  3: {
+    grid: 'lg:grid-cols-3',
+    slots: [
+      { class: 'lg:col-span-2 lg:col-start-1 lg:row-start-1', wide: true },
+      { class: 'lg:col-start-3 lg:row-span-2 lg:row-start-1', wide: false },
+      { class: 'lg:col-span-2 lg:col-start-1 lg:row-start-2', wide: true },
+    ],
+  },
+};
+// Grille « stack » : une colonne par groupe sur grand écran (3 ou 4 groupes).
+const stackColumns: Partial<Record<number, string>> = { 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4' };
+
+const bento = bentoLayouts[expertise.sections.length] ?? { grid: 'lg:grid-cols-2', slots: [] };
+
+const useCases = await Promise.all(
+  (expertise.useCases?.projects ?? []).map(async (useCase) => {
+    const project = await getProject(useCase.id, lang);
+    return { ...useCase, project };
+  }),
+);
 
 /** « **Libellé :** texte » → { label, text } pour les cartes de synthèse. */
 const splitFeature = (item: string) => {
@@ -40,15 +78,22 @@ const splitFeature = (item: string) => {
     title={expertise.hero.title}
     intro={expertise.hero.intro}
     breadcrumbs={breadcrumbs}
-    image={expertiseHeroImages[expertise.slug]}
   >
     <Fragment slot="actions">
-      <Button href={expertise.hero.cta.href} size="lg" icon={ArrowRightIcon}>
+      <Button href={l(expertise.hero.cta.href)} size="lg" icon={ArrowRightIcon}>
         {expertise.hero.cta.label}
       </Button>
-      <Button href={expertise.closing.cta.href} size="lg" variant="secondary">
-        Voir le Portfolio
-      </Button>
+      {
+        useCases.length > 0 ? (
+          <Button href="#projets" size="lg" variant="secondary">
+            {t('expertise.viewProjects')}
+          </Button>
+        ) : (
+          <Button href={l(expertise.closing.cta.href)} size="lg" variant="secondary">
+            {t('expertise.viewPortfolio')}
+          </Button>
+        )
+      }
     </Fragment>
   </PageHero>
 
@@ -61,7 +106,12 @@ const splitFeature = (item: string) => {
           </h2>
           <p class="text-lg text-fg-muted">{expertise.highlight.intro}</p>
         </div>
-        <div class="mt-12 grid gap-6 md:grid-cols-2">
+        <div
+          class:list={[
+            'mt-12 grid gap-6',
+            expertise.highlight.items.length % 3 === 0 ? 'md:grid-cols-3' : 'md:grid-cols-2',
+          ]}
+        >
           {expertise.highlight.items.map((item, i) => {
             const feature = splitFeature(item);
             return (
@@ -77,7 +127,7 @@ const splitFeature = (item: string) => {
         </div>
         {expertise.highlight.cta && (
           <div class="mt-10">
-            <Button href={expertise.highlight.cta.href} icon={ArrowRightIcon}>
+            <Button href={l(expertise.highlight.cta.href)} icon={ArrowRightIcon}>
               {expertise.highlight.cta.label}
             </Button>
           </div>
@@ -86,62 +136,136 @@ const splitFeature = (item: string) => {
     )
   }
 
-  {
-    expertise.sections.map((section, i) => {
-      const sectionImage = expertiseSectionImages[section.id];
-      return (
-        <section
-          id={section.id}
-          aria-labelledby={`${section.id}-titre`}
-          class="container-site border-t border-line py-16 sm:py-24"
-        >
-          <div class="grid gap-12 lg:grid-cols-12">
-            <div class="flex flex-col gap-6 lg:sticky lg:top-28 lg:col-span-5 lg:self-start">
-              <p class="font-display text-sm font-medium tracking-[0.3em] text-accent uppercase">
-                {String(i + 1).padStart(2, '0')} — {expertise.navLabel}
-              </p>
-              <h2 id={`${section.id}-titre`} class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
-                {section.title}
-              </h2>
-              <p class="text-lg text-fg-muted">{section.intro}</p>
-              {sectionImage ? (
-                <ContentImage
-                  src={sectionImage.src}
-                  alt={sectionImage.alt}
-                  ratio="landscape"
-                  fit={sectionImage.fit}
-                  class={sectionImage.class}
-                  sizes="(min-width: 1280px) 460px, (min-width: 1024px) 38vw, calc(100vw - 2.5rem)"
-                />
-              ) : (
-                <ImagePlaceholder label={section.imageLabel} description={section.title} ratio="landscape" />
-              )}
+  <section aria-labelledby="poles-titre" class="container-site border-t border-line py-16 sm:py-24">
+    <div class="flex max-w-3xl flex-col gap-5">
+      <p class="font-mono text-xs tracking-[0.2em] text-accent uppercase sm:text-sm">
+        {expertise.sectionsHeading.eyebrow}
+      </p>
+      <h2 id="poles-titre" class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
+        {expertise.sectionsHeading.title}
+      </h2>
+      <p class="text-lg text-fg-muted">{expertise.sectionsHeading.intro}</p>
+    </div>
+    <div class:list={['mt-12 grid gap-4 sm:gap-6', bento.grid]}>
+      {
+        expertise.sections.map((section, i) => {
+          const SectionIcon = sectionIcons[section.id] ?? expertiseIcons[expertise.slug];
+          const slot = bento.slots[i];
+          // Étroite sur grand écran : contenu sur une colonne (2 colonnes en md, carte pleine largeur).
+          const columns = slot?.wide ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-1';
+          const singleGroup = section.groups.length === 1;
+          return (
+            <article
+              id={section.id}
+              aria-labelledby={`${section.id}-titre`}
+              class:list={[
+                'glass card-hover reveal flex scroll-mt-28 flex-col gap-8 rounded-2xl p-6 sm:p-8',
+                slot?.class,
+              ]}
+            >
+              <header class="flex flex-col gap-4">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="grid size-11 place-items-center rounded-xl border border-line bg-fg/5 text-accent">
+                    <SectionIcon aria-hidden="true" className="size-6" weight="regular" />
+                  </span>
+                  <span aria-hidden="true" class="font-mono text-xs text-fg-muted tabular-nums">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <h3 id={`${section.id}-titre`} class="text-2xl leading-tight font-bold text-fg sm:text-3xl">
+                  {section.title}
+                </h3>
+                <p class="max-w-[60ch] text-fg-muted">{section.intro}</p>
+              </header>
+              <div class:list={['grid gap-8 border-t border-line pt-6', !singleGroup && columns]}>
+                {section.groups.map((group) => (
+                  <div class="flex flex-col gap-4">
+                    <h4 class="font-mono text-xs font-medium tracking-[0.15em] text-accent uppercase">
+                      {group.title}
+                    </h4>
+                    <dl class:list={['grid gap-4', singleGroup && columns]}>
+                      {group.items.map((item) => {
+                        const feature = splitFeature(item);
+                        return (
+                          <div>
+                            <dt class="font-semibold text-fg">{feature.label}</dt>
+                            <dd class="mt-1 text-sm text-fg-muted">{feature.text}</dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  </div>
+                ))}
+              </div>
               {section.cta && (
-                <Button href={section.cta.href} icon={ArrowRightIcon} class="w-fit">
+                <a
+                  href={l(section.cta.href)}
+                  class="group/link mt-auto inline-flex min-h-11 w-fit cursor-pointer items-center gap-2 font-display text-sm font-semibold text-fg transition-colors duration-200 hover:text-accent"
+                >
                   {section.cta.label}
-                </Button>
+                  <ArrowRightIcon
+                    aria-hidden="true"
+                    className="size-4 transition-transform duration-300 ease-out-expo group-hover/link:translate-x-0.5"
+                    weight="bold"
+                  />
+                </a>
               )}
-            </div>
+            </article>
+          );
+        })
+      }
+    </div>
+  </section>
 
-            <div class="flex flex-col gap-6 lg:col-span-7">
-              {section.groups.map((group) => (
-                <article class="glass reveal rounded-2xl p-6 sm:p-8">
-                  <h3 class="text-xl font-semibold text-fg sm:text-2xl">{group.title}</h3>
-                  <ul class="mt-6 flex flex-col gap-5">
-                    {group.items.map((item) => (
-                      <li class="flex gap-4 text-fg-muted">
-                        <span aria-hidden="true" class="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand" />
-                        <span set:html={inlineMarkdown(item)} />
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
+  {
+    expertise.useCases && (
+      <section
+        id="projets"
+        aria-labelledby="projets-titre"
+        class="container-site scroll-mt-20 border-t border-line py-16 sm:py-24"
+      >
+        <div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div class="flex max-w-3xl flex-col gap-5">
+            <h2 id="projets-titre" class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
+              {expertise.useCases.title}
+            </h2>
+            <p class="text-lg text-fg-muted">{expertise.useCases.intro}</p>
           </div>
-        </section>
-      );
-    })
+          <Button href={l(expertise.closing.cta.href)} variant="secondary" icon={ArrowRightIcon} class="w-fit shrink-0">
+            {t('expertise.allPortfolio')}
+          </Button>
+        </div>
+        <ul class:list={['mt-12 grid gap-4 sm:gap-6', useCases.length === 4 ? 'md:grid-cols-2' : 'md:grid-cols-3']}>
+          {useCases.map(({ name, stack, project }) => (
+            <li class="flex">
+              <a
+                href={projectHref(project)}
+                class="glass card-hover group/case flex w-full cursor-pointer flex-col gap-5 rounded-2xl p-6 sm:p-8"
+              >
+                <div class="flex items-center justify-between gap-4 font-mono text-xs text-fg-muted">
+                  <span>{project.data.client} · {project.data.year}</span>
+                  <ArrowUpRightIcon
+                    aria-hidden="true"
+                    className="size-5 shrink-0 text-fg transition-[color,translate] duration-300 ease-out-expo group-hover/case:translate-x-0.5 group-hover/case:-translate-y-0.5 group-hover/case:text-accent"
+                    weight="bold"
+                  />
+                </div>
+                <h3 class="text-2xl font-bold text-fg sm:text-3xl">{name}</h3>
+                <p class="text-sm text-fg-muted">{project.data.summary}</p>
+                <ul aria-label={t('project.stack')} class="mt-auto flex flex-wrap gap-2 pt-2">
+                  {stack.map((tool) => (
+                    <li class="rounded-md border border-line bg-fg/5 px-2 py-1 font-mono text-xs text-fg">{tool}</li>
+                  ))}
+                </ul>
+                <span class="font-display text-sm font-semibold text-fg transition-colors duration-200 group-hover/case:text-accent">
+                  {t('project.view')}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
   }
 
   {
@@ -168,7 +292,7 @@ const splitFeature = (item: string) => {
           </h2>
           <p class="text-lg text-fg-muted">{expertise.stack.intro}</p>
         </div>
-        <dl class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <dl class:list={['mt-12 grid gap-6 sm:grid-cols-2', stackColumns[expertise.stack.groups.length]]}>
           {expertise.stack.groups.map((group) => (
             <div class="glass rounded-2xl p-6">
               <dt class="font-display text-sm font-semibold tracking-[0.2em] text-fg uppercase">
@@ -189,16 +313,16 @@ const splitFeature = (item: string) => {
   }
 
   <CtaSection
-    eyebrow={`Pôle ${expertise.pole}`}
+    eyebrow={`${t('expertise.pole')} ${expertise.pole}`}
     title={expertise.closing.title}
     text={expertise.closing.text}
-    cta={expertise.closing.cta}
-    secondary={{ label: 'Discuter de votre projet', href: expertise.hero.cta.href }}
+    cta={{ ...expertise.closing.cta, href: l(expertise.closing.cta.href) }}
+    secondary={{ label: t('common.discussProject'), href: l(expertise.hero.cta.href) }}
   />
 
   <section aria-labelledby="autres-expertises" class="container-site py-16 sm:py-24">
     <h2 id="autres-expertises" class="text-2xl font-bold text-fg sm:text-3xl">
-      Nos autres expertises
+      {t('expertise.others')}
     </h2>
     <div class="mt-8 grid gap-6 md:grid-cols-2">
       {
@@ -207,9 +331,8 @@ const splitFeature = (item: string) => {
             title={other.hero.title}
             description={other.seo.description}
             icon={expertiseIcons[other.slug]}
-            href={`/expertises/${other.slug}`}
-            linkLabel={`Découvrir ${other.navLabel}`}
-            imageLabel={false}
+            href={l(`/expertises/${other.slug}`)}
+            linkLabel={`${t('expertise.discover')} ${other.navLabel}`}
           />
         ))
       }

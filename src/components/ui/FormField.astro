@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 
 interface Props {
   id: string;
@@ -26,6 +27,7 @@ const {
   class: className = '',
 } = Astro.props;
 
+const t = useTranslations(getLangFromUrl(Astro.url));
 const hintId = hint ? `${id}-aide` : undefined;
 const errorId = `${id}-erreur`;
 const describedBy = [hintId, errorId].filter(Boolean).join(' ');
@@ -44,7 +46,7 @@ const control =
           *
         </span>
       ) : (
-        <span class="font-sans font-normal text-fg-muted"> (facultatif)</span>
+        <span class="font-sans font-normal text-fg-muted"> ({t('common.optional')})</span>
       )
     }
   </label>

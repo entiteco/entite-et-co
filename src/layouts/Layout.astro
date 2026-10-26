@@ -6,6 +6,8 @@ import Navbar from '@/components/layout/Navbar.astro';
 import Footer from '@/components/layout/Footer.astro';
 import favicon from '@/assets/global/entite_co_favicon.webp';
 import { site, socials, type NavItem } from '@/data/site';
+import { langs, ogLocales } from '@/i18n/ui';
+import { getLangFromUrl, localizePath, translatePath, useTranslations } from '@/i18n/utils';
 
 interface Props {
   /** Balise <title> complète (issue de `titre_seo` des fichiers de migration). */
@@ -18,9 +20,12 @@ interface Props {
   breadcrumbs?: readonly NavItem[];
 }
 
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
 const {
-  title = site.defaultTitle,
-  description = site.defaultDescription,
+  title = t('site.defaultTitle'),
+  description = t('site.defaultDescription'),
   noindex = false,
   breadcrumbs = [],
 } = Astro.props;
@@ -28,13 +33,18 @@ const {
 const base = Astro.site ?? site.url;
 const canonical = new URL(Astro.url.pathname, base).href;
 
+// hreflang : uniquement pour les pages disponibles dans toutes les langues.
+const alternates = langs.map((l) => ({ lang: l, path: translatePath(Astro.url.pathname, l) }));
+const translated = alternates.every((alternate) => alternate.path !== null);
+const defaultAlternate = alternates[0]?.path;
+
 const organizationLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: site.name,
   url: site.url,
   email: site.email,
-  slogan: site.slogan,
+  slogan: t('site.slogan'),
   founder: { '@type': 'Person', name: site.founder },
   sameAs: socials.map((s) => s.href),
 };
@@ -44,7 +54,7 @@ const breadcrumbLd =
     ? {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
-        itemListElement: [{ label: 'Accueil', href: '/' }, ...breadcrumbs].map((item, i) => ({
+        itemListElement: [{ label: t('nav.home'), href: localizePath('/', lang) }, ...breadcrumbs].map((item, i) => ({
           '@type': 'ListItem',
           position: i + 1,
           name: item.label,
@@ -55,7 +65,7 @@ const breadcrumbLd =
 ---
 
 <!doctype html>
-<html lang="fr" class="dark">
+<html lang={lang} class="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -79,6 +89,17 @@ const breadcrumbLd =
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, follow" />}
+    {
+      translated &&
+        alternates.map((alternate) => (
+          <link rel="alternate" hreflang={alternate.lang} href={new URL(alternate.path ?? '/', base).href} />
+        ))
+    }
+    {
+      translated && defaultAlternate && (
+        <link rel="alternate" hreflang="x-default" href={new URL(defaultAlternate, base).href} />
+      )
+    }
 
     <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
@@ -91,7 +112,13 @@ const breadcrumbLd =
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:locale" content={site.locale} />
+    <meta property="og:locale" content={ogLocales[lang]} />
+    {
+      translated &&
+        langs
+          .filter((l) => l !== lang)
+          .map((l) => <meta property="og:locale:alternate" content={ogLocales[l]} />)
+    }
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -107,7 +134,7 @@ const breadcrumbLd =
       href="#contenu"
       class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-(--z-index-modal) focus:rounded-full focus:bg-brand focus:px-5 focus:py-3 focus:text-white"
     >
-      Aller au contenu
+      {t('nav.skip')}
     </a>
 
     <Navbar />

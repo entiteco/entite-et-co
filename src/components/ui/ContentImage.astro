@@ -1,5 +1,6 @@
 ---
-// Image de contenu optimisée (WebP, srcset) dans le même cadre que <ImagePlaceholder />.
+// Image de contenu optimisée (WebP, srcset), cadre au ratio fixe (anti-CLS).
+// Seul usage autorisé : la photo du fondateur (À propos) ; le reste du site est sans visuel.
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import { imageRatios, type ImageRatio } from '@/lib/image-ratios';

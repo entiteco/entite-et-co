@@ -3,6 +3,7 @@
 import type { Icon } from '@phosphor-icons/react';
 import { InstagramLogoIcon, LinkedinLogoIcon } from '@phosphor-icons/react/ssr';
 import { socials, type SocialLink } from '@/data/site';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 
 interface Props {
   /** `icons` : boutons ronds icône seule · `list` : icône + libellé. */
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const { variant = 'list', class: className = '' } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
 
 const icons: Record<SocialLink['network'], Icon> = {
   linkedin: LinkedinLogoIcon,
@@ -38,7 +40,7 @@ const icons: Record<SocialLink['network'], Icon> = {
               class="grid size-11 cursor-pointer place-items-center rounded-full text-fg-muted transition-colors duration-200 hover:bg-fg/5 hover:text-fg"
             >
               <SocialIcon aria-hidden="true" className="size-5" weight="regular" />
-              <span class="sr-only">{social.label} (nouvel onglet)</span>
+              <span class="sr-only">{social.label} ({t('common.newTab')})</span>
             </a>
           ) : (
             <a
@@ -49,7 +51,7 @@ const icons: Record<SocialLink['network'], Icon> = {
             >
               <SocialIcon aria-hidden="true" className="size-5 shrink-0" weight="regular" />
               {social.label}
-              <span class="sr-only"> (nouvel onglet)</span>
+              <span class="sr-only"> ({t('common.newTab')})</span>
             </a>
           )}
         </li>

@@ -1,6 +1,6 @@
 ---
 import ExpertisePage from '@/components/sections/ExpertisePage.astro';
-import { impressionTextile } from '@/data/expertises';
+import { getExpertise } from '@/data/expertises';
 ---
 
-<ExpertisePage expertise={impressionTextile} />
+<ExpertisePage expertise={getExpertise('impression-textile', 'fr')} />

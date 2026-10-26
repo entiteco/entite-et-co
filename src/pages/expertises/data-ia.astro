@@ -1,6 +1,6 @@
 ---
 import ExpertisePage from '@/components/sections/ExpertisePage.astro';
-import { dataIa } from '@/data/expertises';
+import { getExpertise } from '@/data/expertises';
 ---
 
-<ExpertisePage expertise={dataIa} />
+<ExpertisePage expertise={getExpertise('data-ia', 'fr')} />

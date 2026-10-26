@@ -1,0 +1,340 @@
+---
+// Page À Propos (/a-propos et /en/a-propos). Contenu FR : migration-entite/page-a-propos/page_propos.md
+// Seule image de contenu du site : la photo du fondateur.
+import { ArrowRightIcon, GraduationCapIcon, HandshakeIcon, StackIcon } from '@phosphor-icons/react/ssr';
+import Layout from '@/layouts/Layout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import Button from '@/components/ui/Button.astro';
+import ContentImage from '@/components/ui/ContentImage.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import { expertiseIcons } from '@/data/expertise-icons';
+import type { ExpertiseSlug } from '@/data/expertises';
+import type { Lang } from '@/i18n/ui';
+import { localizePath } from '@/i18n/utils';
+import { inlineMarkdown } from '@/lib/inline-markdown';
+import founderImg from '@/assets/page-a-propos/entite_co_kevin_heugas.webp';
+
+interface Props {
+  lang: Lang;
+}
+
+interface AboutCopy {
+  seo: { title: string; description: string };
+  navLabel: string;
+  hero: { title: string; intro: string };
+  philosophy: { title: string; text: string };
+  vision: { eyebrow: string; title: string; intro: string; link: string };
+  poles: readonly { slug: ExpertiseSlug; title: string; description: string }[];
+  founder: {
+    alt: string;
+    eyebrow: string;
+    role: string;
+    intro: string;
+    /** `**gras**` autorisé. */
+    points: readonly [string, string];
+  };
+  references: { title: string; text: string; lead: string; more: string; cta: string };
+  closing: { title: string; text: string; cta: string };
+}
+
+const copy: Record<Lang, AboutCopy> = {
+  fr: {
+    seo: {
+      title: "À Propos d'Entité & Co | L'écosystème Digital, Data et Créatif",
+      description:
+        "Découvrez l'histoire et la vision d'Entité & Co. Un studio hybride fondé par Kévin Heugas, alliant expertise technique (IA, Data) et création digitale.",
+    },
+    navLabel: 'À Propos',
+    hero: {
+      title: "À Propos d'Entité & Co",
+      intro:
+        "Entité & Co n'est pas une simple agence web. C'est un écosystème hybride né d'une conviction forte : les meilleurs projets naissent de la convergence entre la technologie de pointe, le design esthétique et la réalité du monde physique.",
+    },
+    philosophy: {
+      title: '« Un est tout, tout est un »',
+      text: 'Notre philosophie, **"Un est tout, tout est un"**, reflète notre approche globale. Nous refusons le travail en silo. Chez nous, la donnée nourrit le design, le web propulse les ventes, et le textile incarne votre marque dans le monde réel.',
+    },
+    vision: {
+      eyebrow: 'Notre vision',
+      title: "Notre Vision : L'Écosystème 360°",
+      intro:
+        "Nous avons structuré notre offre autour de trois pôles d'expertise interconnectés pour vous accompagner de la genèse de votre idée jusqu'à son déploiement à grande échelle :",
+      link: 'Découvrir le pôle',
+    },
+    poles: [
+      {
+        slug: 'data-ia',
+        title: "L'Intelligence Technologique (XENA)",
+        description:
+          "Exploitation de la Data, création d'algorithmes et développement de solutions en Intelligence Artificielle pour propulser votre croissance.",
+      },
+      {
+        slug: 'creation-digitale',
+        title: 'Le Studio Créatif (KVN HGS)',
+        description:
+          'Web design, e-commerce, graphisme et direction artistique pour forger une identité digitale mémorable.',
+      },
+      {
+        slug: 'impression-textile',
+        title: "L'Atelier Physique (SFB)",
+        description:
+          "Impression textile et merchandising pour matérialiser votre marque et fidéliser votre communauté au-delà de l'écran.",
+      },
+    ],
+    founder: {
+      alt: "Kévin Heugas, fondateur d'Entité & Co, sur un toit-terrasse parisien au coucher du soleil",
+      eyebrow: 'Le Fondateur',
+      role: 'Fondateur, Lead Data Engineer & Créateur Digital',
+      intro:
+        "L'écosystème Entité & Co est le reflet du parcours atypique et pluridisciplinaire de son fondateur. Alliant une expertise technique de haut vol à une sensibilité artistique pointue, Kévin incarne cette alliance entre technologie et créativité.",
+      points: [
+        "Fort d'une solide formation en ingénierie de la donnée (**Mastère Data Engineering & Artificial Intelligence à l'EFREI**) et d'une expérience concrète au cœur des systèmes d'information de grands groupes (notamment au sein de la **DSI d'Enedis**), il apporte à l'agence une rigueur analytique et une maîtrise des architectures complexes (Big Data, IA, RGPD).",
+        "En parallèle de ce bagage technique, son profil de créateur autodidacte lui permet de comprendre les enjeux d'image, de design et de commerce de chaque client, offrant ainsi une direction de projet véritablement complète et singulière.",
+      ],
+    },
+    references: {
+      title: 'Ils nous font confiance',
+      text: "De l'artisan local à la startup innovante, en passant par les institutions et les acteurs institutionnels, notre plus grande fierté est la diversité de nos partenaires. Nous adaptons notre force de frappe à l'envergure de vos ambitions.",
+      lead: 'Parmi nos références :',
+      more: "et bien d'autres.",
+      cta: 'Voir les réalisations',
+    },
+    closing: {
+      title: 'Discutons de votre projet.',
+      text: "De la genèse de votre idée jusqu'à son déploiement à grande échelle.",
+      cta: 'Discuter de votre projet avec nous',
+    },
+  },
+  en: {
+    seo: {
+      title: 'About Entité & Co | The Digital, Data and Creative Ecosystem',
+      description:
+        'Discover the story and vision of Entité & Co. A hybrid studio founded by Kévin Heugas, combining technical expertise (AI, Data) and digital design.',
+    },
+    navLabel: 'About',
+    hero: {
+      title: 'About Entité & Co',
+      intro:
+        'Entité & Co is not just another web agency. It is a hybrid ecosystem born from a strong conviction: the best projects emerge where cutting-edge technology, beautiful design and the physical world meet.',
+    },
+    philosophy: {
+      title: '“One is all, all is one”',
+      text: 'Our philosophy, **"One is all, all is one"**, reflects our global approach. We refuse to work in silos. With us, data feeds design, the web drives sales, and textile embodies your brand in the real world.',
+    },
+    vision: {
+      eyebrow: 'Our vision',
+      title: 'Our Vision: The 360° Ecosystem',
+      intro:
+        'We have structured our offer around three interconnected units to support you from the very first idea to large-scale deployment:',
+      link: 'Discover the unit',
+    },
+    poles: [
+      {
+        slug: 'data-ia',
+        title: 'Technological Intelligence (XENA)',
+        description:
+          'Leveraging data, building algorithms and developing Artificial Intelligence solutions to drive your growth.',
+      },
+      {
+        slug: 'creation-digitale',
+        title: 'The Creative Studio (KVN HGS)',
+        description:
+          'Web design, e-commerce, graphic design and art direction to forge a memorable digital identity.',
+      },
+      {
+        slug: 'impression-textile',
+        title: 'The Physical Workshop (SFB)',
+        description:
+          'Textile printing and merchandising to make your brand tangible and build community loyalty beyond the screen.',
+      },
+    ],
+    founder: {
+      alt: 'Kévin Heugas, founder of Entité & Co, on a Parisian rooftop terrace at sunset',
+      eyebrow: 'The Founder',
+      role: 'Founder, Lead Data Engineer & Digital Creator',
+      intro:
+        'The Entité & Co ecosystem reflects the unusual, multidisciplinary background of its founder. Combining top-level technical expertise with a keen artistic sensibility, Kévin embodies this alliance between technology and creativity.',
+      points: [
+        "With solid training in data engineering (**Master's in Data Engineering & Artificial Intelligence at EFREI**) and hands-on experience at the heart of large companies' information systems (notably within **Enedis' IT department**), he brings analytical rigour and command of complex architectures (Big Data, AI, GDPR).",
+        'Alongside this technical background, his self-taught creative profile helps him understand each client’s image, design and business challenges, offering truly complete and distinctive project leadership.',
+      ],
+    },
+    references: {
+      title: 'They trust us',
+      text: 'From local craftspeople to innovative startups and public institutions, our greatest pride is the diversity of our partners. We scale our capabilities to the size of your ambitions.',
+      lead: 'Among our clients:',
+      more: 'and many more.',
+      cta: 'See our work',
+    },
+    closing: {
+      title: 'Let’s talk about your project.',
+      text: 'From the very first idea to large-scale deployment.',
+      cta: 'Discuss your project with us',
+    },
+  },
+};
+
+const references = [
+  'Satisfait Services',
+  'Au Chai de Jérôme',
+  'Adelante Polo Team',
+  'Amplitude 64',
+  'Optique Medar',
+  'Le Petit Pont',
+  'La Yeyette au Rhum',
+  'Balek',
+  'CFDT Enedis',
+] as const;
+
+const { lang } = Astro.props;
+const c = copy[lang];
+const l = (path: string) => localizePath(path, lang);
+const breadcrumbs = [{ label: c.navLabel, href: l('/a-propos') }];
+const pointIcons = [GraduationCapIcon, StackIcon] as const;
+
+const founderLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Kévin Heugas',
+  jobTitle: c.founder.role,
+  worksFor: { '@type': 'Organization', name: 'Entité & Co' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'EFREI' },
+  sameAs: ['https://www.linkedin.com/in/kevinheugas/'],
+};
+---
+
+<Layout title={c.seo.title} description={c.seo.description} breadcrumbs={breadcrumbs}>
+  <script type="application/ld+json" set:html={JSON.stringify(founderLd)} />
+
+  <PageHero
+    eyebrow={c.navLabel}
+    title={c.hero.title}
+    intro={c.hero.intro}
+    breadcrumbs={breadcrumbs}
+    centered
+  />
+
+  <!-- Philosophie -->
+  <section aria-labelledby="philosophie" class="container-site border-t border-line py-16 sm:py-24">
+    <div class="grid gap-10 lg:grid-cols-12">
+      <h2
+        id="philosophie"
+        class="text-4xl leading-[0.95] font-bold text-fg sm:text-6xl lg:col-span-6"
+      >
+        {c.philosophy.title}
+      </h2>
+      <p
+        class="reveal text-lg text-fg-muted lg:col-span-6 lg:pt-3 sm:text-xl"
+        set:html={inlineMarkdown(c.philosophy.text)}
+      />
+    </div>
+  </section>
+
+  <!-- Vision 360° -->
+  <section aria-labelledby="vision-titre" class="container-site py-16 sm:py-24">
+    <SectionHeading eyebrow={c.vision.eyebrow} title={c.vision.title}>
+      <p>{c.vision.intro}</p>
+    </SectionHeading>
+    <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {
+        c.poles.map((pole, i) => (
+          <div class="reveal" style={`--reveal-start: ${i * 8}%`}>
+            <ServiceCard
+              title={pole.title}
+              description={pole.description}
+              icon={expertiseIcons[pole.slug]}
+              href={l(`/expertises/${pole.slug}`)}
+              linkLabel={c.vision.link}
+            />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Fondateur -->
+  <section aria-labelledby="fondateur" class="container-site border-t border-line py-16 sm:py-24">
+    <div class="grid items-start gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:sticky lg:top-28 lg:col-span-5">
+        <ContentImage
+          src={founderImg}
+          alt={c.founder.alt}
+          ratio="portrait"
+          class="object-top"
+          sizes="(min-width: 1280px) 480px, (min-width: 1024px) 38vw, calc(100vw - 2.5rem)"
+        />
+      </div>
+      <div class="flex flex-col gap-6 lg:col-span-7">
+        <p class="font-display text-sm font-medium tracking-[0.3em] text-accent uppercase">
+          {c.founder.eyebrow}
+        </p>
+        <h2 id="fondateur" class="text-4xl leading-[1.02] font-bold text-fg sm:text-6xl">
+          Kévin HEUGAS
+        </h2>
+        <p class="font-display text-lg text-fg">{c.founder.role}</p>
+        <p class="text-lg text-fg-muted">{c.founder.intro}</p>
+
+        <ul class="flex flex-col gap-4">
+          {
+            c.founder.points.map((point, i) => {
+              const PointIcon = pointIcons[i] ?? StackIcon;
+              return (
+                <li class="glass flex gap-4 rounded-2xl p-5 sm:p-6">
+                  <PointIcon aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-accent" weight="regular" />
+                  <p class="text-fg-muted" set:html={inlineMarkdown(point)} />
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Références -->
+  <section aria-labelledby="references" class="container-site border-t border-line py-16 sm:py-24">
+    <div class="grid gap-12 lg:grid-cols-12">
+      <div class="flex flex-col gap-6 lg:col-span-5">
+        <span
+          class="grid size-12 place-items-center rounded-full border border-line bg-fg/5 text-accent"
+        >
+          <HandshakeIcon aria-hidden="true" className="size-6" weight="regular" />
+        </span>
+        <h2 id="references" class="text-3xl leading-[1.05] font-bold text-fg sm:text-5xl">
+          {c.references.title}
+        </h2>
+        <p class="text-lg text-fg-muted">{c.references.text}</p>
+      </div>
+      <div class="lg:col-span-7">
+        <p class="mb-5 text-sm text-fg-muted italic">{c.references.lead}</p>
+        <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {
+            references.map((name) => (
+              <li class="glass flex min-h-20 items-center justify-center rounded-xl px-4 py-3 text-center font-display font-semibold text-fg">
+                {name}
+              </li>
+            ))
+          }
+          <li
+            class="flex min-h-20 items-center justify-center rounded-xl border border-dashed border-line-strong px-4 py-3 text-center text-sm text-fg-muted"
+          >
+            {c.references.more}
+          </li>
+        </ul>
+        <div class="mt-8">
+          <Button href={l('/portfolio')} variant="secondary" icon={ArrowRightIcon}>
+            {c.references.cta}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaSection
+    title={c.closing.title}
+    text={c.closing.text}
+    cta={{ label: c.closing.cta, href: l('/contact') }}
+  />
+</Layout>

@@ -2,7 +2,10 @@
 import { ArrowRightIcon } from '@phosphor-icons/react/ssr';
 import Layout from '@/layouts/Layout.astro';
 import Button from '@/components/ui/Button.astro';
-import { mainNav } from '@/data/site';
+import { localizeNav, mainNav } from '@/data/site';
+
+// Page unique (servie pour toute URL inconnue, y compris sous /en) : en français.
+const nav = localizeNav(mainNav, 'fr');
 ---
 
 <Layout
@@ -26,7 +29,7 @@ import { mainNav } from '@/data/site';
     <nav aria-label="Pages du site" class="border-t border-line pt-8">
       <ul class="flex flex-wrap gap-x-6 gap-y-1">
         {
-          mainNav.map((item) => (
+          nav.map((item) => (
             <li>
               <a
                 href={item.href}

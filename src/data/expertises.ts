@@ -2,7 +2,10 @@
 // - migration-entite/page-data-ia/page_expertise_data_ia.md
 // - migration-entite/page-creation-digitale/page_expertise_creation_digitale.md
 // - migration-entite/page-impression-textile/page_expertise_impression_textile.md
-// `**gras**` est converti par `inlineMarkdown`.
+// `**gras**` est converti par `inlineMarkdown`. Version anglaise : ./expertises.en.ts.
+// Liens sans préfixe de langue : les composants les localisent (`localizePath`).
+import type { Lang } from '@/i18n/ui';
+import { expertisesEn } from './expertises.en';
 
 export type ExpertiseSlug = 'data-ia' | 'creation-digitale' | 'impression-textile';
 
@@ -22,8 +25,16 @@ export interface ExpertiseSection {
   title: string;
   intro: string;
   groups: readonly FeatureGroup[];
-  imageLabel: string;
   cta?: Cta;
+}
+
+export interface UseCase {
+  /** Identifiant de l'entrée `portfolio` (nom du fichier sans `.md`). */
+  id: string;
+  /** Nom court affiché sur la carte. */
+  name: string;
+  /** Stack technique résumée en tags. */
+  stack: readonly string[];
 }
 
 export interface Expertise {
@@ -36,6 +47,10 @@ export interface Expertise {
   /** Bloc d'introduction optionnel (ex. « Comprendre la Data »). */
   highlight?: { title: string; intro: string; items: readonly string[]; cta?: Cta };
   sections: readonly ExpertiseSection[];
+  /** En-tête de la grille bento des sections (icône, titre, texte ; sans visuel). */
+  sectionsHeading: { eyebrow: string; title: string; intro: string };
+  /** Projets du portfolio mis en avant directement sur la page. */
+  useCases?: { title: string; intro: string; projects: readonly UseCase[] };
   stack?: { title: string; intro: string; groups: readonly { label: string; items: readonly string[] }[] };
   ecosystem?: { title: string; paragraphs: readonly string[] };
   closing: { title: string; text: string; cta: Cta };
@@ -51,98 +66,124 @@ export const dataIa: Expertise = {
   pole: 'XENA',
   navLabel: 'Data & IA',
   seo: {
-    title: 'Expertise Data & Intelligence Artificielle | Entité & Co',
+    title: 'Expertise Data Engineering, IA & Analytics | Entité & Co',
     description:
-      "Transformez vos données en décisions stratégiques. Découvrez l'expertise Data Science, Analyse de données et Développement IA d'Entité & Co.",
+      "De l'architecture de vos bases de données jusqu'au déploiement de modèles d'IA générative. Découvrez l'expertise Data complète d'Entité & Co.",
   },
   hero: {
     eyebrow: 'Expertise — Data & IA',
-    title: 'Expertise Data & Intelligence Artificielle',
+    title: 'Expertise Data Engineering & Intelligence Artificielle',
     intro:
-      "L'IA est le moteur de l'innovation de demain. Préparez-vous dès aujourd'hui à la transformation. Au sein d'Entité & Co, le pôle **XENA** est dédié à l'exploitation de votre potentiel data, de l'analyse brute jusqu'au déploiement de modèles prédictifs sur-mesure.",
+      "L'IA est le moteur de l'innovation, mais la donnée en est le carburant. Au sein d'Entité & Co, le pôle **XENA** maîtrise l'intégralité de la chaîne de valeur : de la construction d'infrastructures de données robustes (Data Engineering) jusqu'au déploiement de modèles prédictifs sur-mesure (MLOps).",
     cta: { label: 'Parler de mon projet Data', href: '/contact?sujet=data-ia' },
   },
   highlight: {
-    title: "Comprendre la Data : De l'Analyse à la Prédiction",
-    intro: "Un projet data réussi nécessite d'allier deux visions complémentaires :",
+    title: "La Data de bout en bout : Structurer, Prédire, Piloter",
+    intro: "Un écosystème data performant repose sur trois piliers indissociables :",
     items: [
-      '**La Data Visualisation (Comprendre le présent) :** Transformer vos bases de données complexes en tableaux de bord clairs pour prendre des décisions éclairées au quotidien.',
-      "**La Data Science (Prédire l'avenir) :** Créer des modèles algorithmiques capables d'anticiper les tendances, d'automatiser des tâches complexes et de générer de l'intelligence grâce au Machine Learning.",
+      "**Le Data Engineering (Structurer) :** Construire des fondations solides, des bases de données aux Data Lakes, pour garantir la disponibilité et la sécurité des informations.",
+      "**La Data Science & l'IA (Prédire) :** Développer des algorithmes de Machine Learning et exploiter l'IA générative pour automatiser et anticiper.",
+      '**La Data Analyse (Piloter) :** Transformer la donnée brute en tableaux de bord visuels et interactifs pour une prise de décision stratégique éclairée.',
     ],
-    cta: { label: 'Parler de mon projet Data', href: '/contact?sujet=data-ia' },
+    cta: { label: 'Voir les projets du pôle', href: '#projets' },
+  },
+  sectionsHeading: {
+    eyebrow: 'Pôles d’expertise',
+    title: 'Trois pôles, une seule chaîne de valeur',
+    intro: 'Du stockage à la décision : chaque brique est conçue pour s’intégrer aux autres.',
+  },
+  useCases: {
+    title: 'Projets & Réalisations (Use Cases)',
+    intro: 'Des projets menés de bout en bout, du pipeline de données jusqu’au modèle en production.',
+    projects: [
+      { id: 'data-ia-urban', name: 'Urban Data Explorer', stack: ['Architecture Medallion', 'PostgreSQL', 'Docker'] },
+      { id: 'data-ia-aisca', name: 'AISCA', stack: ['Python', 'RAG', 'SBERT', 'LLM'] },
+      { id: 'data-ia-churn', name: 'Prédiction de Churn', stack: ['Python', 'Machine Learning', 'FastAPI', 'MLOps'] },
+      { id: 'data-ia-my-social-network', name: 'My Social Network API', stack: ['Node.js', 'Express', 'MongoDB', 'JWT'] },
+    ],
   },
   sections: [
+    {
+      id: 'data-engineering-cloud',
+      title: 'Pôle Data Engineering & Cloud Architecture',
+      intro:
+        "La fondation technique de votre entreprise. Nous concevons des architectures scalables pour collecter, nettoyer et stocker vos données massives en toute sécurité.",
+      groups: [
+        {
+          title: 'Architecture et Stockage de Données',
+          items: [
+            '**Bases de données & Data Lakes :** Conception de bases relationnelles (SQL) et non-relationnelles (NoSQL) adaptées à vos flux de données.',
+            '**Pipelines ETL / ELT :** Création de flux automatisés pour extraire, transformer et charger la donnée (Data Integration).',
+          ],
+        },
+        {
+          title: 'Cloud & Industrialisation (MLOps)',
+          items: [
+            '**Déploiement Continu (CI/CD) :** Automatisation des mises en production pour garantir la fiabilité des applications et des modèles IA.',
+            '**Infrastructures Scalables :** Conteneurisation (Docker, Kubernetes) et administration des ressources cloud (Infrastructure as Code).',
+          ],
+        },
+      ],
+    },
     {
       id: 'data-science-ia',
       title: 'Pôle Data Science & Développement IA',
       intro:
         'Des solutions algorithmiques avancées pour résoudre vos problématiques métiers complexes, optimiser vos processus et créer de nouveaux relais de croissance.',
-      imageLabel: 'Visuel Data Science',
       groups: [
         {
-          title: 'Création de modèles IA sur-mesure',
+          title: 'Intelligence Artificielle & Générative',
           items: [
-            '**Machine Learning & Deep Learning :** Modèles prédictifs, analyse comportementale et segmentation client.',
-            '**Traitement du Langage (NLP & LLM) :** Intégration de modèles de langage (type ChatGPT) sur vos données privées, analyse de sentiments et classification de textes.',
+            "**IA Générative (LLM & RAG) :** Intégration de modèles de fondation sur vos données privées pour des solutions innovantes et sécurisées.",
+            '**Traitement du Langage (NLP) :** Analyse de sentiments, classification sémantique et extraction de connaissances.',
           ],
         },
         {
-          title: 'Automatisation et Data Engineering',
+          title: 'Machine Learning & Analyse Prédictive',
           items: [
-            '**Pipelines de données :** Préparation, nettoyage et transformation (ETL) de vos flux de données.',
-            '**Collecte automatisée :** Web scraping éthique et structuration de données massives (Big Data).',
-          ],
-        },
-        {
-          title: 'Intégration et Déploiement (MLOps)',
-          items: [
-            '**Mise en production :** Déploiement de modèles IA dans des environnements sécurisés (Docker, serveurs cloud).',
-            "**Industrialisation :** Création d'APIs robustes en Python pour connecter l'IA à vos outils existants.",
+            '**Modèles Prédictifs :** Anticipation des comportements, scoring (ex: prédiction de churn) et segmentation client.',
+            '**Évaluation & Optimisation :** Comparaison de modèles et ajustement des hyperparamètres pour maximiser la performance et l\'écoresponsabilité.',
           ],
         },
       ],
     },
     {
       id: 'data-analyst-bi',
-      title: 'Pôle Data Analyst & Business Intelligence (BI)',
+      title: 'Pôle Data Analyse & Gouvernance',
       intro:
-        'Faites parler vos données. Nous transformons vos chiffres en un atout stratégique et visuel.',
-      imageLabel: 'Mockup Dashboard',
+        'Faites parler vos données en toute conformité. Nous transformons vos chiffres en atouts stratégiques visuels tout en assurant leur sécurité.',
       groups: [
         {
-          title: 'Tableaux de bord et Rapports interactifs',
+          title: 'Business Intelligence & Dataviz',
           items: [
-            "**Business Intelligence :** Conception de dashboards sur-mesure avec Power BI pour un pilotage d'entreprise en temps réel.",
-            "**Applications Web d'Analyse :** Développement d'applications interactives (via Streamlit) pour visualiser et manipuler vos données dynamiquement.",
+            "**Tableaux de bord interactifs :** Conception d'interfaces de pilotage en temps réel avec Power BI et Streamlit.",
+            "**Analyse Exploratoire :** Identification des tendances cachées et extraction d'insights exploitables pour la gouvernance.",
           ],
         },
         {
-          title: 'Exploration et Stratégie Data',
+          title: 'Gouvernance & Sécurité des Données',
           items: [
-            '**Analyse avancée :** Exploration de bases de données (SQL, Excel) pour identifier les tendances cachées et les anomalies.',
-            '**Accompagnement Stratégique :** Audit de votre maturité data et formation de vos équipes aux outils de visualisation (Data-Driven strategy).',
+            '**Management de la Donnée :** Mise en place d\'un cycle de vie de la donnée (traçabilité, archivage) respectant les réglementations (RGPD).',
+            '**Qualité & Audit :** Monitoring continu pour garantir l\'adéquation et la propreté des données exploitées.',
           ],
         },
       ],
     },
   ],
   stack: {
-    title: 'Stack Technologique',
+    title: 'Stack Technologique & Outils',
     intro:
-      'Nous utilisons les outils les plus performants du marché pour garantir fiabilité et scalabilité :',
+      'Un écosystème d\'outils modernes pour garantir la fiabilité, la scalabilité et la performance de vos projets data :',
     groups: [
-      { label: 'Langages', items: ['Python', 'SQL', 'DAX'] },
-      {
-        label: 'Data Science & IA',
-        items: ['Scikit-Learn', 'TensorFlow', 'PyTorch', 'Pandas', 'Modèles NLP/LLM'],
-      },
-      { label: 'Visualisation', items: ['Power BI', 'Streamlit', 'Matplotlib'] },
-      { label: 'Déploiement', items: ['Docker', 'Git', 'API REST'] },
+      { label: 'Engineering & BDD', items: ['PostgreSQL', 'MongoDB', 'Redis', 'PySpark'] },
+      { label: 'MLOps & Cloud', items: ['Docker', 'Kubernetes', 'Terraform', 'FastAPI', 'AWS / Vercel'] },
+      { label: 'Data Science & IA', items: ['Scikit-Learn', 'XGBoost', 'SBERT / Hugging Face', 'Gemini API', 'Pandas'] },
+      { label: 'Dataviz & BI', items: ['Power BI', 'Streamlit', 'Plotly', 'MapLibre'] },
     ],
   },
   closing: {
-    title: 'Transformez vos données en décisions stratégiques.',
-    text: "De l'analyse brute jusqu'au déploiement de modèles prédictifs sur-mesure.",
+    title: 'De la donnée brute à l\'intelligence automatisée.',
+    text: "Une maîtrise complète de la chaîne de valeur Data, de l'architecture serveur jusqu'au tableau de bord final.",
     cta: portfolioCta('data'),
   },
 };
@@ -163,13 +204,17 @@ export const creationDigitale: Expertise = {
       "Votre présence en ligne est le premier point de contact entre vous et vos futurs clients. Elle se doit d'être irréprochable. Au sein d'Entité & Co, le studio créatif **KVN HGS** conçoit des écosystèmes digitaux sur-mesure, alliant esthétisme (UI), ergonomie (UX) et performance de conversion.",
     cta: { label: 'Parler de mon projet Web', href: '/contact?sujet=creation-digitale' },
   },
+  sectionsHeading: {
+    eyebrow: 'Savoir-faire',
+    title: 'Du pixel à la conversion',
+    intro: 'Deux pôles complémentaires pour construire, faire vivre et incarner votre marque en ligne.',
+  },
   sections: [
     {
       id: 'web-e-commerce',
       title: 'Déployez et boostez votre activité (Web & E-commerce)',
       intro:
         'De la vitrine institutionnelle à la boutique en ligne complète, nous développons des plateformes performantes et optimisées pour les moteurs de recherche.',
-      imageLabel: 'Mockup Site Web',
       groups: [
         {
           title: 'Web Design & Développement (Site Vitrine)',
@@ -195,7 +240,6 @@ export const creationDigitale: Expertise = {
       title: 'Incarnez votre marque (Graphisme & Social Media)',
       intro:
         'Une identité visuelle forte et une communication maîtrisée sont indispensables pour vous démarquer et fidéliser votre communauté.',
-      imageLabel: 'Mockup Branding',
       groups: [
         {
           title: 'Graphisme & Identité Visuelle',
@@ -257,13 +301,17 @@ export const impressionTextile: Expertise = {
       "Le digital connecte les gens, le physique marque les esprits. L'entité **SFB** transforme votre identité visuelle en produits tangibles. Que vous souhaitiez lancer votre propre marque de vêtements, équiper vos collaborateurs ou préparer un événement, nous assurons la production de vos supports physiques avec une qualité professionnelle.",
     cta: { label: 'Demander un devis textile', href: '/contact?sujet=impression-textile' },
   },
+  sectionsHeading: {
+    eyebrow: 'Savoir-faire',
+    title: 'Du fichier au produit fini',
+    intro: 'La technique de marquage et le support adaptés à chaque visuel, chaque budget et chaque usage.',
+  },
   sections: [
     {
       id: 'marquage-textile',
       title: 'Marquage Textile Personnalisé',
       intro:
         'Du t-shirt promotionnel au sweat à capuche premium, nous habillons vos équipes et vos communautés en choisissant la technique de marquage la plus adaptée à votre visuel et à votre budget.',
-      imageLabel: 'Mockup Textile',
       groups: [
         {
           title: "Nos techniques d'impression textile",
@@ -282,7 +330,6 @@ export const impressionTextile: Expertise = {
       title: 'Objets Publicitaires & Accessoires (Goodies)',
       intro:
         "Étendez la portée de votre marque au-delà de l'écran avec des objets utiles, mémorables et parfaits pour l'événementiel.",
-      imageLabel: 'Mockup Goodies',
       groups: [
         {
           title: 'Nos supports de communication physique',
@@ -310,3 +357,13 @@ export const impressionTextile: Expertise = {
 };
 
 export const expertises = [dataIa, creationDigitale, impressionTextile] as const;
+
+const expertisesByLang: Record<Lang, readonly Expertise[]> = { fr: expertises, en: expertisesEn };
+
+export const getExpertises = (lang: Lang): readonly Expertise[] => expertisesByLang[lang];
+
+export const getExpertise = (slug: ExpertiseSlug, lang: Lang): Expertise => {
+  const expertise = expertisesByLang[lang].find((item) => item.slug === slug);
+  if (!expertise) throw new Error(`Expertise introuvable : « ${lang}/${slug} »`);
+  return expertise;
+};

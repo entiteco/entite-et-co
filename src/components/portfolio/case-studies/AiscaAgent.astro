@@ -1,0 +1,164 @@
+---
+// Étude de cas « AISCA » (page /portfolio/data-ia-aisca et modale du portfolio) :
+// application Streamlit en iframe, architecture interactive (FlowDiagram), stack technique et lien GitHub.
+import type { Icon } from '@phosphor-icons/react';
+import {
+  BrainIcon,
+  BrowserIcon,
+  ChatCircleTextIcon,
+  DatabaseIcon,
+  ListMagnifyingGlassIcon,
+  RocketLaunchIcon,
+  ShieldCheckIcon,
+  SparkleIcon,
+} from '@phosphor-icons/react/ssr';
+import FlowDiagram, { type FlowNode } from '@/components/portfolio/case-studies/FlowDiagram.astro';
+import LiveDemo from '@/components/portfolio/case-studies/LiveDemo.astro';
+import StackSection, { type StackGroup } from '@/components/portfolio/case-studies/StackSection.astro';
+import type { Lang } from '@/i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const APP_SRC = 'https://projet-ia-gen-aisca.streamlit.app/?embed=true';
+const APP_HREF = 'https://projet-ia-gen-aisca.streamlit.app/';
+const REPO_HREF = 'https://github.com/entiteco/Projet_IA_Gen_AISCA';
+
+const stack: StackGroup[] = [
+  { title: 'NLP & ML', icon: ListMagnifyingGlassIcon, items: ['Sentence-Transformers', 'SBERT', 'Scikit-Learn', 'Numpy', 'Pandas'] },
+  { title: 'GenAI', icon: SparkleIcon, items: ['Google Gemini API', 'google-generativeai', 'RAG'] },
+  { title: 'Interface', icon: BrowserIcon, items: ['Streamlit', 'Plotly (Radars)', 'FPDF (Export PDF)'] },
+  { title: lang === 'fr' ? 'Déploiement' : 'Deployment', icon: RocketLaunchIcon, items: ['Docker', 'Docker-Compose', 'Hugging Face', 'Streamlit Cloud'] },
+];
+
+const copy = {
+  fr: {
+    appTitle: 'L’agent, en direct',
+    appIntro:
+      'Décrivez votre profil en quelques lignes et obtenez les métiers IT les plus proches sémantiquement, puis un plan de coaching généré par l’IA. Hébergée sur Streamlit Cloud, l’application peut mettre quelques secondes à se réveiller.',
+    iframeTitle: 'Application Streamlit AISCA : agent d’orientation professionnelle Tech & Data',
+    openFull: 'Ouvrir dans Streamlit',
+    archEyebrow: 'Architecture',
+    archTitle: 'De la bio au plan de coaching',
+    archIntro:
+      'Un moteur sémantique local, encadré par des règles déterministes, puis augmenté par un LLM. Sélectionnez un composant pour lire les choix techniques.',
+    diagramLabel: 'Schéma d’architecture du projet AISCA',
+    repoNote: 'Moteur SBERT, pipeline RAG Gemini, interface Streamlit et configuration Docker.',
+    flow: {
+      etl: {
+        tag: 'ETL & Cache',
+        title: 'Data Loader & Historique',
+        text: 'Chargement du référentiel JSON nettoyé, et gestion du cache des requêtes (history.csv) pour ne pas recalculer une analyse déjà faite.',
+      },
+      nlp: {
+        tag: 'NLP Engine',
+        title: 'Moteur SBERT',
+        text: 'Calcul de similarité cosinus entre la bio de l’utilisateur et la base de métiers IT, sur des embeddings Sentence-Transformers.',
+      },
+      guard: {
+        tag: 'Filtrage',
+        title: 'Garde-fous Logiques',
+        text: 'Pénalités déterministes sur les profils techniquement inadaptés (niveaux Maths/Code) : une protection anti-hallucination en amont du LLM.',
+      },
+      rag: {
+        tag: 'GenAI Engine',
+        title: 'RAG via Google Gemini',
+        text: 'Augmentation des inputs courts (bios pauvres) et génération d’un plan de coaching personnalisé, ancré sur les résultats du moteur sémantique.',
+      },
+      ui: {
+        tag: 'Frontend',
+        title: 'Interface Streamlit',
+        text: 'Application web interactive conteneurisée avec Docker : radars de compétences et export PDF du plan de coaching.',
+      },
+    },
+  },
+  en: {
+    appTitle: 'The agent, live',
+    appIntro:
+      'Describe your profile in a few lines to get the semantically closest IT roles, then an AI-generated coaching plan. Hosted on Streamlit Cloud, the app may take a few seconds to wake up.',
+    iframeTitle: 'AISCA Streamlit app: Tech & Data career guidance agent',
+    openFull: 'Open in Streamlit',
+    archEyebrow: 'Architecture',
+    archTitle: 'From bio to coaching plan',
+    archIntro:
+      'A local semantic engine, framed by deterministic rules, then augmented by an LLM. Select a component to read the technical choices.',
+    diagramLabel: 'AISCA architecture diagram',
+    repoNote: 'SBERT engine, Gemini RAG pipeline, Streamlit interface and Docker setup.',
+    flow: {
+      etl: {
+        tag: 'ETL & Cache',
+        title: 'Data Loader & History',
+        text: 'Loading of the cleaned JSON reference data, and request cache management (history.csv) so an analysis is never computed twice.',
+      },
+      nlp: {
+        tag: 'NLP Engine',
+        title: 'SBERT Engine',
+        text: 'Cosine similarity between the user’s bio and the IT roles database, on Sentence-Transformers embeddings.',
+      },
+      guard: {
+        tag: 'Filtering',
+        title: 'Logical Guardrails',
+        text: 'Deterministic penalties on technically unsuitable profiles (maths/coding levels): anti-hallucination protection upstream of the LLM.',
+      },
+      rag: {
+        tag: 'GenAI Engine',
+        title: 'RAG with Google Gemini',
+        text: 'Augmentation of short inputs (thin bios) and generation of a personalised coaching plan, grounded on the semantic engine’s results.',
+      },
+      ui: {
+        tag: 'Frontend',
+        title: 'Streamlit Interface',
+        text: 'Interactive web application containerised with Docker: skill radars and PDF export of the coaching plan.',
+      },
+    },
+  },
+}[lang];
+
+const flowIcons: Record<keyof typeof copy.flow, Icon> = {
+  etl: DatabaseIcon,
+  nlp: BrainIcon,
+  guard: ShieldCheckIcon,
+  rag: ChatCircleTextIcon,
+  ui: BrowserIcon,
+};
+const flowStacks: Record<keyof typeof copy.flow, string[]> = {
+  etl: ['JSON', 'Pandas', 'history.csv'],
+  nlp: ['Sentence-Transformers', 'Scikit-Learn', 'Numpy'],
+  guard: ['Python', lang === 'fr' ? 'Règles déterministes' : 'Deterministic rules'],
+  rag: ['Google Gemini', 'google-generativeai'],
+  ui: ['Streamlit', 'Plotly', 'FPDF', 'Docker'],
+};
+const flow: FlowNode[] = (Object.keys(copy.flow) as (keyof typeof copy.flow)[]).map((id) => ({
+  id,
+  icon: flowIcons[id],
+  ...copy.flow[id],
+  stack: flowStacks[id],
+}));
+---
+
+<LiveDemo
+  lang={lang}
+  title={copy.appTitle}
+  intro={copy.appIntro}
+  src={APP_SRC}
+  href={APP_HREF}
+  iframeTitle={copy.iframeTitle}
+  openLabel={copy.openFull}
+/>
+
+<section aria-labelledby="architecture-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class="font-mono text-xs tracking-[0.2em] text-accent uppercase sm:text-sm">{copy.archEyebrow}</p>
+    <h2 id="architecture-titre" class="text-2xl leading-tight font-bold text-fg sm:text-4xl">{copy.archTitle}</h2>
+    <p class="text-fg-muted">{copy.archIntro}</p>
+  </div>
+
+  <div class="mt-10">
+    <FlowDiagram id="aisca-archi" label={copy.diagramLabel} nodes={flow} />
+  </div>
+</section>
+
+<StackSection lang={lang} groups={stack} repoHref={REPO_HREF} repoNote={copy.repoNote} />

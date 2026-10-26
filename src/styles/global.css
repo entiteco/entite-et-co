@@ -143,6 +143,12 @@
     @apply border border-line bg-glass backdrop-blur-xl;
   }
 
+  /* Carte interactive (accueil, bento, projets) : élévation + liseré rouge au survol.
+     `translate` (et non `transform`) : se combine avec l'animation `.reveal`. */
+  .card-hover {
+    @apply transition-[translate,border-color,box-shadow] duration-300 ease-out-expo hover:border-brand/40 hover:shadow-xl motion-safe:hover:-translate-y-1 dark:hover:shadow-[0_0_40px_-12px_rgb(230_0_0/0.45)];
+  }
+
   .container-site {
     @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
   }

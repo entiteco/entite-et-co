@@ -1,14 +1,16 @@
 ---
-// Fiche projet, partagée entre la modale (/portfolio) et la page dédiée (/portfolio/[slug]).
+// Fiche projet (visuel principal + galerie, ou grille Bento si `intro` est renseigné), partagée entre la modale (/portfolio) et la page dédiée
+// (/portfolio/[slug]), en français comme en anglais (/en/…).
 import { render } from 'astro:content';
 import { Image } from 'astro:assets';
-import { ArrowRightIcon } from '@phosphor-icons/react/ssr';
-import Button from '@/components/ui/Button.astro';
+import { SealCheckIcon } from '@phosphor-icons/react/ssr';
+import ProjectActions from '@/components/portfolio/ProjectActions.astro';
 import PrefixIds from '@/components/ui/PrefixIds.astro';
 import ContentImage from '@/components/ui/ContentImage.astro';
-import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
+import { approachIcons } from '@/data/approach-icons';
 import { categoryMeta } from '@/data/portfolio';
-import type { Project } from '@/lib/portfolio';
+import { projectLang, projectSlug, type Project } from '@/lib/portfolio';
+import { useTranslations } from '@/i18n/utils';
 
 interface Props {
   project: Project;
@@ -17,19 +19,32 @@ interface Props {
   titleId: string;
   /** Focus initial sur le titre à l'ouverture de la modale. */
   focusTitle?: boolean;
+  /** Boutons de fin de fiche ; la modale les affiche elle-même, après l'étude de cas. */
+  showActions?: boolean;
 }
 
-const { project, headingLevel: Heading = 'h2', titleId, focusTitle = false } = Astro.props;
-const { title, category, client, year, summary, services, tools, demo, cover, coverAlt, gallery } =
+const { project, headingLevel: Heading = 'h2', titleId, focusTitle = false, showActions = true } = Astro.props;
+const { title, category, client, year, summary, services, tools, demo, cover, coverAlt, gallery, intro } =
   project.data;
+const lang = projectLang(project);
+const t = useTranslations(lang);
 const meta = categoryMeta[category];
+// Projets Data & IA : fiche purement textuelle / interactive ; le visuel reste sur la carte de la grille.
+const showMedia = category !== 'data';
 const { Content } = await render(project);
 
+// Niveaux de titre des blocs Bento (`intro`), sous le titre du projet.
+const SectionHeading = Heading === 'h1' ? 'h2' : 'h3';
+const CardHeading = Heading === 'h1' ? 'h3' : 'h4';
+const approachCols =
+  intro?.approach.length === 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : intro?.approach.length === 3 ? 'md:grid-cols-3' : 'sm:grid-cols-2';
+const bentoLabel = 'font-mono text-xs tracking-[0.2em] text-accent uppercase';
+
 const facts = [
-  { label: 'Client', value: client },
-  { label: 'Année', value: String(year) },
-  { label: 'Expertise', value: meta.longLabel },
-  { label: 'Prestations', value: services.join(', ') },
+  { label: t('project.client'), value: client },
+  { label: t('project.year'), value: String(year) },
+  { label: t('project.expertise'), value: meta.longLabel[lang] },
+  { label: t('project.services'), value: services.join(', ') },
 ];
 ---
 
@@ -39,12 +54,12 @@ const facts = [
       <span
         class="rounded-full border border-brand/40 px-2.5 py-0.5 font-display text-xs font-semibold tracking-[0.15em] text-accent uppercase"
       >
-        {meta.label}
+        {meta.label[lang]}
       </span>
       {
         demo && (
           <span class="rounded-full border border-line-strong px-2.5 py-0.5 text-xs text-fg-muted">
-            Projet de démonstration
+            {t('project.demo')}
           </span>
         )
       }
@@ -64,16 +79,20 @@ const facts = [
     <p class="max-w-[65ch] text-lg text-fg-muted">{summary}</p>
   </header>
 
+
   {
-    cover ? (
+    showMedia && cover && (
       <ContentImage src={cover} alt={coverAlt ?? ''} ratio="video" fit="contain" sizes="(min-width: 1280px) 1152px, 100vw" />
-    ) : (
-      <ImagePlaceholder label="Mockup Projet" description={`Visuel principal — ${title}`} ratio="video" />
     )
   }
 
-  <div class="grid gap-10 lg:grid-cols-12">
-    <dl class="grid content-start gap-5 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-1">
+  <div class:list={['grid lg:grid-cols-12', intro ? 'gap-4 sm:gap-6' : 'gap-10']}>
+    <dl
+      class:list={[
+        'grid content-start gap-5 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-1',
+        intro && 'glass rounded-2xl p-6 sm:p-8 [&>div:first-child]:border-t-0 [&>div:first-child]:pt-0',
+      ]}
+    >
       {
         facts.map((fact) => (
           <div class="border-t border-line pt-3">
@@ -88,7 +107,7 @@ const facts = [
         tools.length > 0 && (
           <div class="border-t border-line pt-3 sm:col-span-2 lg:col-span-1">
             <dt class="font-display text-xs font-semibold tracking-[0.2em] text-fg-muted uppercase">
-              Outils
+              {t('project.tools')}
             </dt>
             <dd class="mt-2">
               <ul class="flex flex-wrap gap-2">
@@ -102,19 +121,66 @@ const facts = [
       }
     </dl>
 
-    <div class="prose-site lg:col-span-8 [&_:is(h2,h3)]:mt-0 [&_:is(h2,h3):not(:first-child)]:mt-10 [&_:is(h2,h3)]:text-xl sm:[&_:is(h2,h3)]:text-2xl">
-      <PrefixIds prefix={project.id}><Content /></PrefixIds>
-    </div>
+    {
+      intro ? (
+        <section class="glass flex flex-col gap-4 rounded-2xl p-6 sm:p-10 lg:col-span-8">
+          <SectionHeading class={bentoLabel}>{t('project.context')}</SectionHeading>
+          <p class="max-w-[65ch] text-lg leading-relaxed text-fg sm:text-xl">{intro.context}</p>
+        </section>
+      ) : (
+        <div class="prose-site lg:col-span-8 [&_:is(h2,h3)]:mt-0 [&_:is(h2,h3):not(:first-child)]:mt-10 [&_:is(h2,h3)]:text-xl sm:[&_:is(h2,h3)]:text-2xl">
+          <PrefixIds prefix={projectSlug(project)}><Content /></PrefixIds>
+        </div>
+      )
+    }
   </div>
 
   {
-    gallery && gallery.length > 0 ? (
-      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label={`Galerie — ${title}`}>
+    intro && (
+      <section class="flex flex-col gap-6">
+        <div class="flex max-w-3xl flex-col gap-2">
+          <SectionHeading class={bentoLabel}>{t('project.approach')}</SectionHeading>
+          {intro.approachIntro && <p class="text-fg-muted">{intro.approachIntro}</p>}
+        </div>
+        <ul class:list={['grid gap-4 sm:gap-6', approachCols]}>
+          {intro.approach.map((step) => {
+            const StepIcon = approachIcons[step.icon];
+            return (
+              <li class="glass card-hover flex flex-col gap-4 rounded-2xl p-6">
+                <span class="flex size-11 items-center justify-center rounded-xl border border-brand/40 text-accent">
+                  <StepIcon aria-hidden="true" className="size-6" weight="duotone" />
+                </span>
+                <CardHeading class="text-lg leading-snug font-bold text-fg">{step.title}</CardHeading>
+                <p class="text-sm leading-relaxed text-fg-muted">{step.text}</p>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    intro && (
+      <section class="flex flex-col gap-4 rounded-2xl border border-brand/40 p-6 sm:flex-row sm:items-start sm:gap-6 sm:p-8 dark:shadow-[0_0_40px_-16px_rgb(230_0_0/0.45)]">
+        <SealCheckIcon aria-hidden="true" className="size-8 shrink-0 text-accent" weight="duotone" />
+        <div class="flex flex-col gap-2">
+          <SectionHeading class={bentoLabel}>{t('project.deliverables')}</SectionHeading>
+          <p class="max-w-[70ch] text-lg text-fg">{intro.deliverables}</p>
+        </div>
+      </section>
+    )
+  }
+
+
+  {
+    showMedia && gallery && gallery.length > 0 && (
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label={`${t('project.gallery')} — ${title}`}>
         {gallery.map((img, index) => (
           <li>
             <Image
               src={img}
-              alt={`${title} (${client}) — visuel ${index + 2}`}
+              alt={`${title} (${client}) — ${t('project.visual')} ${index + 2}`}
               widths={[320, 480, 640, 960].filter((w) => w <= img.width)}
               sizes="(min-width: 1280px) 568px, (min-width: 640px) 50vw, 100vw"
               loading="lazy"
@@ -123,20 +189,8 @@ const facts = [
           </li>
         ))}
       </ul>
-    ) : (
-      <div class="grid gap-4 sm:grid-cols-2">
-        <ImagePlaceholder label="Ajouter une image" description={`Détail 1 — ${title}`} ratio="landscape" />
-        <ImagePlaceholder label="Ajouter une image" description={`Détail 2 — ${title}`} ratio="landscape" />
-      </div>
     )
   }
 
-  <div class="flex flex-wrap gap-3 border-t border-line pt-8">
-    <Button href={`/contact?sujet=${meta.expertise}`} icon={ArrowRightIcon}>
-      Discuter d'un projet similaire
-    </Button>
-    <Button href={`/expertises/${meta.expertise}`} variant="secondary">
-      Expertise {meta.longLabel}
-    </Button>
-  </div>
+  {showActions && <ProjectActions project={project} />}
 </div>

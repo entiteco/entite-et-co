@@ -17,7 +17,8 @@ Tu dois impérativement utiliser les technologies suivantes :
 * **Framework :** Astro (Configuration pour un rendu statique ultra-rapide SSG).
 * **Styling :** Tailwind CSS.
 * **Langage :** TypeScript (Typage strict requis pour tous les composants).
-* **Déploiement cible :** Vercel (Prévoir la configuration Vercel si nécessaire).
+* **Déploiement cible :** Vercel.
+* **i18n :** routage natif Astro (`defaultLocale: 'fr'`, `locales: ['fr', 'en']`, `prefixDefaultLocale: false`) : français à la racine, anglais sous `/en` (mêmes slugs). Voir section 9.
 * **Icônes :** Phosphor Icons (`@phosphor-icons/react/ssr`, noms suffixés `…Icon`, rendu statique sans JS), recommandé par `ui-ux-pro-max`. Logos de marque officiels : `LinkedinLogoIcon`, `InstagramLogoIcon`.
 
 ---
@@ -43,6 +44,8 @@ Basé sur l'identité visuelle historique et amplifié par les directives de `sk
   * Animations subtiles au scroll en CSS natif (`.reveal`, scroll-driven animations, zéro JS) pour l'apparition des éléments ; `prefers-reduced-motion` respecté.
   * Boutons d'appel à l'action (CTA) minimalistes avec effet de survol marqué (ex: fond transparent qui se remplit de rouge).
   * Les projets du portfolio doivent s'ouvrir dans des modales (Dialogs) fluides, sans recharger la page.
+  * Cartes interactives (accueil, grille bento, projets) : classe `.card-hover` (`global.css`) : élévation `-translate-y-1`, liseré `border-brand/40`, ombre ; `translate` (compatible `.reveal`), désactivée si `prefers-reduced-motion`.
+  * **Design sans images** : positionnement « Expert indépendant Data Engineering & IA », rendu typographique façon SaaS technique (grilles Bento, tags `font-mono`). Images autorisées sur le front : le **logo**, la **photo du fondateur** (À propos) et les **visuels des projets du portfolio** (`cover` + `gallery`, grille, modale et page projet). Accueil et expertises restent sans image.
 
 ---
 
@@ -131,11 +134,18 @@ Pour cette phase de développement, n'intègre **aucune véritable image**. Tu d
 * Portfolio : collection Astro `src/content/portfolio/*.md` (schéma dans `src/content.config.ts`), catégories dans `src/data/portfolio.ts`, helpers dans `src/lib/portfolio.ts`, composants dans `src/components/portfolio/`. Chaque projet a une page `/portfolio/[slug]` (SEO) et s'ouvre en modale depuis la grille.
 * ✅ Médias réels intégrés (section 7) : logos, accueil, expertises, à propos ; portfolio réel : 6 projets textile (Balek, Kayou, CFDT Enedis, P4PBLUR, La Yeyette, Adelante Polo Team) et 2 projets web (La Yeyette au Rhum e-commerce, Pavillons de l'Atlantique), avec `cover` + `gallery`.
 * Projets data réels (les projets `demo: true` ont été supprimés) : Prédiction de Churn, AISCA, Urban Data Explorer (`src/content/portfolio/data-ia-*.md`, logos dans `src/assets/page-portfolio/data-ia/`, `gallery: []`).
+* Fiches Data & IA : texte dans le champ frontmatter `intro` (`context`, `approachIntro?`, `approach[]` avec `icon` parmi `approachIconKeys`, `deliverables`), rendu en grille Bento par `ProjectDetail.astro` (corps Markdown vide). Aucun visuel sur la fiche (`cover` sert uniquement à la carte de la grille). Études de cas interactives par slug dans `src/components/portfolio/case-studies/` (`FlowDiagram`, `StackSection`, iframes), centralisées dans `CaseStudy.astro`, affichées sur la page projet **et** dans la modale du portfolio (ids préfixés via `PrefixIds`, boutons de fin `ProjectActions.astro` avec « Ouvrir la page du projet » en modale) ; dashboard Urban servi depuis `public/urban-data-explorer/`.
+* Projet « My Social Network API » (`data-ia-my-social-network`) : étude de cas `MySocialNetwork.astro` (terminal `ui/TerminalApi.astro` + `<Code />` Shiki, surface d'API calculée depuis l'export Postman `src/assets/page-portfolio/data-ia/projets-portfolio-data-ia-my-social-network.json`, diagramme ER `ui/MermaidDiagram.astro` chargé paresseusement au scroll).
+* ✅ Pivot « Expert Data Engineering & IA » : accueil (carte « Cœur d'expertise » pleine largeur + « Compétences transverses »), les 3 expertises en grille Bento (`ExpertisePage.astro`, icônes dans `sectionIcons`), section « Projets & Réalisations (Use Cases) » sur Data & IA (`useCases` dans `expertises.ts`).
+* ✅ Images retirées de l'accueil et des expertises (`ImagePlaceholder` et `expertise-images.ts` supprimés) ; conservées : logo, photo du fondateur, visuels du portfolio.
+* ✅ i18n FR/EN (section 9).
 * 🔜 Prochaine phase : déploiement Vercel (section 8).
 
 ---
 
 # 7. INTÉGRATION DES VRAIS MÉDIAS (FIN DE LA RÈGLE D'OR)
+
+> ⚠️ Depuis le pivot minimaliste, seuls le logo, la photo du fondateur et les visuels du portfolio sont affichés. Les projets étant rangés par langue (`src/content/portfolio/fr|en/`), les chemins d'image ont un niveau de plus : `cover: "../../../assets/page-portfolio/…"`, à renseigner dans les deux langues (`coverAlt` traduit).
 
 * **Emplacement :** images de contenu dans `src/assets/` (optimisées par Astro : WebP, `width`/`height`, `srcset`, lazy-loading), un sous-dossier par page source : `global/`, `page-accueil/`, `page-data-ia/`, `page-creation-digitale/`, `page-impression-textile/`, `page-a-propos/`, `page-portfolio/<categorie-ou-projet>/` (ex. `page-portfolio/textile/entite_sfb_<client>_<visuel>.webp`). `public/` est réservé aux fichiers servis tels quels (favicon, `robots.txt`, images Open Graph).
 * **Format des sources :** `.webp` uniquement (convertir avant d'ajouter), noms en minuscules sans espaces ni guillemets.
@@ -153,3 +163,14 @@ Pour cette phase de développement, n'intègre **aucune véritable image**. Tu d
 * Node ≥ 22.12 (champ `engines` de `package.json`, requis par Astro 7).
 * `site: 'https://www.entite.co'` dans `astro.config.mjs` : à modifier si le domaine final change (canonical, sitemap, Open Graph).
 * Procédure : pousser sur GitHub → importer le dépôt dans Vercel (réglages détectés automatiquement) → brancher le domaine.
+
+---
+
+# 9. INTERNATIONALISATION (FR / EN)
+
+* **Routes :** pages FR dans `src/pages/`, EN dans `src/pages/en/` (mêmes slugs). Chaque route est un fichier mince qui rend un composant de page partagé (`src/components/pages/*Page.astro`, `ExpertisePage.astro`) avec `lang="fr"` ou `lang="en"`.
+* **Dictionnaire UI :** `src/i18n/ui.ts` (navigation, footer, boutons, statuts) ; helpers dans `src/i18n/utils.ts` : `getLangFromUrl`, `useTranslations`, `localizePath` (préfixe `/en`, idempotent, ignore ancres / mailto), `translatePath` (sélecteur de langue + hreflang).
+* **Contenus :** textes de page dans l'objet `copy` de chaque composant de page ; expertises : `src/data/expertises.ts` (FR) + `src/data/expertises.en.ts` (EN), via `getExpertises(lang)` / `getExpertise(slug, lang)`. Liens écrits **sans préfixe** dans les données : les composants les localisent.
+* **Portfolio :** `src/content/portfolio/fr/*.md` et `src/content/portfolio/en/*.md` (même nom de fichier = même slug) ; id de collection `<lang>/<slug>` ; `getProjects(lang)`, `getProject(slug, lang)`, `projectSlug`, `projectHref` dans `src/lib/portfolio.ts`. Tout nouveau projet doit exister dans les deux dossiers.
+* **Non traduit :** pages légales et 404 (FR uniquement) ; le sélecteur renvoie alors vers `/en`. Les paramètres d'URL restent `?categorie=` / `?sujet=`.
+* **SEO :** `<html lang>`, `og:locale`, `<link rel="alternate" hreflang>` (fr, en, x-default) pour les pages traduites, alternatives hreflang dans le sitemap.

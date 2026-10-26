@@ -1,0 +1,2075 @@
+{
+	"info": {
+		"_postman_id": "db7b64a3-f9c0-4f5a-97ba-428ab18740c1",
+		"name": "API_WEB_SERVICES : MY SOCIAL NETWORK",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41787216"
+	},
+	"item": [
+		{
+			"name": "1. Users & Authentification",
+			"item": [
+				{
+					"name": "User Self-Service",
+					"item": [
+						{
+							"name": "POST /users/register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"firstname\": \"KZ\",\n  \"lastname\": \"MASTER\",\n  \"email\": \"xena@entite.co\",\n  \"password\": \"123abc\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:3000/users/register",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"users",
+										"register"
+									]
+								},
+								"description": "Create a new user account."
+							},
+							"response": []
+						},
+						{
+							"name": "POST /users/login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"kevin@entite.co\",\n  \"password\": \"123abc\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:3000/users/login",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"users",
+										"login"
+									]
+								},
+								"description": "Authenticate a user and receive a JWT."
+							},
+							"response": []
+						},
+						{
+							"name": "GET /users/me",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/users/me",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"users",
+										"me"
+									]
+								},
+								"description": "Get the profile of the currently logged-in user."
+							},
+							"response": []
+						},
+						{
+							"name": "PUT /users/me",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"firstname\": \"Kévin\",\n  \"lastname\": \"HEUGAS\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:3000/users/me",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"users",
+										"me"
+									]
+								},
+								"description": "Update the profile of the currently logged-in user."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Admin Management",
+					"item": [
+						{
+							"name": "GET /users",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/users",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"users"
+									]
+								},
+								"description": "Get a list of all users in the database."
+							},
+							"response": []
+						},
+						{
+							"name": "GET /users/:id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/users/68fcb61e075992e45b944d3d",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"users",
+										"68fcb61e075992e45b944d3d"
+									]
+								},
+								"description": "Get a specific user by their ID."
+							},
+							"response": []
+						},
+						{
+							"name": "PUT /users/:id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"avatar\": \"kevin_heugas.png\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:3000/users/68fcb61e075992e45b944d3d",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"users",
+										"68fcb61e075992e45b944d3d"
+									]
+								},
+								"description": "Update a specific user's information by their ID."
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE /users/:id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/users/68fcb61e075992e45b944d3d",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"users",
+										"68fcb61e075992e45b944d3d"
+									]
+								},
+								"description": "Delete a specific user by their ID."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "2. Groups",
+			"item": [
+				{
+					"name": "Group Management",
+					"item": [
+						{
+							"name": "POST /groups",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"My First Public Group\",\n  \"description\": \"This is a test group for our API.\",\n  \"groupType\": \"public\",\n  \"settings\": {\n    \"membersCanPost\": true,\n    \"membersCanCreateEvents\": false\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:3000/groups",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups"
+									]
+								},
+								"description": "Create a new group (requires auth). The creator becomes the first admin/member."
+							},
+							"response": []
+						},
+						{
+							"name": "GET /groups",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/groups",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups"
+									]
+								},
+								"description": "Get a list of all **public** groups."
+							},
+							"response": []
+						},
+						{
+							"name": "GET /groups/:id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups",
+										"68fd12596553c2bfa9f02831"
+									]
+								},
+								"description": "Get detailed information for a specific group. Access is restricted for private/secret groups."
+							},
+							"response": []
+						},
+						{
+							"name": "PUT /groups/:id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"description\": \"This is a test group for My Social Network API.\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups",
+										"68fd12596553c2bfa9f02831"
+									]
+								},
+								"description": "Update a group's details (Admin only)."
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE /groups/:id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"description\": \"This is a test group for My Social Network API.\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups",
+										"68fd12596553c2bfa9f02831"
+									]
+								},
+								"description": "Delete a group (Admin only)."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Member Management",
+					"item": [
+						{
+							"name": "GET /groups/:id/members",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:Kévin HEUGAS JWT token My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831/members",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups",
+										"68fd12596553c2bfa9f02831",
+										"members"
+									]
+								},
+								"description": "List all members of a group."
+							},
+							"response": []
+						},
+						{
+							"name": "POST /groups/:id/join",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:KZ MASTER JWT token\n My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831/join",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups",
+										"68fd12596553c2bfa9f02831",
+										"join"
+									]
+								},
+								"description": "Request to join a **public** group."
+							},
+							"response": []
+						},
+						{
+							"name": "POST /groups/:id/leave",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:KZ MASTER\n JWT token\n My Social Network}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831/leave",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups",
+										"68fd12596553c2bfa9f02831",
+										"leave"
+									]
+								},
+								"description": "Leave a group."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Group Discussion",
+					"item": [
+						{
+							"name": "GET /groups/:id/messages",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{Kévin_HEUGAS}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831/messages",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups",
+										"68fd12596553c2bfa9f02831",
+										"messages"
+									]
+								},
+								"description": "Get all messages from the group's discussion thread."
+							},
+							"response": []
+						},
+						{
+							"name": "POST /groups/:id/messages",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{Kévin_HEUGAS}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"content\": \"Hello, this is the first message!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831/messages",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"groups",
+										"68fd12596553c2bfa9f02831",
+										"messages"
+									]
+								},
+								"description": "Post a new message to the group's discussion thread."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "3. Events",
+			"item": [
+				{
+					"name": "POST /events",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My First Standalone Event\",\n  \"description\": \"This is a public event not tied to any group.\",\n  \"startDate\": \"2025-11-20T19:00:00.000Z\",\n  \"endDate\": \"2025-11-20T23:00:00.000Z\",\n  \"location\": \"At my place\",\n  \"coverPhoto\": \"default_event_cover.png\",\n  \"isPublic\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events"
+							]
+						},
+						"description": "Create a new standalone event."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /groups/:groupId/events",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Event FROM My Group\",\n  \"description\": \"This event auto-invites everyone!\",\n  \"startDate\": \"2025-12-01T19:00:00.000Z\",\n  \"endDate\": \"2025-12-01T23:00:00.000Z\",\n  \"location\": \"Group HQ\",\n  \"isPublic\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831/events",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"groups",
+								"68fd12596553c2bfa9f02831",
+								"events"
+							]
+						},
+						"description": "Create a new event linked to a group (auto-invites members)."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /events",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events"
+							]
+						},
+						"description": "Get a list of all public events."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /events:/:id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/6902140ff10178b6ed8178c9",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"6902140ff10178b6ed8178c9"
+							]
+						},
+						"description": "Get a list of all public events."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /events/:id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carpoolingEnabled\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45"
+							]
+						},
+						"description": "Update an event's details (Organizer only)"
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /events/:id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/68ff517a1ab7c6a715d6730d",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff517a1ab7c6a715d6730d"
+							]
+						},
+						"description": "Cancel an event (Organizer only)"
+					},
+					"response": []
+				},
+				{
+					"name": "POST /events/:id/join",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{KZ_MASTER}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/6902140ff10178b6ed8178c9/join",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"6902140ff10178b6ed8178c9",
+								"join"
+							]
+						},
+						"description": "RSVP or join an event as a participant."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Discussion Threads",
+			"item": [
+				{
+					"name": "GET /groups/:id/messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831/messages",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"groups",
+								"68fd12596553c2bfa9f02831",
+								"messages"
+							]
+						},
+						"description": "Get all messages for a group's discussion thread."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /groups/:id/messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Hello, this is the second message!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/groups/68fd12596553c2bfa9f02831/messages",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"groups",
+								"68fd12596553c2bfa9f02831",
+								"messages"
+							]
+						},
+						"description": "Post a new message in a group's thread."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /events/:id/messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"First message in the event!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/6902140ff10178b6ed8178c9/messages",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"6902140ff10178b6ed8178c9",
+								"messages"
+							]
+						},
+						"description": "Post a new message in an event's thread."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /events/:id/messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/6902140ff10178b6ed8178c9/messages",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"6902140ff10178b6ed8178c9",
+								"messages"
+							]
+						},
+						"description": "Get all messages for an event's discussion thread."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /thread/messages/:messageId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"This is the EDITED message content.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/thread/messages/6904726b41d32cf37adaaf25",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"thread",
+								"messages",
+								"6904726b41d32cf37adaaf25"
+							]
+						},
+						"description": "Edit a message (Author only)."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /thread/messages/:messageId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/thread/messages/6904726b41d32cf37adaaf25",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"thread",
+								"messages",
+								"6904726b41d32cf37adaaf25"
+							]
+						},
+						"description": "Delete a message (Author or Admin/Organizer)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Photo Albums",
+			"item": [
+				{
+					"name": "GET /events/:eventId/photos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/6902140ff10178b6ed8178c9/photos",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"6902140ff10178b6ed8178c9",
+								"photos"
+							]
+						},
+						"description": "Get all photo albums for an event."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /events/:eventId/albums",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Selfies Album\",\n  \"description\": \"Just for the selfies.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/6902140ff10178b6ed8178c9/albums",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"6902140ff10178b6ed8178c9",
+								"albums"
+							]
+						},
+						"description": "Create a new photo album for an event (Organizer or participant)."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /albums/:albumId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/albums/6906465759fe484edeb62164",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"albums",
+								"6906465759fe484edeb62164"
+							]
+						},
+						"description": "Get details and photos for a specific album."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /albums/:albumId/photos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"url\": \"https://example.com/my-selfie.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/albums/6906465759fe484edeb62164/photos",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"albums",
+								"6906465759fe484edeb62164",
+								"photos"
+							]
+						},
+						"description": "Upload one or more photos to a specific album (Participant only)."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /photos/:photoId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/photos/690648d61de4c18a1e4d35cb",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"photos",
+								"690648d61de4c18a1e4d35cb"
+							]
+						},
+						"description": "Delete a photo (Author or Organizer)."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /photos/:photoId/comments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Wow, great photo!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/photos/6906497b1de4c18a1e4d35dc/comments",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"photos",
+								"6906497b1de4c18a1e4d35dc",
+								"comments"
+							]
+						},
+						"description": "Add a comment to a photo."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /photos/:photoId/comments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/photos/6906497b1de4c18a1e4d35dc/comments",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"photos",
+								"6906497b1de4c18a1e4d35dc",
+								"comments"
+							]
+						},
+						"description": "Get all comments for a photo."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Polls",
+			"item": [
+				{
+					"name": "GET /events/:eventId/polls",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/6902140ff10178b6ed8178c9/polls",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"6902140ff10178b6ed8178c9",
+								"polls"
+							]
+						},
+						"description": "Get all polls for an event."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /events/:eventId/polls",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"What's for lunch? (Corrected)\",\n  \"questions\": [\n    {\n      \"text\": \"Main course?\",\n      \"choices\": [\"Pizza\", \"Burgers\", \"Salad\"] \n    },\n    {\n      \"text\": \"Drink?\",\n      \"choices\": [\"Water\", \"Soda\"]\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/6902140ff10178b6ed8178c9/polls",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"6902140ff10178b6ed8178c9",
+								"polls"
+							]
+						},
+						"description": "Create a new poll (Organizer only)."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /polls/:pollId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/polls/69064b0c24a79d39c65b1e1c",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"polls",
+								"69064b0c24a79d39c65b1e1c"
+							]
+						},
+						"description": "Get a specific poll with its questions and answer options."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /polls/:pollId",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/polls/69064b0c24a79d39c65b1e1c",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"polls",
+								"69064b0c24a79d39c65b1e1c"
+							]
+						},
+						"description": "Delete a poll (Organizer only)."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /polls/:pollId/vote",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"answers\": [\n    {\n      \"questionId\": \"69064f243ba27836a2482cbc\",\n      \"chosenChoice\": \"Pizza\"\n    },\n    {\n      \"questionId\": \"69064f243ba27836a2482cbd\",\n      \"chosenChoice\": \"Soda\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/polls/69064f243ba27836a2482cbb/vote",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"polls",
+								"69064f243ba27836a2482cbb",
+								"vote"
+							]
+						},
+						"description": "Submit a vote for a poll (Participant only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Ticketing",
+			"item": [
+				{
+					"name": "GET /events/:eventId/ticket-types",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45/ticket-types",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45",
+								"ticket-types"
+							]
+						},
+						"description": "List all available ticket types for a public event."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /events/:eventId/ticket-types",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"General Admission\",\n  \"price\": 25,\n  \"quantity\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45/ticket-types",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45",
+								"ticket-types"
+							]
+						},
+						"description": "Create a new ticket type (Organizer only)."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /ticket-types/:typeId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": 30,\n  \"quantity\": 150\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/ticket-types/690650cac85bc6f4f34b2676",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"ticket-types",
+								"690650cac85bc6f4f34b2676"
+							]
+						},
+						"description": "Update a ticket type (Organizer only)."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /ticket-types/:typeId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/ticket-types/690650cac85bc6f4f34b2676",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"ticket-types",
+								"690650cac85bc6f4f34b2676"
+							]
+						},
+						"description": "Delete a ticket type (Organizer only)."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /events/:eventId/purchase",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ticketTypeId\": \"690650cac85bc6f4f34b2676\",\n  \"buyerFirstName\": \"Peter\",\n  \"buyerLastName\": \"Pan\",\n  \"buyerAddress\": \"123 Neverland St, London\",\n  \"buyerEmail\": \"peter.pan@test.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45/purchase",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45",
+								"purchase"
+							]
+						},
+						"description": "\"Purchase\" a ticket (acquires one ticket of a specific type)."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /events/:eventId/attendees",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45/attendees",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45",
+								"attendees"
+							]
+						},
+						"description": "List all registered ticket holders (Organizer only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8. Shopping List",
+			"item": [
+				{
+					"name": "GET /events/:eventId/shopping-list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45"
+							]
+						},
+						"description": "Get the complete shopping list for an event."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /events/:eventId/shopping-list",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"itemName\": \"Pizzas\",\n  \"quantity\": 5,\n  \"arrivalTime\": \"2025-11-20T19:30:00.000Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45/shopping-list",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45",
+								"shopping-list"
+							]
+						},
+						"description": "Add a new item to the shopping list (requires auth)."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /shopping-list/:itemId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"quantity\": 8\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/shopping-list/690653ea6e9b5633797e599c",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"shopping-list",
+								"690653ea6e9b5633797e599c"
+							]
+						},
+						"description": "Update an item you added (e.g., change quantity or arrival time)."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /shopping-list/:itemId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/shopping-list/690653ea6e9b5633797e599c",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"shopping-list",
+								"690653ea6e9b5633797e599c"
+							]
+						},
+						"description": "Remove an item you added (Author or Organizer only)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8. Carpooling",
+			"item": [
+				{
+					"name": "GET /events/:eventId/carpooling",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45/carpool-offers",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45",
+								"carpool-offers"
+							]
+						},
+						"description": "Get all carpool rides offered for an event."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /events/:eventId/carpool-offers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"departureLocation\": \"Paris, Gare de Lyon\",\n  \"departureTime\": \"2025-11-20T17:00:00.000Z\",\n  \"price\": 5,\n  \"availableSeats\": 3,\n  \"maxDetourMinutes\": 15\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/events/68ff53f7feb4ed139d5dbb45/carpool-offers",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"events",
+								"68ff53f7feb4ed139d5dbb45",
+								"carpool-offers"
+							]
+						},
+						"description": "Offer a new ride for the event (requires auth)."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /carpooling/:rideId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": 7,\n  \"availableSeats\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/carpooling/690656e441bb556b47cb4ae7",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"carpooling",
+								"690656e441bb556b47cb4ae7"
+							]
+						},
+						"description": "Update a ride you offered (Author only)."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /carpooling/:rideId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Kévin_HEUGAS}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/carpooling/690656e441bb556b47cb4ae7",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"carpooling",
+								"690656e441bb556b47cb4ae7"
+							]
+						},
+						"description": "Cancel a ride you offered (Author or Organizer)."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

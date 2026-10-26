@@ -1,0 +1,105 @@
+---
+// Fenêtre de terminal façon macOS qui simule un appel d'API : requête HTTP puis réponse JSON,
+// colorées au build par <Code /> (Shiki, aucun JavaScript côté client). Toujours sombre, quel que soit le thème.
+import { Code } from 'astro:components';
+import { GithubLogoIcon } from '@phosphor-icons/react/ssr';
+import type { Lang } from '@/i18n/ui';
+
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+interface Props {
+  lang: Lang;
+  /** Titre affiché dans la barre de la fenêtre. */
+  title: string;
+  method: HttpMethod;
+  host: string;
+  path: string;
+  headers?: Record<string, string>;
+  requestBody?: unknown;
+  status: { code: number; text: string };
+  responseBody: unknown;
+  repoHref?: string;
+  class?: string;
+}
+
+const {
+  lang,
+  title,
+  method,
+  host,
+  path,
+  headers = {},
+  requestBody,
+  status,
+  responseBody,
+  repoHref,
+  class: className = '',
+} = Astro.props;
+
+const copy = {
+  fr: { request: 'Requête', response: 'Réponse', repo: 'Voir le dépôt GitHub', newTab: '(nouvel onglet)' },
+  en: { request: 'Request', response: 'Response', repo: 'View the GitHub repository', newTab: '(new tab)' },
+}[lang];
+
+const json = (value: unknown) => JSON.stringify(value, null, 2);
+
+const request = [
+  `${method} ${path} HTTP/1.1`,
+  `Host: ${host}`,
+  ...Object.entries(headers).map(([name, value]) => `${name}: ${value}`),
+  ...(requestBody === undefined ? [] : ['', json(requestBody)]),
+].join('\n');
+
+const statusTone = status.code < 300 ? 'text-emerald-400' : status.code < 500 ? 'text-amber-300' : 'text-red-400';
+const sectionLabel = 'font-mono text-[0.7rem] font-medium tracking-[0.15em] text-slate-400 uppercase';
+// `bg-transparent!` : écrase le fond inline posé par le thème Shiki.
+const codeClass = 'bg-transparent! overflow-x-auto font-mono text-[0.8rem] leading-relaxed sm:text-sm';
+---
+
+<figure
+  class:list={[
+    'overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl shadow-black/40',
+    className,
+  ]}
+>
+  <figcaption class="relative flex items-center gap-2 border-b border-slate-700/60 bg-slate-800/70 px-4 py-3">
+    <span class="size-3 rounded-full bg-[#ff5f57]" aria-hidden="true"></span>
+    <span class="size-3 rounded-full bg-[#febc2e]" aria-hidden="true"></span>
+    <span class="size-3 rounded-full bg-[#28c840]" aria-hidden="true"></span>
+    <span class="ml-3 truncate font-mono text-xs text-slate-300 sm:absolute sm:inset-x-24 sm:ml-0 sm:text-center">
+      {title}
+    </span>
+  </figcaption>
+
+  <div class="flex flex-col gap-6 p-4 sm:p-6">
+    <div class="flex flex-col gap-2">
+      <p class={sectionLabel}><span aria-hidden="true">$ </span>{copy.request}</p>
+      <Code code={request} lang="http" theme="github-dark" class={codeClass} />
+    </div>
+
+    <div class="flex flex-col gap-2 border-t border-dashed border-slate-700/60 pt-6">
+      <p class={sectionLabel}>
+        {copy.response}
+        <span class:list={['ml-2 normal-case tracking-normal', statusTone]}>HTTP/1.1 {status.code} {status.text}</span>
+      </p>
+      <Code code={json(responseBody)} lang="json" theme="github-dark" class={codeClass} />
+    </div>
+  </div>
+
+  {
+    repoHref && (
+      <div class="flex justify-end border-t border-slate-700/60 bg-slate-800/40 px-4 py-3 sm:px-6">
+        <a
+          href={repoHref}
+          target="_blank"
+          rel="noopener"
+          class="group/btn relative isolate inline-flex min-h-11 cursor-pointer items-center gap-2 overflow-hidden rounded-full border border-brand px-5 font-display text-sm font-semibold text-slate-100 transition-colors duration-300 ease-out-expo before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:bg-brand before:transition-transform before:duration-300 before:ease-out-expo hover:text-white hover:before:scale-y-100 focus-visible:before:scale-y-100"
+        >
+          <GithubLogoIcon aria-hidden="true" className="size-5" weight="fill" />
+          {copy.repo}
+          <span class="sr-only">{copy.newTab}</span>
+        </a>
+      </div>
+    )
+  }
+</figure>

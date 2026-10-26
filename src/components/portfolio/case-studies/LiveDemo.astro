@@ -1,0 +1,59 @@
+---
+// Section « Démo live » des études de cas : application embarquée en iframe dans un cadre façon navigateur.
+import { ArrowSquareOutIcon } from '@phosphor-icons/react/ssr';
+import type { Lang } from '@/i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  intro: string;
+  /** URL chargée dans l'iframe. */
+  src: string;
+  /** URL ouverte par le lien « nouvel onglet » (par défaut : `src`). */
+  href?: string;
+  iframeTitle: string;
+  openLabel: string;
+}
+
+const { lang, title, intro, src, href = src, iframeTitle, openLabel } = Astro.props;
+
+const copy = {
+  fr: { eyebrow: 'Démo live', newTab: '(nouvel onglet)' },
+  en: { eyebrow: 'Live demo', newTab: '(new tab)' },
+}[lang];
+---
+
+<section aria-labelledby="demo-live-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class="font-mono text-xs tracking-[0.2em] text-accent uppercase sm:text-sm">{copy.eyebrow}</p>
+    <h2 id="demo-live-titre" class="text-2xl leading-tight font-bold text-fg sm:text-4xl">{title}</h2>
+    <p class="text-fg-muted">{intro}</p>
+  </div>
+
+  <div class="mt-10 overflow-hidden rounded-xl border border-line bg-surface shadow-2xl dark:border-white/10">
+    <div class="flex items-center justify-between gap-4 border-b border-line px-4 py-1">
+      <div class="flex items-center gap-1.5" aria-hidden="true">
+        <span class="size-2.5 rounded-full bg-line-strong"></span>
+        <span class="size-2.5 rounded-full bg-line-strong"></span>
+        <span class="size-2.5 rounded-full bg-brand"></span>
+      </div>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex min-h-11 items-center gap-2 font-mono text-xs text-fg-muted transition-colors duration-200 hover:text-accent"
+      >
+        {openLabel}
+        <span class="sr-only">{copy.newTab}</span>
+        <ArrowSquareOutIcon aria-hidden="true" className="size-4" />
+      </a>
+    </div>
+    <iframe
+      src={src}
+      title={iframeTitle}
+      loading="lazy"
+      allow="fullscreen"
+      class="block h-[75svh] min-h-[480px] w-full bg-white sm:h-[800px]"
+    ></iframe>
+  </div>
+</section>

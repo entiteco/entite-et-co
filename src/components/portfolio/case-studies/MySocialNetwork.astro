@@ -1,0 +1,388 @@
+---
+// Étude de cas « My Social Network API » (page /portfolio/data-ia-my-social-network et modale du portfolio) :
+// l'API n'a pas de front-end, on la rend visible : requête simulée dans un terminal, surface des endpoints
+// (calculée depuis l'export Postman), modèle de données en diagramme Mermaid, stack et lien GitHub.
+import {
+  CarIcon,
+  ChartBarIcon,
+  ChatsCircleIcon,
+  ImagesIcon,
+  LockKeyIcon,
+  ShoppingCartIcon,
+  TerminalWindowIcon,
+  TicketIcon,
+  UsersThreeIcon,
+  CalendarDotsIcon,
+  DatabaseIcon,
+  ShieldCheckIcon,
+  WrenchIcon,
+  HardDrivesIcon,
+} from '@phosphor-icons/react/ssr';
+import type { Icon } from '@phosphor-icons/react';
+import TerminalApi, { type HttpMethod } from '@/components/ui/TerminalApi.astro';
+import MermaidDiagram from '@/components/ui/MermaidDiagram.astro';
+import StackSection, { type StackGroup } from '@/components/portfolio/case-studies/StackSection.astro';
+import postman from '@/assets/page-portfolio/data-ia/projets-portfolio-data-ia-my-social-network.json';
+import type { Lang } from '@/i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const REPO_HREF = 'https://github.com/entiteco/Api_Web_Services_My_social_network';
+
+// --- Export Postman : structure minimale utilisée ici ---------------------------------------------
+interface PostmanRequest {
+  name: string;
+  request: { method: HttpMethod; url: { raw: string; host?: string[]; port?: string; path?: string[] }; body?: { raw?: string } };
+}
+interface PostmanFolder {
+  name: string;
+  item: (PostmanFolder | PostmanRequest)[];
+}
+const collection = postman as unknown as PostmanFolder;
+
+const isFolder = (item: PostmanFolder | PostmanRequest): item is PostmanFolder => 'item' in item;
+const flatten = (items: PostmanFolder['item']): PostmanRequest[] =>
+  items.flatMap((item) => (isFolder(item) ? flatten(item.item) : [item]));
+
+// Requête mise en scène : l'achat d'un billet (transaction MongoDB).
+const purchase = flatten(collection.item).find((item) => item.name === 'POST /events/:eventId/purchase');
+if (!purchase) throw new Error('Requête « POST /events/:eventId/purchase » introuvable dans l’export Postman.');
+const purchaseUrl = purchase.request.url;
+const purchaseBody = JSON.parse(purchase.request.body?.raw ?? '{}') as Record<string, string>;
+const eventId = purchaseUrl.path?.[1] ?? '';
+
+// Réponse 201 : le document PurchasedTicket renvoyé par le contrôleur (src/controllers/ticketing.mjs).
+const purchaseResponse = {
+  _id: '6906528fc85bc6f4f34b2690',
+  event: eventId,
+  ticketType: purchaseBody.ticketTypeId,
+  buyerFirstName: purchaseBody.buyerFirstName,
+  buyerLastName: purchaseBody.buyerLastName,
+  buyerAddress: purchaseBody.buyerAddress,
+  buyerEmail: purchaseBody.buyerEmail,
+  purchaseDate: '2025-11-01T18:42:07.311Z',
+  createdAt: '2025-11-01T18:42:07.311Z',
+  updatedAt: '2025-11-01T18:42:07.311Z',
+};
+
+// Surface de l'API : un dossier Postman = une ressource.
+const resourceIcons: Icon[] = [
+  LockKeyIcon,
+  UsersThreeIcon,
+  CalendarDotsIcon,
+  ChatsCircleIcon,
+  ImagesIcon,
+  ChartBarIcon,
+  TicketIcon,
+  ShoppingCartIcon,
+  CarIcon,
+];
+const methodOrder: HttpMethod[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+const resources = collection.item.filter(isFolder).map((folder, index) => {
+  const requests = flatten(folder.item);
+  const methods = methodOrder
+    .map((method) => ({ method, count: requests.filter((r) => r.request.method === method).length }))
+    .filter(({ count }) => count > 0);
+  return {
+    name: folder.name.replace(/^\d+\.\s*/, ''),
+    icon: resourceIcons[index] ?? HardDrivesIcon,
+    total: requests.length,
+    methods,
+  };
+});
+const endpointCount = resources.reduce((sum, resource) => sum + resource.total, 0);
+
+const methodTone: Record<HttpMethod, string> = {
+  GET: 'text-emerald-600 dark:text-emerald-400',
+  POST: 'text-sky-600 dark:text-sky-400',
+  PUT: 'text-amber-700 dark:text-amber-300',
+  PATCH: 'text-violet-600 dark:text-violet-400',
+  DELETE: 'text-accent',
+};
+
+const stack: StackGroup[] = [
+  { title: 'Runtime & API', icon: TerminalWindowIcon, items: ['Node.js (ESM)', 'Express', 'REST'] },
+  { title: lang === 'fr' ? 'Données' : 'Data', icon: DatabaseIcon, items: ['MongoDB', 'Mongoose', 'Transactions ACID'] },
+  {
+    title: lang === 'fr' ? 'Sécurité' : 'Security',
+    icon: ShieldCheckIcon,
+    items: ['JWT', 'bcrypt', 'Helmet', 'express-rate-limit', 'CORS', 'HTTPS / TLS'],
+  },
+  { title: lang === 'fr' ? 'Outillage' : 'Tooling', icon: WrenchIcon, items: ['Postman', 'ESLint', 'compression', 'dotenv'] },
+];
+
+const copy = {
+  fr: {
+    termEyebrow: 'API en action',
+    termTitle: 'Un achat de billet, une transaction',
+    termIntro:
+      'Pas d’interface graphique : l’API se lit dans ses requêtes. Voici l’appel réel de la collection Postman pour acheter un billet, et le document renvoyé par le serveur.',
+    termWindow: 'zsh — https://localhost:3000',
+    stepsTitle: 'Dans une session MongoDB',
+    steps: [
+      'L’événement existe et est public, sinon la billetterie est refusée.',
+      'Le type de billet appartient bien à cet événement.',
+      'Contrôle du stock : soldCount < quantity.',
+      'Création du billet ; l’index unique (événement + email) bloque un second achat (409).',
+      'Incrément atomique de soldCount ($inc), puis commit ou rollback complet.',
+    ],
+    surfaceEyebrow: 'Surface de l’API',
+    surfaceTitle: `${endpointCount} requêtes documentées`,
+    surfaceIntro: 'Chaque ressource de la collection Postman, avec la répartition de ses verbes HTTP.',
+    requests: 'requêtes',
+    archEyebrow: 'Architecture',
+    archTitle: 'Le modèle de données',
+    archIntro:
+      'Treize schémas Mongoose reliés par références. L’événement est le pivot : billetterie, covoiturage, shopping list, albums, sondages et fil de discussion s’y rattachent.',
+    diagramLabel:
+      'Diagramme entité-relation de My Social Network : les utilisateurs administrent et rejoignent des groupes ; un groupe peut organiser des événements ; chaque événement porte types de billets, billets achetés, offres de covoiturage, articles de shopping list, albums photos, sondages et un fil de discussion.',
+    repoNote: 'Contrôleurs Express, schémas Mongoose, middleware JWT et collection Postman complète.',
+    rel: {
+      memberOf: 'admin / membre',
+      hosts: 'organise',
+      attends: 'organise / participe',
+      thread: 'fil',
+      contains: 'contient',
+      writes: 'écrit',
+      replies: 'répond à',
+      albums: 'albums',
+      uploads: 'publie',
+      polls: 'sondages',
+      responds: 'vote',
+      answers: 'réponses',
+      tickets: 'billetterie',
+      sold: 'vendu',
+      buys: '1 par email',
+      list: 'shopping list',
+      brings: 'apporte',
+      carpool: 'covoiturage',
+      drives: 'conduit',
+    },
+  },
+  en: {
+    termEyebrow: 'API in action',
+    termTitle: 'One ticket purchase, one transaction',
+    termIntro:
+      'No user interface: the API reads through its requests. Here is the real ticket purchase call from the Postman collection, and the document returned by the server.',
+    termWindow: 'zsh — https://localhost:3000',
+    stepsTitle: 'Inside a MongoDB session',
+    steps: [
+      'The event exists and is public, otherwise ticketing is refused.',
+      'The ticket type actually belongs to this event.',
+      'Stock check: soldCount < quantity.',
+      'Ticket creation; the unique index (event + email) blocks a second purchase (409).',
+      'Atomic soldCount increment ($inc), then full commit or rollback.',
+    ],
+    surfaceEyebrow: 'API surface',
+    surfaceTitle: `${endpointCount} documented requests`,
+    surfaceIntro: 'Every resource of the Postman collection, with its HTTP verb breakdown.',
+    requests: 'requests',
+    archEyebrow: 'Architecture',
+    archTitle: 'The data model',
+    archIntro:
+      'Thirteen Mongoose schemas linked by references. The event is the hub: ticketing, carpooling, shopping list, albums, polls and discussion thread all hang off it.',
+    diagramLabel:
+      'My Social Network entity-relationship diagram: users administer and join groups; a group can host events; each event carries ticket types, purchased tickets, carpool offers, shopping list items, photo albums, polls and a discussion thread.',
+    repoNote: 'Express controllers, Mongoose schemas, JWT middleware and the full Postman collection.',
+    rel: {
+      memberOf: 'admin / member',
+      hosts: 'hosts',
+      attends: 'organises / attends',
+      thread: 'thread',
+      contains: 'contains',
+      writes: 'writes',
+      replies: 'replies to',
+      albums: 'albums',
+      uploads: 'uploads',
+      polls: 'polls',
+      responds: 'votes',
+      answers: 'responses',
+      tickets: 'ticketing',
+      sold: 'sold as',
+      buys: '1 per email',
+      list: 'shopping list',
+      brings: 'brings',
+      carpool: 'carpooling',
+      drives: 'drives',
+    },
+  },
+}[lang];
+
+// Modèle de données relevé dans src/models/*.mjs du dépôt (références Mongoose `ref`).
+const { rel } = copy;
+const erDiagram = `erDiagram
+  User {
+    ObjectId _id PK
+    string firstname
+    string lastname
+    string email UK
+    string password "bcrypt"
+    string avatar
+  }
+  Group {
+    ObjectId _id PK
+    string name
+    string groupType "public | private | secret"
+    ObjectId[] admins FK
+    ObjectId[] members FK
+    object settings
+  }
+  Event {
+    ObjectId _id PK
+    string name
+    date startDate
+    date endDate
+    string location
+    boolean isPrivate
+    ObjectId group FK
+    boolean shoppingListEnabled
+    boolean carpoolingEnabled
+  }
+  TicketType {
+    ObjectId _id PK
+    ObjectId event FK
+    string name
+    number price
+    number quantity
+    number soldCount
+  }
+  PurchasedTicket {
+    ObjectId _id PK
+    ObjectId event FK
+    ObjectId ticketType FK
+    string buyerEmail "unique par event"
+    date purchaseDate
+  }
+  CarpoolOffer {
+    ObjectId _id PK
+    ObjectId event FK
+    ObjectId driver FK
+    string departureLocation
+    date departureTime
+    number price
+    number availableSeats
+    number maxDetourMinutes
+  }
+  ShoppingListItem {
+    ObjectId _id PK
+    ObjectId event FK
+    ObjectId user FK
+    string itemName
+    number quantity
+    date arrivalTime
+  }
+  User }o--o{ Group : "${rel.memberOf}"
+  Group |o--o{ Event : "${rel.hosts}"
+  User }o--o{ Event : "${rel.attends}"
+  Group ||--o| DiscussionThread : "${rel.thread}"
+  Event ||--o| DiscussionThread : "${rel.thread}"
+  DiscussionThread ||--o{ Message : "${rel.contains}"
+  User ||--o{ Message : "${rel.writes}"
+  Message |o--o{ Message : "${rel.replies}"
+  Event ||--o{ PhotoAlbum : "${rel.albums}"
+  PhotoAlbum ||--o{ Photo : "${rel.contains}"
+  User ||--o{ Photo : "${rel.uploads}"
+  Event ||--o{ Poll : "${rel.polls}"
+  Poll ||--o{ PollResponse : "${rel.answers}"
+  User ||--o{ PollResponse : "${rel.responds}"
+  Event ||--o{ TicketType : "${rel.tickets}"
+  TicketType ||--o{ PurchasedTicket : "${rel.sold}"
+  Event ||--o{ PurchasedTicket : "${rel.buys}"
+  Event ||--o{ ShoppingListItem : "${rel.list}"
+  User ||--o{ ShoppingListItem : "${rel.brings}"
+  Event ||--o{ CarpoolOffer : "${rel.carpool}"
+  User ||--o{ CarpoolOffer : "${rel.drives}"`;
+
+const eyebrow = 'font-mono text-xs tracking-[0.2em] text-accent uppercase sm:text-sm';
+const heading = 'text-2xl leading-tight font-bold text-fg sm:text-4xl';
+---
+
+<section aria-labelledby="api-terminal-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class={eyebrow}>{copy.termEyebrow}</p>
+    <h2 id="api-terminal-titre" class={heading}>{copy.termTitle}</h2>
+    <p class="text-fg-muted">{copy.termIntro}</p>
+  </div>
+
+  <div class="mt-10 grid gap-6 lg:grid-cols-5 lg:items-start">
+    <TerminalApi
+      lang={lang}
+      class="min-w-0 lg:col-span-3"
+      title={copy.termWindow}
+      method={purchase.request.method}
+      host={`${purchaseUrl.host?.join('.') ?? 'localhost'}:${purchaseUrl.port ?? '3000'}`}
+      path={`/${purchaseUrl.path?.join('/') ?? ''}`}
+      headers={{ Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…', 'Content-Type': 'application/json' }}
+      requestBody={purchaseBody}
+      status={{ code: 201, text: 'Created' }}
+      responseBody={purchaseResponse}
+      repoHref={REPO_HREF}
+    />
+
+    <article class="glass flex flex-col gap-5 rounded-2xl p-6 sm:p-8 lg:col-span-2">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="font-display text-lg font-semibold text-fg">{copy.stepsTitle}</h3>
+        <TicketIcon aria-hidden="true" className="size-6 text-accent" weight="duotone" />
+      </div>
+      <ol class="flex flex-col gap-4">
+        {
+          copy.steps.map((step, index) => (
+            <li class="flex gap-3">
+              <span class="flex size-7 shrink-0 items-center justify-center rounded-full border border-brand/40 font-mono text-xs text-accent">
+                {index + 1}
+              </span>
+              <span class="text-sm text-fg-muted">{step}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </article>
+  </div>
+</section>
+
+<section aria-labelledby="api-surface-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class={eyebrow}>{copy.surfaceEyebrow}</p>
+    <h2 id="api-surface-titre" class={heading}>{copy.surfaceTitle}</h2>
+    <p class="text-fg-muted">{copy.surfaceIntro}</p>
+  </div>
+
+  <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      resources.map((resource) => (
+        <li class="glass card-hover flex flex-col gap-4 rounded-2xl p-6">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="font-display text-base font-semibold text-fg">{resource.name}</h3>
+            <resource.icon aria-hidden="true" className="size-5 text-accent" weight="duotone" />
+          </div>
+          <p class="font-mono text-xs text-fg-muted">
+            {resource.total} {copy.requests}
+          </p>
+          <ul class="flex flex-wrap gap-2">
+            {resource.methods.map(({ method, count }) => (
+              <li class:list={['rounded-full border border-line px-3 py-1 font-mono text-xs', methodTone[method]]}>
+                {method} × {count}
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<section aria-labelledby="architecture-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class={eyebrow}>{copy.archEyebrow}</p>
+    <h2 id="architecture-titre" class={heading}>{copy.archTitle}</h2>
+    <p class="text-fg-muted">{copy.archIntro}</p>
+  </div>
+
+  <MermaidDiagram lang={lang} class="mt-10" code={erDiagram} label={copy.diagramLabel} />
+</section>
+
+<StackSection lang={lang} groups={stack} repoHref={REPO_HREF} repoNote={copy.repoNote} />

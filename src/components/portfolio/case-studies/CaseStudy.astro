@@ -1,0 +1,24 @@
+---
+// Étude de cas interactive d'un projet (par slug), affichée sur la page dédiée et dans la modale du portfolio.
+// Rien n'est rendu pour un projet sans étude de cas.
+import AiscaAgent from '@/components/portfolio/case-studies/AiscaAgent.astro';
+import ChurnPrediction from '@/components/portfolio/case-studies/ChurnPrediction.astro';
+import HubbleLakehouse from '@/components/portfolio/case-studies/HubbleLakehouse.astro';
+import MySocialNetwork from '@/components/portfolio/case-studies/MySocialNetwork.astro';
+import UrbanDataExplorer from '@/components/portfolio/case-studies/UrbanDataExplorer.astro';
+import { projectLang, projectSlug, type Project } from '@/lib/portfolio';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const slug = projectSlug(project);
+const lang = projectLang(project);
+---
+
+{slug === 'data-ia-aisca' && <AiscaAgent lang={lang} />}
+{slug === 'data-ia-churn' && <ChurnPrediction lang={lang} />}
+{slug === 'data-ia-urban' && <UrbanDataExplorer lang={lang} />}
+{slug === 'data-ia-my-social-network' && <MySocialNetwork lang={lang} />}
+{slug === 'data-ia-hubble' && <HubbleLakehouse lang={lang} />}

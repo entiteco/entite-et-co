@@ -1,0 +1,27 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ProjectPage from '@/components/pages/ProjectPage.astro';
+import { getProjects, projectSlug, type Project } from '@/lib/portfolio';
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects('en');
+  return projects.map((project) => ({
+    params: { slug: projectSlug(project) },
+    props: {
+      project,
+      related: projects
+        .filter((other) => other.data.category === project.data.category && other.id !== project.id)
+        .slice(0, 2),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  project: Project;
+  related: Project[];
+}
+
+const { project, related } = Astro.props;
+---
+
+<ProjectPage project={project} related={related} />

@@ -2,24 +2,28 @@
 // Bascule clair / sombre. Plusieurs instances possibles (navbar + menu mobile) :
 // le script (chargé une seule fois par Astro) les synchronise toutes.
 import { MoonIcon, SunIcon } from '@phosphor-icons/react/ssr';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 
 interface Props {
   class?: string;
 }
 
 const { class: className = '' } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
 ---
 
 <button
   type="button"
   data-theme-toggle
   aria-pressed="true"
+  data-label-to-light={t('theme.toLight')}
+  data-label-to-dark={t('theme.toDark')}
   class:list={[
     'group/theme relative grid size-11 cursor-pointer place-items-center overflow-hidden rounded-full border border-line bg-fg/5 text-fg transition-colors duration-200 hover:border-line-strong',
     className,
   ]}
 >
-  <span class="sr-only">Thème sombre</span>
+  <span class="sr-only">{t('theme.label')}</span>
   <!-- Soleil visible en mode sombre (action : passer en clair), lune en mode clair -->
   <SunIcon
     aria-hidden="true"
@@ -41,9 +45,7 @@ const { class: className = '' } = Astro.props;
     const dark = root.classList.contains('dark');
     buttons.forEach((button) => {
       button.setAttribute('aria-pressed', String(dark));
-      const label = button.querySelector('.sr-only');
-      if (label) label.textContent = 'Thème sombre';
-      button.title = dark ? 'Passer au thème clair' : 'Passer au thème sombre';
+      button.title = (dark ? button.dataset.labelToLight : button.dataset.labelToDark) ?? '';
     });
   };
 

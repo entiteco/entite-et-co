@@ -1,0 +1,63 @@
+---
+// Section « Stack technique » des études de cas : groupes d'outils en grille Bento + lien vers le dépôt GitHub.
+import type { Icon } from '@phosphor-icons/react';
+import { GithubLogoIcon } from '@phosphor-icons/react/ssr';
+import Button from '@/components/ui/Button.astro';
+import type { Lang } from '@/i18n/ui';
+
+export interface StackGroup {
+  title: string;
+  icon: Icon;
+  items: string[];
+}
+
+interface Props {
+  lang: Lang;
+  groups: StackGroup[];
+  repoHref: string;
+  repoNote: string;
+}
+
+const { lang, groups, repoHref, repoNote } = Astro.props;
+
+const copy = {
+  fr: { eyebrow: 'Stack technique', title: 'Outillage', repo: 'Voir le code source complet (GitHub)', newTab: '(nouvel onglet)' },
+  en: { eyebrow: 'Tech stack', title: 'Tooling', repo: 'View the full source code (GitHub)', newTab: '(new tab)' },
+}[lang];
+
+const cols = groups.length === 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3';
+const tag = 'font-mono text-[0.7rem] font-medium tracking-[0.15em] uppercase';
+---
+
+<section aria-labelledby="stack-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class="font-mono text-xs tracking-[0.2em] text-accent uppercase sm:text-sm">{copy.eyebrow}</p>
+    <h2 id="stack-titre" class="text-2xl leading-tight font-bold text-fg sm:text-4xl">{copy.title}</h2>
+  </div>
+
+  <div class:list={['mt-10 grid gap-4 sm:gap-6', cols]}>
+    {
+      groups.map((group) => (
+        <article class="glass card-hover flex flex-col gap-5 rounded-2xl p-6 sm:p-8">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class:list={[tag, 'text-fg']}>{group.title}</h3>
+            <group.icon aria-hidden="true" className="size-5 text-accent" weight="duotone" />
+          </div>
+          <ul class="flex flex-wrap gap-2">
+            {group.items.map((item) => (
+              <li class="rounded-full border border-line px-3 py-1 font-mono text-xs text-fg-muted">{item}</li>
+            ))}
+          </ul>
+        </article>
+      ))
+    }
+  </div>
+
+  <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+    <Button href={repoHref} target="_blank" rel="noopener" icon={GithubLogoIcon} size="lg">
+      {copy.repo}
+      <span class="sr-only">{copy.newTab}</span>
+    </Button>
+    <p class="text-sm text-fg-muted">{repoNote}</p>
+  </div>
+</section>

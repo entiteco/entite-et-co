@@ -1,6 +1,7 @@
 ---
 import { CaretRightIcon } from '@phosphor-icons/react/ssr';
 import type { NavItem } from '@/data/site';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 
 interface Props {
   /** Chemin hors Accueil ; le dernier élément est la page courante. */
@@ -9,10 +10,12 @@ interface Props {
 }
 
 const { items, class: className = '' } = Astro.props;
-const trail: readonly NavItem[] = [{ label: 'Accueil', href: '/' }, ...items];
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const trail: readonly NavItem[] = [{ label: t('nav.home'), href: localizePath('/', lang) }, ...items];
 ---
 
-<nav aria-label="Fil d'Ariane" class:list={['text-sm text-fg-muted', className]}>
+<nav aria-label={t('nav.breadcrumb')} class:list={['text-sm text-fg-muted', className]}>
   <ol class="flex flex-wrap items-center gap-x-1.5 gap-y-1">
     {
       trail.map((item, i) => {

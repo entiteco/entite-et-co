@@ -1,7 +1,7 @@
 ---
 // Préfixe les attributs id du contenu enfant (ex. titres Markdown), pour éviter les id
 // dupliqués quand plusieurs contenus sont rendus sur une même page (modales du portfolio).
-// Les ancres internes (href="#…") du contenu sont réécrites en conséquence.
+// Les ancres internes (href="#…") et les références ARIA / for= du contenu sont réécrites en conséquence.
 interface Props {
   prefix: string;
 }
@@ -10,7 +10,11 @@ const { prefix } = Astro.props;
 const html = await Astro.slots.render('default');
 const prefixed = html
   .replace(/ id="([^"]+)"/g, ` id="${prefix}-$1"`)
-  .replace(/ href="#([^"]+)"/g, ` href="#${prefix}-$1"`);
+  .replace(/ href="#([^"]+)"/g, ` href="#${prefix}-$1"`)
+  .replace(
+    / (aria-labelledby|aria-describedby|aria-controls|for)="([^"]+)"/g,
+    (_, attr: string, ids: string) => ` ${attr}="${ids.split(/\s+/).map((id) => `${prefix}-${id}`).join(' ')}"`,
+  );
 ---
 
 <Fragment set:html={prefixed} />

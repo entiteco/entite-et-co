@@ -1,10 +1,8 @@
 ---
 import type { Icon } from '@phosphor-icons/react';
 import { ArrowUpRightIcon } from '@phosphor-icons/react/ssr';
-import ContentImage from './ContentImage.astro';
-import ImagePlaceholder from './ImagePlaceholder.astro';
 import { inlineMarkdown } from '@/lib/inline-markdown';
-import type { ContentImageData } from '@/lib/image-ratios';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 
 interface Props {
   title: string;
@@ -12,12 +10,9 @@ interface Props {
   /** Points clés ; `**gras**` autorisé (ex. « **Data Science :** Machine Learning… »). */
   items?: readonly string[];
   icon?: Icon;
+  /** Lien de la carte : toute la surface devient cliquable. */
   href?: string;
   linkLabel?: string;
-  /** Libellé du placeholder visuel ; `false` pour ne pas en afficher. */
-  imageLabel?: string | false;
-  /** Visuel réel ; remplace le placeholder. */
-  image?: ContentImageData;
   headingLevel?: 'h2' | 'h3';
   class?: string;
 }
@@ -28,9 +23,7 @@ const {
   items = [],
   icon: CardIcon,
   href,
-  linkLabel = 'En savoir plus',
-  imageLabel = 'Ajouter une image',
-  image,
+  linkLabel = useTranslations(getLangFromUrl(Astro.url))('common.learnMore'),
   headingLevel: Heading = 'h3',
   class: className = '',
 } = Astro.props;
@@ -38,65 +31,51 @@ const {
 
 <article
   class:list={[
-    'glass group/card flex h-full flex-col gap-6 rounded-2xl p-5 transition-[border-color,box-shadow] duration-300 ease-out-expo hover:border-brand/40 hover:shadow-[0_0_40px_-12px_rgb(230_0_0/0.45)] sm:p-6',
+    'glass group/card relative flex h-full flex-col gap-4 rounded-2xl p-6 sm:p-8',
+    href && 'card-hover',
     className,
   ]}
 >
+  <div class="flex items-center gap-3">
+    {
+      CardIcon && (
+        <span class="grid size-11 shrink-0 place-items-center rounded-xl border border-line bg-fg/5 text-accent">
+          <CardIcon aria-hidden="true" className="size-5" weight="regular" />
+        </span>
+      )
+    }
+    <Heading class="text-xl font-semibold text-fg sm:text-2xl">{title}</Heading>
+  </div>
+
+  <p class="text-fg-muted" set:html={inlineMarkdown(description)} />
+
   {
-    image ? (
-      <ContentImage
-        src={image.src}
-        alt={image.alt}
-        class={image.class}
-        sizes="(min-width: 1280px) 340px, (min-width: 1024px) 27vw, (min-width: 768px) 44vw, calc(100vw - 4.5rem)"
-      />
-    ) : (
-      imageLabel !== false && <ImagePlaceholder label={imageLabel} description={title} />
+    items.length > 0 && (
+      <ul class="flex flex-col gap-2.5 text-sm text-fg-muted">
+        {items.map((item) => (
+          <li class="flex gap-3">
+            <span aria-hidden="true" class="mt-2 size-1.5 shrink-0 rounded-full bg-brand" />
+            <span set:html={inlineMarkdown(item)} />
+          </li>
+        ))}
+      </ul>
     )
   }
 
-  <div class="flex flex-1 flex-col gap-4">
-    <div class="flex items-center gap-3">
-      {
-        CardIcon && (
-          <span class="grid size-11 shrink-0 place-items-center rounded-full border border-line bg-fg/5 text-accent">
-            <CardIcon aria-hidden="true" className="size-5" weight="regular" />
-          </span>
-        )
-      }
-      <Heading class="text-xl font-semibold text-fg sm:text-2xl">{title}</Heading>
-    </div>
-
-    <p class="text-fg-muted" set:html={inlineMarkdown(description)} />
-
-    {
-      items.length > 0 && (
-        <ul class="flex flex-col gap-2.5 text-sm text-fg-muted">
-          {items.map((item) => (
-            <li class="flex gap-3">
-              <span aria-hidden="true" class="mt-2 size-1.5 shrink-0 rounded-full bg-brand" />
-              <span set:html={inlineMarkdown(item)} />
-            </li>
-          ))}
-        </ul>
-      )
-    }
-
-    {
-      href && (
-        <a
-          href={href}
-          class="mt-auto inline-flex min-h-11 w-fit cursor-pointer items-center gap-2 pt-2 font-display text-sm font-semibold text-fg transition-colors duration-200 hover:text-accent"
-        >
-          {linkLabel}
-          <span class="sr-only"> — {title}</span>
-          <ArrowUpRightIcon
-            aria-hidden="true"
-            className="size-4 transition-transform duration-300 ease-out-expo group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5"
-            weight="bold"
-          />
-        </a>
-      )
-    }
-  </div>
+  {
+    href && (
+      <a
+        href={href}
+        class="mt-auto inline-flex min-h-11 w-fit cursor-pointer items-center gap-2 pt-2 font-display text-sm font-semibold text-fg transition-colors duration-200 group-hover/card:text-accent after:absolute after:inset-0 after:rounded-2xl"
+      >
+        {linkLabel}
+        <span class="sr-only"> — {title}</span>
+        <ArrowUpRightIcon
+          aria-hidden="true"
+          className="size-4 transition-transform duration-300 ease-out-expo group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5"
+          weight="bold"
+        />
+      </a>
+    )
+  }
 </article>

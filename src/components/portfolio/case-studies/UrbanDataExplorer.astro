@@ -1,0 +1,348 @@
+---
+// Étude de cas « Urban Data Explorer » (page /portfolio/data-ia-urban et modale du portfolio) :
+// dashboard jouable en iframe (export statique servi depuis public/urban-data-explorer/)
+// puis schéma d'architecture interactif (clic, survol ou clavier sur un nœud → panneau de détail).
+import type { Icon } from '@phosphor-icons/react';
+import {
+  ArrowDownIcon,
+  ArrowRightIcon,
+  ChartBarIcon,
+  CloudArrowDownIcon,
+  CubeIcon,
+  DatabaseIcon,
+  GearSixIcon,
+  ListMagnifyingGlassIcon,
+  MapTrifoldIcon,
+} from '@phosphor-icons/react/ssr';
+import StackSection, { type StackGroup } from '@/components/portfolio/case-studies/StackSection.astro';
+import LiveDemo from '@/components/portfolio/case-studies/LiveDemo.astro';
+import type { Lang } from '@/i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const stack: StackGroup[] = [
+  { title: 'Data', icon: DatabaseIcon, items: ['PostgreSQL', 'MongoDB'] },
+  { title: 'Backend', icon: GearSixIcon, items: ['Python', 'Flask'] },
+  { title: 'Frontend', icon: MapTrifoldIcon, items: ['MapLibre', 'Plotly'] },
+  { title: 'Infra', icon: CubeIcon, items: ['Docker', 'Kubernetes'] },
+];
+
+const DASHBOARD_SRC = '/urban-data-explorer/index.html';
+const REPO_HREF = 'https://github.com/entiteco/Project_Urban_Data_Explorer';
+
+type NodeId = 'bronze' | 'silver' | 'gold' | 'api' | 'mongo' | 'k8s' | 'client';
+
+interface ArchNode {
+  tag: string;
+  title: string;
+  text: string;
+  stack: string[];
+}
+
+const icons: Record<NodeId, Icon> = {
+  bronze: CloudArrowDownIcon,
+  silver: GearSixIcon,
+  gold: ChartBarIcon,
+  api: DatabaseIcon,
+  mongo: ListMagnifyingGlassIcon,
+  k8s: CubeIcon,
+  client: MapTrifoldIcon,
+};
+
+const stacks: Record<NodeId, string[]> = {
+  bronze: ['Cron', 'DVF .txt', 'OpenData API'],
+  silver: ['Python', 'Pandas', 'Bash', 'PostgreSQL'],
+  gold: ['SQL', 'PostgreSQL'],
+  api: ['Flask', 'Gunicorn', 'X-API-KEY'],
+  mongo: ['MongoDB'],
+  k8s: ['Docker', 'Kubernetes', 'VPS'],
+  client: ['Vanilla JS', 'MapLibre GL JS', 'Plotly'],
+};
+
+const copy = {
+  fr: {
+    dashboardTitle: 'Le dashboard, en direct',
+    dashboardIntro:
+      'Choisissez un indicateur, cliquez sur un arrondissement et faites défiler la timeline : la carte ci-dessous est l’application réelle, servie en export statique.',
+    iframeTitle: 'Dashboard interactif Urban Data Explorer : carte des arrondissements de Paris',
+    openFull: 'Ouvrir en plein écran',
+    archEyebrow: 'Architecture',
+    archTitle: 'Du fichier brut à la carte',
+    archIntro:
+      'Une architecture médaillon (Bronze → Silver → Gold) servie par une API sécurisée. Sélectionnez un composant pour lire les choix techniques.',
+    diagramLabel: 'Schéma d’architecture d’Urban Data Explorer',
+    logs: 'logs de l’API',
+    pod: 'Pod',
+    repoNote: 'Pipeline ETL, API Flask et client cartographique MapLibre.',
+    nodes: {
+      bronze: {
+        tag: 'Bronze',
+        title: 'Sources & Zone Bronze',
+        text: 'Extraction automatisée via Cron 1x/jour. Ingestion hétérogène : fichiers DVF (.txt) massifs de Data.gouv et API OpenData (Paris, IDF Mobilités) stockés localement à l’état brut.',
+      },
+      silver: {
+        tag: 'Silver',
+        title: 'Pipeline ETL & Silver Database',
+        text: 'Scripts Python/Pandas exécutés par Bash. Filtrage intra-muros, gestion des NaN, et géocodage intensif (conversion Lambert 93 vers GeoPoints WGS 84). Sauvegarde en base PostgreSQL.',
+      },
+      gold: {
+        tag: 'Gold',
+        title: 'Agrégation Analytique (Gold)',
+        text: 'Requêtes SQL complexes pré-calculant les ratios spatiaux (ex: ratio de logements sociaux, densité d’arbres par arrondissement). Optimisation totale pour éviter les calculs côté serveur lors de la requête API.',
+      },
+      api: {
+        tag: 'API',
+        title: 'API Flask MVC',
+        text: 'Architecture MVC en Python. Sécurité maximale : Authentification par clé X-API-KEY, protection anti-CSRF, et Rate Limiting (30 requêtes/sec). Déploiement via Gunicorn.',
+      },
+      mongo: {
+        tag: 'Télémétrie',
+        title: 'Audit NoSQL (MongoDB)',
+        text: 'Base documentaire NoSQL dédiée exclusivement aux logs de l’API (latence, codes HTTP, tracking des clés). Séparation stricte pour ne pas impacter les performances de la base PostgreSQL métier.',
+      },
+      k8s: {
+        tag: 'Infra',
+        title: 'Déploiement Kubernetes',
+        text: 'Conteneurisation Docker. Co-location du conteneur API et du serveur Dashboard au sein du même Pod Kubernetes sur un VPS sécurisé pour une latence réseau inter-services quasi nulle.',
+      },
+      client: {
+        tag: 'Client',
+        title: 'Client JS (MapLibre)',
+        text: 'Application Vanilla JS. Rendu vectoriel très haute performance avec MapLibre GL JS et graphiques Plotly. Cache local dynamique (Promise.all) pour fluidifier l’expérience utilisateur.',
+      },
+    },
+  },
+  en: {
+    dashboardTitle: 'The dashboard, live',
+    dashboardIntro:
+      'Pick an indicator, click an arrondissement and scrub the timeline: the map below is the real application, served as a static export.',
+    iframeTitle: 'Urban Data Explorer interactive dashboard: map of the Paris arrondissements',
+    openFull: 'Open full screen',
+    archEyebrow: 'Architecture',
+    archTitle: 'From raw file to map',
+    archIntro:
+      'A medallion architecture (Bronze → Silver → Gold) served by a secured API. Select a component to read the technical choices.',
+    diagramLabel: 'Urban Data Explorer architecture diagram',
+    logs: 'API logs',
+    pod: 'Pod',
+    repoNote: 'ETL pipeline, Flask API and MapLibre map client.',
+    nodes: {
+      bronze: {
+        tag: 'Bronze',
+        title: 'Sources & Bronze Zone',
+        text: 'Automated extraction via a daily Cron job. Heterogeneous ingestion: massive DVF files (.txt) from Data.gouv and OpenData APIs (Paris, IDF Mobilités) stored locally in their raw state.',
+      },
+      silver: {
+        tag: 'Silver',
+        title: 'ETL Pipeline & Silver Database',
+        text: 'Python/Pandas scripts run by Bash. Inner-Paris filtering, NaN handling and intensive geocoding (Lambert 93 to WGS 84 GeoPoints). Persisted in PostgreSQL.',
+      },
+      gold: {
+        tag: 'Gold',
+        title: 'Analytical Aggregation (Gold)',
+        text: 'Complex SQL queries pre-computing spatial ratios (e.g. social housing ratio, tree density per arrondissement). Fully optimised so that no server-side computation happens at API request time.',
+      },
+      api: {
+        tag: 'API',
+        title: 'Flask MVC API',
+        text: 'MVC architecture in Python. Hardened security: X-API-KEY authentication, anti-CSRF protection and rate limiting (30 requests/sec). Served with Gunicorn.',
+      },
+      mongo: {
+        tag: 'Telemetry',
+        title: 'NoSQL Audit (MongoDB)',
+        text: 'Document database dedicated exclusively to API logs (latency, HTTP codes, key tracking). Strictly separated so as not to affect the performance of the business PostgreSQL database.',
+      },
+      k8s: {
+        tag: 'Infra',
+        title: 'Kubernetes Deployment',
+        text: 'Docker containerisation. The API container and the dashboard server are co-located in the same Kubernetes Pod on a secured VPS, for near-zero inter-service network latency.',
+      },
+      client: {
+        tag: 'Client',
+        title: 'JS Client (MapLibre)',
+        text: 'Vanilla JS application. High-performance vector rendering with MapLibre GL JS and Plotly charts. Dynamic local cache (Promise.all) for a smooth user experience.',
+      },
+    },
+  },
+}[lang];
+
+const nodes = Object.fromEntries(
+  (Object.keys(copy.nodes) as NodeId[]).map((id) => [id, { ...copy.nodes[id], stack: stacks[id] }]),
+) as Record<NodeId, ArchNode>;
+const order: NodeId[] = ['bronze', 'silver', 'gold', 'k8s', 'api', 'client', 'mongo'];
+const initial: NodeId = 'bronze';
+const panelId = (id: NodeId) => `archi-${id}`;
+
+const nodeButton =
+  'group flex w-full cursor-pointer flex-col gap-3 rounded-xl border border-line bg-surface/60 p-4 text-left backdrop-blur-xl transition-[border-color,box-shadow,translate] duration-300 ease-out-expo hover:border-brand/40 motion-safe:hover:-translate-y-0.5 aria-pressed:border-brand/70 aria-pressed:shadow-[0_0_0_1px_rgb(230_0_0/0.35),0_0_32px_-8px_rgb(230_0_0/0.55)] lg:min-h-32';
+const tagClass = 'font-mono text-[0.7rem] font-medium tracking-[0.15em] uppercase';
+const arrowClass = 'flex items-center justify-center text-fg-muted';
+// Nœuds hors Pod : alignés sur la ligne API / Client (padding + bordure du Pod).
+const outsidePod = 'lg:mb-[13px] lg:self-end';
+---
+
+<LiveDemo
+  lang={lang}
+  title={copy.dashboardTitle}
+  intro={copy.dashboardIntro}
+  src={DASHBOARD_SRC}
+  iframeTitle={copy.iframeTitle}
+  openLabel={copy.openFull}
+/>
+
+<section aria-labelledby="architecture-titre" class="container-site py-16">
+  <div class="flex max-w-3xl flex-col gap-4">
+    <p class="font-mono text-xs tracking-[0.2em] text-accent uppercase sm:text-sm">{copy.archEyebrow}</p>
+    <h2 id="architecture-titre" class="text-2xl leading-tight font-bold text-fg sm:text-4xl">{copy.archTitle}</h2>
+    <p class="text-fg-muted">{copy.archIntro}</p>
+  </div>
+
+  <div data-archi class="mt-10 flex flex-col gap-6">
+    <div
+      role="group"
+      aria-label={copy.diagramLabel}
+      class="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr_auto_1fr]"
+    >
+      {
+        (['bronze', 'silver', 'gold'] as const).map((id) => {
+          const NodeIcon = icons[id];
+          return (
+            <>
+              <button
+                type="button"
+                class:list={[nodeButton, outsidePod]}
+                data-node={id}
+                aria-controls={panelId(id)}
+                aria-pressed={id === initial ? 'true' : 'false'}
+              >
+                <span class="flex items-center justify-between gap-2">
+                  <span class:list={[tagClass, 'text-fg-muted group-aria-pressed:text-accent']}>{nodes[id].tag}</span>
+                  <NodeIcon aria-hidden="true" className="size-5 text-accent" weight="duotone" />
+                </span>
+                <span class="font-display text-base leading-snug font-semibold text-fg">{nodes[id].title}</span>
+              </button>
+              <span class:list={[arrowClass, outsidePod, 'lg:h-32']} aria-hidden="true">
+                <ArrowDownIcon className="size-5 lg:hidden" />
+                <ArrowRightIcon className="hidden size-5 lg:block" />
+              </span>
+            </>
+          );
+        })
+      }
+
+      <!-- Pod Kubernetes : enveloppe l'API et le serveur du dashboard (colonnes 7 à 9). -->
+      <div class="grid grid-cols-1 gap-3 rounded-2xl border border-dashed border-line-strong p-3 lg:col-span-3 lg:grid-cols-subgrid">
+        <button
+          type="button"
+          class:list={[nodeButton, 'flex-row! items-center justify-between py-3 lg:col-span-3 lg:min-h-0!']}
+          data-node="k8s"
+          aria-controls={panelId('k8s')}
+          aria-pressed="false"
+        >
+          <span class="flex items-center gap-3">
+            <CubeIcon aria-hidden="true" className="size-5 text-accent" weight="duotone" />
+            <span class="font-display text-sm font-semibold text-fg">{nodes.k8s.title}</span>
+          </span>
+          <span class:list={[tagClass, 'text-fg-muted group-aria-pressed:text-accent']}>{copy.pod}</span>
+        </button>
+        {
+          (['api', 'client'] as const).map((id, index) => {
+            const NodeIcon = icons[id];
+            return (
+              <>
+                {index > 0 && (
+                  <span class={arrowClass} aria-hidden="true">
+                    <ArrowDownIcon className="size-5 lg:hidden" />
+                    <ArrowRightIcon className="hidden size-5 lg:block" />
+                  </span>
+                )}
+                <button type="button" class={nodeButton} data-node={id} aria-controls={panelId(id)} aria-pressed="false">
+                  <span class="flex items-center justify-between gap-2">
+                    <span class:list={[tagClass, 'text-fg-muted group-aria-pressed:text-accent']}>{nodes[id].tag}</span>
+                    <NodeIcon aria-hidden="true" className="size-5 text-accent" weight="duotone" />
+                  </span>
+                  <span class="font-display text-base leading-snug font-semibold text-fg">{nodes[id].title}</span>
+                </button>
+              </>
+            );
+          })
+        }
+      </div>
+
+      <!-- Télémétrie : sous l'API, hors du Pod (même retrait que le Pod pour rester aligné). -->
+      <div class="grid grid-cols-1 px-3 lg:col-span-3 lg:col-start-7 lg:grid-cols-subgrid lg:px-[13px]">
+        <div class="flex flex-col gap-3">
+          <span class:list={[arrowClass, 'gap-2 font-mono text-xs']} aria-hidden="true">
+            <ArrowDownIcon className="size-5" />
+            {copy.logs}
+          </span>
+          <button type="button" class={nodeButton} data-node="mongo" aria-controls={panelId('mongo')} aria-pressed="false">
+            <span class="flex items-center justify-between gap-2">
+              <span class:list={[tagClass, 'text-fg-muted group-aria-pressed:text-accent']}>{nodes.mongo.tag}</span>
+              <ListMagnifyingGlassIcon aria-hidden="true" className="size-5 text-accent" weight="duotone" />
+            </span>
+            <span class="font-display text-base leading-snug font-semibold text-fg">{nodes.mongo.title}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fiches de détail : seule celle du nœud actif est affichée (toutes sans JavaScript). -->
+    <noscript><style>[data-panel][hidden] { display: block; }</style></noscript>
+    <div aria-live="polite" class="grid gap-4">
+      {
+        order.map((id) => {
+          const NodeIcon = icons[id];
+          return (
+            <article id={panelId(id)} data-panel={id} hidden={id !== initial} class="glass rounded-2xl p-6 sm:p-8">
+              <div class="flex items-start gap-4">
+                <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-brand/40 text-accent">
+                  <NodeIcon aria-hidden="true" className="size-6" weight="duotone" />
+                </span>
+                <div class="flex flex-col gap-3">
+                  <p class:list={[tagClass, 'text-accent']}>{nodes[id].tag}</p>
+                  <h3 class="text-xl font-bold text-fg sm:text-2xl">{nodes[id].title}</h3>
+                  <p class="max-w-[70ch] text-fg-muted">{nodes[id].text}</p>
+                  <ul class="flex flex-wrap gap-2">
+                    {nodes[id].stack.map((item) => (
+                      <li class="rounded-full border border-line px-3 py-1 font-mono text-xs text-fg-muted">{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<StackSection lang={lang} groups={stack} repoHref={REPO_HREF} repoNote={copy.repoNote} />
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-archi]');
+
+  if (root) {
+    const buttons = root.querySelectorAll<HTMLButtonElement>('[data-node]');
+    const panels = root.querySelectorAll<HTMLElement>('[data-panel]');
+
+    const select = (id: string) => {
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.node === id)));
+      panels.forEach((panel) => (panel.hidden = panel.dataset.panel !== id));
+    };
+
+    buttons.forEach((button) => {
+      const id = button.dataset.node ?? '';
+      button.addEventListener('click', () => select(id));
+      // Survol à la souris uniquement : au toucher, le clic suffit.
+      button.addEventListener('pointerenter', (event) => {
+        if (event.pointerType === 'mouse') select(id);
+      });
+    });
+  }
+</script>

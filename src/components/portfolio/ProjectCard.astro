@@ -1,34 +1,40 @@
 ---
+// Carte projet : visuel (si renseigné), catégorie, client, titre, accroche, stack.
 import { ArrowUpRightIcon } from '@phosphor-icons/react/ssr';
 import ContentImage from '@/components/ui/ContentImage.astro';
-import ImagePlaceholder from '@/components/ui/ImagePlaceholder.astro';
 import { categoryMeta } from '@/data/portfolio';
-import { projectHref, type Project } from '@/lib/portfolio';
+import { projectHref, projectLang, projectSlug, type Project } from '@/lib/portfolio';
+import { useTranslations } from '@/i18n/utils';
 
 interface Props {
   project: Project;
 }
 
 const { project } = Astro.props;
-const { title, category, client, year, summary, featured, cover, coverAlt } = project.data;
+const { title, category, client, year, summary, featured, services, tools, cover, coverAlt } =
+  project.data;
+const lang = projectLang(project);
+const t = useTranslations(lang);
+const slug = projectSlug(project);
 const meta = categoryMeta[category];
+const tags = tools.length > 0 ? tools : services;
 ---
 
 <li
   data-project
   data-category={category}
-  style={`view-transition-name: projet-${project.id}`}
+  style={`view-transition-name: projet-${slug}`}
   class:list={['flex', featured && 'lg:col-span-2']}
 >
   <a
     href={projectHref(project)}
-    data-project-link={project.id}
+    data-project-link={slug}
     data-astro-prefetch="false"
     aria-haspopup="dialog"
-    class="glass group/project flex w-full cursor-pointer flex-col gap-5 rounded-2xl p-4 transition-[border-color,box-shadow] duration-300 ease-out-expo hover:border-brand/40 hover:shadow-[0_0_40px_-12px_rgb(230_0_0/0.45)] sm:p-5"
+    class="glass card-hover group/project flex w-full cursor-pointer flex-col gap-5 rounded-2xl p-4 sm:p-5"
   >
     {
-      cover ? (
+      cover && (
         <ContentImage
           src={cover}
           alt={coverAlt ?? ''}
@@ -37,36 +43,33 @@ const meta = categoryMeta[category];
           sizes={featured ? '(min-width: 1024px) 66vw, 100vw' : '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'}
           class="lg:aspect-auto lg:h-64"
         />
-      ) : (
-        <ImagePlaceholder
-          label="Mockup Projet"
-          description={title}
-          ratio={featured ? 'video' : 'landscape'}
-          class="lg:aspect-auto lg:h-64"
-        />
       )
     }
-    <div class="flex flex-1 flex-col gap-3 px-1 pb-1">
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+    <div class="flex flex-1 flex-col gap-5 px-2 pb-2 sm:px-3 sm:pb-3">
+      <div class="flex items-center justify-between gap-4">
         <span
           class="rounded-full border border-brand/40 px-2.5 py-0.5 font-display text-xs font-semibold tracking-[0.15em] text-accent uppercase"
         >
-          {meta.label}
+          {meta.label[lang]}
         </span>
-        <span class="text-fg-muted">{client} · {year}</span>
-      </div>
-      <h3 class="text-xl font-semibold text-fg sm:text-2xl">{title}</h3>
-      <p class="text-fg-muted">{summary}</p>
-      <span
-        class="mt-auto inline-flex items-center gap-2 pt-2 font-display text-sm font-semibold text-fg transition-colors duration-200 group-hover/project:text-accent"
-      >
-        Voir le projet
         <ArrowUpRightIcon
           aria-hidden="true"
-          className="size-4 transition-transform duration-300 ease-out-expo group-hover/project:translate-x-0.5 group-hover/project:-translate-y-0.5"
+          className="size-5 shrink-0 text-fg transition-[color,translate] duration-300 ease-out-expo group-hover/project:translate-x-0.5 group-hover/project:-translate-y-0.5 group-hover/project:text-accent"
           weight="bold"
         />
-      </span>
+      </div>
+      <div class="flex flex-col gap-3">
+        <p class="font-mono text-xs text-fg-muted">{client} · {year}</p>
+        <h3 class="text-xl leading-tight font-bold text-fg sm:text-2xl">{title}</h3>
+        <p class="text-fg-muted">{summary}</p>
+      </div>
+      <ul aria-label={t('project.tags')} class="mt-auto flex flex-wrap gap-2 pt-2">
+        {
+          tags.map((tag) => (
+            <li class="rounded-md border border-line bg-fg/5 px-2 py-1 font-mono text-xs text-fg">{tag}</li>
+          ))
+        }
+      </ul>
     </div>
   </a>
 </li>
